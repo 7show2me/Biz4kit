@@ -17,12 +17,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 WBS = ROOT / "Prep" / "WBS.md"
-ASK = ROOT / ".claude" / "skills" / "linear-question" / "ask.py"
+ASK = ROOT / ".claude" / "skills" / "biz-linear-question" / "ask.py"
 
 TEAM = {"name": "Biz4Kit", "key": "BIZ", "description": "Biz4Kit build: Dev, Business and Sales & success (Prep/WBS.md)"}
 
 # Added on top of Linear's defaults (Backlog, Todo, In Progress, In Review, Done, Canceled, Duplicate).
-# Statuses follow Prep/Workflow & final verification.md, plus two for linear-question.
+# Statuses follow Prep/Workflow & final verification.md, plus two for biz-linear-question.
 STATES = [
     ("Ready to verify", "started", "#4EA7FC"),
     ("Verifying", "started", "#BB87FC"),
@@ -38,7 +38,7 @@ PROJECTS = {
     "phase3": ("Phase 3 · Scale", "Weeks 5–12, scoped after the pilot readout."),
     "business": ("Business ops", "Company, CA and lawyer, legal drafts, cost sheet, hiring (B rows)."),
     "sales": ("Sales & success", "Founding 20 recruitment, set-up visits, check-ins, G-reviews (S rows)."),
-    "questions": ("Business Questions", "Questions AI agents must not answer themselves (linear-question skill)."),
+    "questions": ("Business Questions", "Questions AI agents must not answer themselves (biz-linear-question skill)."),
 }
 
 AREAS = ["auth", "catalog", "quote", "invoice", "payments", "messages", "portal", "admin", "infra"]
@@ -240,7 +240,7 @@ def description(row, deps):
         lines.append("_Row marked † in the WBS: amended after the Workflow, Architecture and Market fit reviews._")
     if amend.get("note"):
         lines.append(f"_Changed by decision {amend['note']} in `docs/decisions.md`._")
-    lines += ["", "Source: `Prep/WBS.md`. Business facts not stated in Prep or docs/decisions.md must be asked (linear-question), not assumed."]
+    lines += ["", "Source: `Prep/WBS.md`. Business facts not stated in Prep or docs/decisions.md must be asked (biz-linear-question), not assumed."]
     return "\n".join(lines)
 
 

@@ -1,6 +1,6 @@
 # Biz4Kit: Decision log
 
-Answered business questions. This file and `Prep/` are the only sources of business facts for AI agents. Anything not stated here or in `Prep/` must be asked via the `linear-question` skill, never assumed.
+Answered business questions. This file and `Prep/` are the only sources of business facts for AI agents. Anything not stated here or in `Prep/` must be asked via the `biz-linear-question` skill, never assumed.
 
 Newest at the bottom. One row per decision; never edit an old row. A later decision replaces an earlier one by citing its id.
 

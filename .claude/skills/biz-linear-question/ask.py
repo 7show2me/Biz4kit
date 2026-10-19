@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Open and track business questions in Linear (team BIZ), with a Slack ping.
 
-Used by the linear-question skill and by scripts/linear_seed.py.
+Used by the biz-linear-question skill and by scripts/linear_seed.py.
 
   python ask.py ask --title "..." --area pricing --question "..." --context "..." \
       --option "A: ..." --option "B: ..." --recommend "..." --blocks 1.1 --needed-by 2026-10-25
@@ -117,7 +117,7 @@ def build_description(a, blocked):
         "To answer: write the decision as a comment, then move this issue to **Answered**. "
         "The agent records it in `docs/decisions.md` and continues.",
         "",
-        "_Opened by an AI agent via the linear-question skill. Agents must not assume this answer._",
+        "_Opened by an AI agent via the biz-linear-question skill. Agents must not assume this answer._",
     ]
     return "\n".join(lines)
 

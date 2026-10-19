@@ -1,13 +1,13 @@
 ---
-name: linear-question
+name: biz-linear-question
 description: Ask a person instead of assuming. Use BEFORE writing code, copy, config or a plan that depends on a business fact not stated in Prep/*.md or docs/decisions.md. Examples are prices, plan limits, GST or tax rules, legal or consent wording, pilot verticals, vendor or hosting choices, message wording, who approves what, retention periods, refund terms, people and dates. Prep figures labelled "assumptions" count as open too. Opens a question in Linear (team BIZ, emailed to the assignee by Linear) and pings Slack #business-questions. Also use to check whether open questions have been answered and to record answers in docs/decisions.md.
 ---
 
-# linear-question
+# biz-linear-question
 
 Biz4Kit code is written by AI agents and checked by people. An agent that guesses a business rule creates silent bugs, so **business facts come only from `Prep/*.md`, `docs/decisions.md`, or a person's answer in Linear.**
 
-Helper: `python .claude/skills/linear-question/ask.py` (run from the repo root; uses the `linear` and `slackcli` CLIs, already logged in).
+Helper: `python .claude/skills/biz-linear-question/ask.py` (run from the repo root; uses the `linear` and `slackcli` CLIs, already logged in).
 
 ## 1. Look first
 Search before asking: `Grep` over `Prep/*.md` and `docs/decisions.md`.
@@ -17,13 +17,13 @@ Search before asking: `Grep` over `Prep/*.md` and `docs/decisions.md`.
 - Technical choices that the Prep docs or decisions already settle (Next.js, Better Auth, Neon, Fly) are not questions. Ask about the business side, or where a vendor or cost choice is still open.
 
 ## 2. Check for an existing question
-`python .claude/skills/linear-question/ask.py list`. If an open question already covers it, don't open another; add context with `linear issue comment add <KEY> --yes --body "..."` if you have any. `ask` also refuses an exact duplicate title on its own.
+`python .claude/skills/biz-linear-question/ask.py list`. If an open question already covers it, don't open another; add context with `linear issue comment add <KEY> --yes --body "..."` if you have any. `ask` also refuses an exact duplicate title on its own.
 
 ## 3. Ask
 One question per issue, answerable by a busy owner in under a minute:
 
 ```
-python .claude/skills/linear-question/ask.py ask \
+python .claude/skills/biz-linear-question/ask.py ask \
   --title "Starter plan monthly price" --area pricing \
   --question "What monthly price should the Starter plan show at launch?" \
   --context "WBS 5.5 plan billing; Prep/Outline.md:117 lists ₹499 as a starting assumption to adjust after the pilot." \

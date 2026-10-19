@@ -1,0 +1,6 @@
+# One-person project (D24): the owner reviews everything.
+# Per the Workflow doc, these paths need the lead / security reviewer.
+*                   @7show2me
+/packages/db/       @7show2me
+/packages/connectors/ @7show2me
+/apps/api/auth/     @7show2me

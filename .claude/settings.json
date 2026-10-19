@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "[ -n \"$CLAUDE_ENV_FILE\" ] && t=$(gh auth token --user 7show2me 2>/dev/null) && [ -n \"$t\" ] && echo \"export GH_TOKEN=$t\" >> \"$CLAUDE_ENV_FILE\"; true",
+            "statusMessage": "Using GitHub account 7show2me for this project"
+          }
+        ]
+      }
+    ]
+  }
+}

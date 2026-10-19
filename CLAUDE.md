@@ -34,4 +34,4 @@ If work depends on a business fact that is not stated in `Prep/` or `docs/decisi
 ## Skills
 
 - Every project skill in `.claude/skills/` is named with the prefix `biz-` (folder and `name:`), and its description says plainly when to use it.
-- Current skills: `biz-linear-question` (ask a person instead of assuming), `biz-progress-report` (3-day report: Linear, git, decisions, today's WBS items).
+- Current skills: `biz-linear-question` (ask a person instead of assuming), `biz-record-decision` (record answers in docs/decisions.md), `biz-wbs-task` (one WBS package to a verified PR), `biz-progress-report` (3-day report: Linear, git, decisions, today's WBS items).

@@ -20,7 +20,7 @@ If work depends on a business fact that is not stated in `Prep/` or `docs/decisi
 
 ## Stack decisions (see docs/decisions.md)
 
-- Backend runs in Docker (API + workers) on an AWS container service, Mumbai (D28). Web app on Vercel (D22). Queue: Postgres-based (D32), no Redis in Phase 1. Files: S3 Mumbai (D31).
+- Backend runs in Docker (API + workers) on an AWS container service, Mumbai (D28). Web app on Vercel (D22). Queue: Upstash Redis free + BullMQ (D33). Files: S3 Mumbai (D31).
 - Postgres is on Neon, AWS Mumbai.
 - Brand (Biz4Kit chrome only, local only, D10-D19): `brand/theme.css` (colours, fonts, radius, shadows), `brand/logo/*.svg` (4B mark and lockup), `brand/design-system/` (brand book, tokens, usage rules), `brand/preview.html` (open in a browser). Customer-facing pages use the business's own theme.
 - Re-create the Linear board with `python scripts/linear_seed.py`. It is safe to re-run.

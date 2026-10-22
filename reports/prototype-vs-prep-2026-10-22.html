@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Biz4Kit · Prototype vs prep · 22 Oct 2026</title>
+    <link rel="stylesheet" href="../brand/theme.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Fraunces:opsz,wght@9..144,500..800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        font:
+          13px/1.45 "DM Sans",
+          system-ui,
+          sans-serif;
+      }
+      .wrap {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      h1 {
+        font-family: "Fraunces", serif;
+        font-size: 26px;
+        margin: 0 0 4px;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 26px 0 8px;
+      }
+      .muted {
+        color: var(--muted-foreground);
+      }
+      code {
+        font:
+          12px "DM Mono",
+          ui-monospace,
+          monospace;
+      }
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        margin-top: 16px;
+      }
+      @media (max-width: 900px) {
+        .tiles {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      .tile {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 14px;
+        background: var(--card);
+      }
+      .tile b {
+        display: block;
+        font-size: 24px;
+        font-variant-numeric: tabular-nums;
+      }
+      .pill {
+        display: inline-block;
+        padding: 0 6px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 18px;
+        white-space: nowrap;
+      }
+      .same {
+        background: var(--muted);
+        color: var(--muted-foreground);
+      }
+      .chg {
+        background: #eff6ff;
+        color: #1d4ed8;
+      }
+      .new {
+        background: #f0fdf4;
+        color: #15803d;
+      }
+      .gone {
+        background: #fef2f2;
+        color: #b91c1c;
+      }
+      .ask {
+        background: #fffbeb;
+        color: #b45309;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      th,
+      td {
+        text-align: left;
+        vertical-align: top;
+        padding: 7px 10px;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--muted-foreground);
+        background: color-mix(in oklch, var(--muted) 50%, white);
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      td.area {
+        color: var(--muted-foreground);
+        white-space: nowrap;
+      }
+      s {
+        color: var(--muted-foreground);
+      }
+      .box {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 16px;
+        background: var(--card);
+      }
+      .box ol,
+      .box ul {
+        margin: 4px 0 0;
+        padding-left: 20px;
+      }
+      .box li {
+        margin: 4px 0;
+      }
+      .filters {
+        display: flex;
+        gap: 6px;
+        margin: 4px 0 10px;
+      }
+      .filters button {
+        font: inherit;
+        border: 1px solid var(--border);
+        background: var(--card);
+        border-radius: 6px;
+        padding: 3px 10px;
+        cursor: pointer;
+      }
+      .filters button.on {
+        background: var(--secondary);
+        color: var(--secondary-foreground);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Prototype vs prep</h1>
+      <p class="muted">
+        <code>design/screens-v2.html</code> (34 screens) compared with the
+        screen map in <code>prep/Design inputs.md</code> (34 screens). The “Why”
+        column gives the decision in <code>docs/decisions.md</code> that made
+        each change; decisions override prep. Rows marked
+        <span class="pill ask">Needs OK</span> have no decision behind them and
+        are prototype-only for now. Local page only (D19).
+      </p>
+
+      <div class="tiles">
+        <div class="tile"><b id="n-same"></b>Same as prep</div>
+        <div class="tile"><b id="n-chg"></b>Changed by a decision</div>
+        <div class="tile"><b id="n-gone"></b>In prep, dropped</div>
+        <div class="tile"><b id="n-new"></b>New in prototype</div>
+        <div class="tile"><b id="n-ask"></b>Need your OK</div>
+      </div>
+
+      <h2>1 · Screen by screen</h2>
+      <div class="filters" id="filters"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Area</th>
+            <th>Prep says</th>
+            <th>Prototype has</th>
+            <th>Change</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+
+      <h2>2 · Across the whole app (not one screen)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Topic</th>
+            <th>Prep says</th>
+            <th>Prototype has</th>
+            <th>Change</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody id="cross"></tbody>
+      </table>
+
+      <h2>3 · What we will add to the build, per the prototype</h2>
+      <div class="box">
+        <ul>
+          <li>
+            <b>4 new screens:</b> Onboarding Done, Overdue payments, Invoice
+            email, Invoice PDF.
+          </li>
+          <li>
+            <b>Invoice replaces Quote:</b> no Quotes list, Quote editor or
+            portal Quote page. A quoted lead is answered with a proforma
+            <code>PI-</code> that becomes <code>INV-</code> on approval (D60,
+            D71).
+          </li>
+          <li>
+            <b>Lead flow:</b> two lead types (quoted / booked), Accept / Edit /
+            Reject, Assign + Confirm, new statuses (D59 to D62, D66, D72).
+          </li>
+          <li>
+            <b>Board</b> with the D65 columns, switched on as an extra (D63,
+            D65).
+          </li>
+          <li>
+            <b>Today dashboard:</b> four KPIs, paid-per-day chart, money owed,
+            leads to answer (D52, D77).
+          </li>
+          <li>
+            <b>Payment rules:</b> Manager limit, self-approval logged, no
+            overpayment, blocked payments on rejected or expired replies (D57,
+            D73, D74, D76).
+          </li>
+          <li>
+            <b>Shell:</b> five sidebar sections with pages as tabs, phone bottom
+            bar, Lite mode, 4B mark only, business logo on the profile button
+            (D63, D78 to D81).
+          </li>
+          <li>
+            <b>Settings:</b> two extra tabs, Messages and Devices (from prep's
+            message templates and the 1.3 device list).
+          </li>
+        </ul>
+      </div>
+
+      <h2>4 · Your call (3 questions)</h2>
+      <div class="box">
+        <ol>
+          <li>
+            <b>Logo maker</b> in Brand setup (two characters and a line, colour,
+            thickness, rotation): keep it in Phase 1, or upload only as prep
+            says?
+          </li>
+          <li>
+            <b>Super-admin</b> in the prototype is a <i>read-only</i> support
+            view with access logged. Prep 3.7 says
+            <i>impersonate with a consent log</i>. Which one?
+          </li>
+          <li>
+            <b>Manager on Today</b> sees counts only, not money (Team today
+            instead of Money owed). Prep only says the dashboard is for All.
+            Keep this?
+          </li>
+        </ol>
+        <p class="muted">
+          Once you answer, I record it in docs/decisions.md. I can also update
+          the screen map in prep/Design inputs.md to match, if you want prep
+          kept in step.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      const T = {
+        same: "Same",
+        chg: "Changed",
+        gone: "Dropped",
+        new: "New",
+        ask: "Needs OK",
+      };
+      const ROWS = [
+        [
+          "Auth",
+          "Sign in · /login · Continue with Google",
+          "Same; invite-code fallback (prep 1.3)",
+          "same",
+          "—",
+        ],
+        [
+          "Auth",
+          "Accept invite · /invite/:token",
+          "Same; shows the role before joining",
+          "same",
+          "—",
+        ],
+        [
+          "Onboarding",
+          "Create workspace · /new",
+          "Same; slug on <code>&lt;brand&gt;.biz4kit.com</code>",
+          "chg",
+          "D47",
+        ],
+        [
+          "Onboarding",
+          "Brand setup · logo light / dark, two colours",
+          "Adds a <b>logo maker</b> (two characters + a line)",
+          "ask",
+          "none",
+        ],
+        [
+          "Onboarding",
+          "Business details · /new/details",
+          "Numbering PI- and INV- (gap-free on approval)",
+          "chg",
+          "D60, D71",
+        ],
+        ["Onboarding", "Catalog starter · /new/catalog", "Same", "same", "—"],
+        ["Onboarding", "Invite team · /new/team", "Same", "same", "—"],
+        [
+          "Onboarding",
+          "<s>not in the screen map</s> (flow step 7 only)",
+          "<b>Done</b> · /new/done · share price list, QR",
+          "new",
+          "prep flow step 7",
+        ],
+        [
+          "Workspace",
+          "Dashboard · bookings, jobs, approvals, overdue",
+          "<b>Today</b>: 4 KPIs, paid-per-day chart, money owed, leads to answer",
+          "chg",
+          "D52, D77",
+        ],
+        [
+          "Workspace",
+          "Pipeline board · Lead → Quoted → … → Paid",
+          "<b>Board</b>: New → Replied → Booked → In service → Invoiced → Paid; an extra",
+          "chg",
+          "D63, D65, D72",
+        ],
+        [
+          "Leads",
+          "Leads inbox · assign, open, create quote",
+          "Assign, open, <b>reply</b>; quoted / booked type; status tabs",
+          "chg",
+          "D59, D66",
+        ],
+        [
+          "Leads",
+          "Lead detail · Create quote",
+          "<b>Accept / Edit / Reject</b> (quoted) or <b>Assign + Confirm</b> (booked)",
+          "chg",
+          "D61, D62",
+        ],
+        [
+          "Catalog",
+          "Items list · add, reorder, import CSV",
+          "Same + “Your page” card and Share price list (Quick Catalog)",
+          "chg",
+          "D77",
+        ],
+        ["Catalog", "Item editor", "Same", "same", "—"],
+        [
+          "Catalog",
+          "Packages · add tier",
+          "Same; a bookable package makes a booked lead",
+          "chg",
+          "D59",
+        ],
+        [
+          "Quotes",
+          "Quotes list · /quotes",
+          "<s>removed</s>",
+          "gone",
+          "D60 (no Quote record)",
+        ],
+        [
+          "Quotes",
+          "Quote editor (doc) · /quotes/:id",
+          "<s>removed</s>; the reply is the invoice editor (PI-)",
+          "gone",
+          "D60",
+        ],
+        [
+          "Quotes",
+          "Share sheet · modal",
+          "Kept as a dialog on Catalog and Invoice, not its own screen",
+          "gone",
+          "D60, D67",
+        ],
+        [
+          "Bookings",
+          "Calendar · new booking, drag",
+          "Same; statuses <b>To confirm / Agreed</b>",
+          "chg",
+          "D68, D69",
+        ],
+        ["Jobs", "Job list", "Same; an extra", "chg", "D63"],
+        [
+          "Jobs",
+          "Job detail · mark done",
+          "Same; staff “My day” state",
+          "same",
+          "prep 3.3",
+        ],
+        [
+          "Invoices",
+          "Invoices list · overdue filter",
+          "Bills only count as owed; replies expire; Overdue moves to its own tab",
+          "chg",
+          "D64, D71, D75",
+        ],
+        [
+          "Invoices",
+          "Invoice editor (doc)",
+          "Draft → <b>PI-</b> → <b>INV-</b> on approval",
+          "chg",
+          "D60, D70, D71",
+        ],
+        [
+          "Invoices",
+          "<s>not a screen</s>",
+          "<b>Overdue payments</b> · one-tap Remind (messages 13 / 14)",
+          "new",
+          "D64, D67",
+        ],
+        [
+          "Invoices",
+          "<s>not a screen</s> (sender rule only)",
+          "<b>Invoice email</b> · business name, reply-to owner",
+          "new",
+          "D35",
+        ],
+        [
+          "Invoices",
+          "<s>not a screen</s> (PDF row in white-label rules)",
+          "<b>Invoice PDF</b> · A4, GST fields, no Biz4Kit mark",
+          "new",
+          "D78",
+        ],
+        [
+          "Payments",
+          "Record payment / upload proof · modal",
+          "Same",
+          "same",
+          "—",
+        ],
+        [
+          "Payments",
+          "Approval queue · Owner approves",
+          "Manager below a limit; self-approval logged; no overpaying",
+          "chg",
+          "D57, D73, D74, D76",
+        ],
+        [
+          "Customers",
+          "Customer list",
+          "Same; an extra; owed = bills only",
+          "chg",
+          "D63, D75",
+        ],
+        [
+          "Customers",
+          "Customer timeline · New quote",
+          "Action is <b>New invoice</b>",
+          "chg",
+          "D60",
+        ],
+        ["Reports", "Reports · export CSV", "Same", "same", "—"],
+        [
+          "Settings",
+          "Brand, business, numbering, team, roles",
+          "Same + <b>Messages</b> and <b>Devices</b> tabs",
+          "chg",
+          "prep message templates, 1.3 device list; D81",
+        ],
+        [
+          "Portal",
+          "Catalog · brand.biz4kit.app",
+          "glow.biz4kit.com; “Made with Biz4Kit” footer only",
+          "chg",
+          "D47, D78",
+        ],
+        ["Portal", "Quote request form · /request", "Same", "same", "—"],
+        [
+          "Portal",
+          "Quote page · /q/:token · Accept",
+          "<s>removed</s>; paying the proforma is the acceptance",
+          "gone",
+          "D60",
+        ],
+        ["Portal", "Booking picker · /book/:package", "Same", "same", "—"],
+        [
+          "Portal",
+          "Invoice & pay page · /i/:token",
+          "Same; expired or rejected replies cannot be paid",
+          "chg",
+          "D73",
+        ],
+        ["Portal", "My orders · /me/:token", "Same", "same", "—"],
+      ];
+      const CROSS = [
+        [
+          "Sidebar",
+          "Not specified (logo in sidebar)",
+          "Home · Sales · Schedule · Payments · Business; pages as tabs; phone bottom bar",
+          "chg",
+          "D80, D81",
+        ],
+        [
+          "Lite mode",
+          "Catalog, quote, invoice, payment by default",
+          "Board, Customers, Bookings, Jobs switched on as extras",
+          "chg",
+          "D63",
+        ],
+        [
+          "Logos",
+          "Business logo in the workspace switcher",
+          "4B mark + business name at the top; business logo on the profile button",
+          "chg",
+          "D78, D79",
+        ],
+        [
+          "Status colours",
+          "Not specified",
+          "Word + icon + colour; no two statuses of one record share a colour",
+          "chg",
+          "D55",
+        ],
+        [
+          "Super-admin",
+          "3.7: console; impersonate with consent log",
+          "Read-only support view inside the workspace, access logged",
+          "ask",
+          "none",
+        ],
+        [
+          "Manager view",
+          "Dashboard for All",
+          "Counts only, no money; Team today instead of Money owed",
+          "ask",
+          "none",
+        ],
+      ];
+      const tr = (r) =>
+        `<tr data-k="${r[3]}"><td class="area">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><span class="pill ${r[3]}">${T[r[3]]}</span></td><td>${r[4]}</td></tr>`;
+      document.getElementById("rows").innerHTML = ROWS.map(tr).join("");
+      document.getElementById("cross").innerHTML = CROSS.map(tr).join("");
+      const all = [...ROWS, ...CROSS];
+      for (const k of Object.keys(T))
+        document.getElementById("n-" + k).textContent = all.filter(
+          (r) => r[3] === k
+        ).length;
+      const f = document.getElementById("filters");
+      f.innerHTML = ["all", ...Object.keys(T)]
+        .map(
+          (k) =>
+            `<button data-k="${k}" class="${k === "all" ? "on" : ""}">${k === "all" ? "All" : T[k]}</button>`
+        )
+        .join("");
+      f.onclick = (e) => {
+        const k = e.target.dataset.k;
+        if (!k) return;
+        f.querySelectorAll("button").forEach((b) =>
+          b.classList.toggle("on", b === e.target)
+        );
+        document
+          .querySelectorAll("#rows tr")
+          .forEach((r) => (r.hidden = k !== "all" && r.dataset.k !== k));
+      };
+    </script>
+  </body>
+</html>

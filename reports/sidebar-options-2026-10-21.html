@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Biz4Kit · Sidebar options · 21 Oct 2026</title>
+    <link rel="stylesheet" href="../brand/theme.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Fraunces:opsz,wght@9..144,500..800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        font:
+          13px/1.4 "DM Sans",
+          system-ui,
+          sans-serif;
+      }
+      .wrap {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      h1 {
+        font-family: "Fraunces", serif;
+        font-size: 26px;
+        margin: 0 0 4px;
+      }
+      .muted {
+        color: var(--muted-foreground);
+      }
+      .row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-top: 18px;
+      }
+      @media (max-width: 1100px) {
+        .row {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      .opt h2 {
+        font-size: 15px;
+        margin: 0 0 2px;
+      }
+      .opt p.d {
+        margin: 0 0 10px;
+        color: var(--muted-foreground);
+        min-height: 36px;
+      }
+      .frame {
+        height: 620px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .sec {
+        padding: 0 8px;
+      }
+      .item,
+      .sum {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 32px;
+        padding: 0 8px;
+        border-radius: 6px;
+      }
+      .sub {
+        margin: 2px 0 6px 16px;
+        padding-left: 8px;
+      }
+      .sub .item {
+        height: 30px;
+      }
+      .badge {
+        margin-left: auto;
+        font-size: 11px;
+        padding: 0 6px;
+        border-radius: 999px;
+        line-height: 18px;
+      }
+      .chev {
+        margin-left: auto;
+        opacity: 0.55;
+      }
+      .grow {
+        flex: 1;
+      }
+      .prof {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 8px;
+        padding: 8px;
+        border-radius: 8px;
+      }
+      .gs {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        background: #9f1239;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex: none;
+      }
+      .tile {
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        font-size: 14px;
+      }
+      i.ph,
+      i.ph-duotone,
+      i.ph-fill {
+        font-size: 17px;
+      }
+      .sub i {
+        font-size: 15px;
+      }
+
+      /* Current */
+      .cur {
+        background: color-mix(in oklch, var(--muted) 60%, white);
+      }
+      .cur .item.on {
+        background: var(--secondary);
+        color: var(--secondary-foreground);
+        font-weight: 600;
+      }
+      .cur .sub {
+        border-left: 1px solid var(--border);
+      }
+      .cur .badge {
+        background: var(--muted);
+      }
+
+      /* A: coloured tiles (like iOS Settings / Notion) */
+      .a {
+        background: #fbfaf9;
+        border-right: 1px solid var(--border);
+      }
+      .a .item.on {
+        background: #fff;
+        box-shadow:
+          0 1px 2px rgb(0 0 0 / 0.08),
+          0 0 0 1px var(--border);
+        font-weight: 600;
+      }
+      .a .sub {
+        border-left: 1px solid var(--border);
+      }
+      .a .badge {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+      .a .lbl {
+        font-size: 11px;
+        color: var(--muted-foreground);
+        padding: 10px 8px 4px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      /* B: duotone icons, accent bar on the active item */
+      .b {
+        background: #fff;
+        border-right: 1px solid var(--border);
+      }
+      .b .item {
+        position: relative;
+        color: #475569;
+      }
+      .b .item i {
+        color: #64748b;
+      }
+      .b .item.on {
+        color: var(--primary);
+        font-weight: 700;
+        background: color-mix(in oklch, var(--secondary) 55%, white);
+      }
+      .b .item.on i {
+        color: oklch(0.47 0.22 262);
+      }
+      .b .item.on::before {
+        content: "";
+        position: absolute;
+        left: -8px;
+        top: 6px;
+        bottom: 6px;
+        width: 3px;
+        border-radius: 3px;
+        background: oklch(0.47 0.22 262);
+      }
+      .b .sub {
+        border-left: 1px dashed #cbd5e1;
+      }
+      .b .badge {
+        background: oklch(0.47 0.22 262);
+        color: #fff;
+      }
+      .b .sum {
+        font-weight: 600;
+        color: #0f172a;
+      }
+
+      /* C: dark navy (brand primary), like Razorpay / Stripe dashboards */
+      .c {
+        background: var(--primary);
+        color: #e2e8f0;
+      }
+      .c .item,
+      .c .sum {
+        color: #cbd5e1;
+      }
+      .c .item:hover,
+      .c .sum:hover {
+        background: rgb(255 255 255 / 0.06);
+      }
+      .c .item.on {
+        background: rgb(255 255 255 / 0.12);
+        color: #fff;
+        font-weight: 600;
+      }
+      .c .sub {
+        border-left: 1px solid rgb(255 255 255 / 0.18);
+      }
+      .c .badge {
+        background: #ef4444;
+        color: #fff;
+      }
+      .c .prof {
+        background: rgb(255 255 255 / 0.06);
+      }
+      .c .muted2 {
+        color: #94a3b8;
+      }
+      .pick {
+        margin-top: 10px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Sidebar: pick a direction</h1>
+      <p class="muted">
+        Each option changes three things together: the logo at the top, the icon
+        style and how items look. The menu, groups, sub-items, Favourites and
+        the profile at the bottom stay the same in all of them. Local page only
+        (D19).
+      </p>
+      <div class="row">
+        <!-- CURRENT -->
+        <div class="opt">
+          <h2>Now (V2)</h2>
+          <p class="d">
+            Wordmark logo, thin outline icons, pale-blue highlight.
+          </p>
+          <div class="frame cur">
+            <div style="padding: 14px 16px 8px">
+              <img
+                src="../brand/logo/biz4kit-lockup.svg"
+                alt="Biz4Kit"
+                style="height: 22px"
+              />
+            </div>
+            <div class="sec grow">
+              <div class="sum">
+                <i data-lucide="layout-dashboard"></i>Overview<i
+                  data-lucide="chevron-down"
+                  class="chev"
+                  style="width: 14px"
+                ></i>
+              </div>
+              <div class="sub">
+                <div class="item on">
+                  <i data-lucide="layout-dashboard" style="width: 14px"></i
+                  >Today
+                </div>
+                <div class="item muted">
+                  <i data-lucide="square-kanban" style="width: 14px"></i>Board
+                </div>
+                <div class="item muted">
+                  <i data-lucide="chart-column" style="width: 14px"></i>Reports
+                </div>
+              </div>
+              <div class="sum muted">
+                <i data-lucide="handshake"></i>Sales<span class="badge">4</span>
+              </div>
+              <div class="sum muted">
+                <i data-lucide="briefcase"></i>Work<i
+                  data-lucide="chevron-right"
+                  class="chev"
+                  style="width: 14px"
+                ></i>
+              </div>
+              <div class="sum muted">
+                <i data-lucide="wallet"></i>Money<span class="badge">4</span>
+              </div>
+              <div class="sum muted">
+                <i data-lucide="sliders-horizontal"></i>Setup<i
+                  data-lucide="chevron-right"
+                  class="chev"
+                  style="width: 14px"
+                ></i>
+              </div>
+            </div>
+            <div
+              class="sec"
+              style="border-top: 1px solid var(--border); padding-top: 6px"
+            >
+              <div class="sum muted"><i data-lucide="star"></i>Favourites</div>
+              <div class="sub">
+                <div class="item muted">
+                  <i data-lucide="book-open" style="width: 14px"></i>Catalog
+                </div>
+                <div class="item muted">
+                  <i data-lucide="file-plus" style="width: 14px"></i>Create
+                  invoice
+                </div>
+                <div class="item muted">
+                  <i data-lucide="send" style="width: 14px"></i>Send reply
+                </div>
+              </div>
+            </div>
+            <div class="prof">
+              <span class="gs">G</span>
+              <div>
+                <b>Priya Rao</b>
+                <div class="muted">Glow Studio · Owner</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- A -->
+        <div class="opt">
+          <h2>A · Colour tiles</h2>
+          <p class="d">
+            Logo tile + name + workspace. Each group gets a coloured icon tile
+            (like phone Settings). White card highlight.
+          </p>
+          <div class="frame a">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 14px 14px 6px;
+              "
+            >
+              <img
+                src="../brand/logo/biz4kit-app-icon.svg"
+                alt=""
+                style="height: 32px; border-radius: 8px"
+              />
+              <div>
+                <b style="font-family: Fraunces, serif; font-size: 15px"
+                  >Biz4Kit</b
+                >
+                <div class="muted">Glow Studio</div>
+              </div>
+            </div>
+            <div class="sec grow">
+              <div class="lbl">MENU</div>
+              <div class="sum">
+                <span class="tile" style="background: #e0e7ff; color: #4338ca"
+                  ><i class="ph-fill ph-squares-four"></i></span
+                >Overview<i class="ph ph-caret-down chev"></i>
+              </div>
+              <div class="sub">
+                <div class="item on"><i class="ph ph-sun"></i>Today</div>
+                <div class="item"><i class="ph ph-kanban"></i>Board</div>
+                <div class="item"><i class="ph ph-chart-bar"></i>Reports</div>
+              </div>
+              <div class="sum">
+                <span class="tile" style="background: #f3e8ff; color: #7e22ce"
+                  ><i class="ph-fill ph-handshake"></i></span
+                >Sales<span class="badge">4</span>
+              </div>
+              <div class="sum">
+                <span class="tile" style="background: #ccfbf1; color: #0f766e"
+                  ><i class="ph-fill ph-briefcase"></i></span
+                >Work<i class="ph ph-caret-right chev"></i>
+              </div>
+              <div class="sum">
+                <span class="tile" style="background: #dcfce7; color: #15803d"
+                  ><i class="ph-fill ph-wallet"></i></span
+                >Money<span class="badge">4</span>
+              </div>
+              <div class="sum">
+                <span class="tile" style="background: #f1f5f9; color: #475569"
+                  ><i class="ph-fill ph-gear-six"></i></span
+                >Setup<i class="ph ph-caret-right chev"></i>
+              </div>
+              <div class="lbl">FAVOURITES</div>
+              <div class="item">
+                <span class="tile" style="background: #fef3c7; color: #b45309"
+                  ><i class="ph-fill ph-book-open"></i></span
+                >Catalog
+              </div>
+              <div class="item">
+                <span class="tile" style="background: #fef3c7; color: #b45309"
+                  ><i class="ph-fill ph-receipt"></i></span
+                >Create invoice
+              </div>
+              <div class="item">
+                <span class="tile" style="background: #fef3c7; color: #b45309"
+                  ><i class="ph-fill ph-paper-plane-tilt"></i></span
+                >Send reply
+              </div>
+            </div>
+            <div
+              class="prof"
+              style="background: #fff; border: 1px solid var(--border)"
+            >
+              <span class="gs">G</span>
+              <div>
+                <b>Priya Rao</b>
+                <div class="muted">Owner</div>
+              </div>
+              <i class="ph ph-caret-up-down" style="margin-left: auto"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- B -->
+        <div class="opt">
+          <h2>B · Duotone + accent bar</h2>
+          <p class="d">
+            Bigger logo, two-tone icons, a blue bar marks where you are. Clean
+            white, like Zoho / Freshworks.
+          </p>
+          <div class="frame b">
+            <div
+              style="
+                padding: 16px 16px 10px;
+                border-bottom: 1px solid var(--border);
+              "
+            >
+              <img
+                src="../brand/logo/biz4kit-lockup.svg"
+                alt="Biz4Kit"
+                style="height: 26px"
+              />
+            </div>
+            <div class="sec grow" style="padding-top: 8px">
+              <div class="sum">
+                <i class="ph-duotone ph-squares-four"></i>Overview<i
+                  class="ph ph-caret-down chev"
+                ></i>
+              </div>
+              <div class="sub">
+                <div class="item on">
+                  <i class="ph-duotone ph-sun"></i>Today
+                </div>
+                <div class="item">
+                  <i class="ph-duotone ph-kanban"></i>Board
+                </div>
+                <div class="item">
+                  <i class="ph-duotone ph-chart-bar"></i>Reports
+                </div>
+              </div>
+              <div class="sum">
+                <i class="ph-duotone ph-handshake"></i>Sales<span class="badge"
+                  >4</span
+                >
+              </div>
+              <div class="sum">
+                <i class="ph-duotone ph-briefcase"></i>Work<i
+                  class="ph ph-caret-right chev"
+                ></i>
+              </div>
+              <div class="sum">
+                <i class="ph-duotone ph-wallet"></i>Money<span class="badge"
+                  >4</span
+                >
+              </div>
+              <div class="sum">
+                <i class="ph-duotone ph-gear-six"></i>Setup<i
+                  class="ph ph-caret-right chev"
+                ></i>
+              </div>
+            </div>
+            <div
+              class="sec"
+              style="border-top: 1px solid var(--border); padding-top: 6px"
+            >
+              <div class="sum">
+                <i class="ph-duotone ph-star"></i>Favourites<i
+                  class="ph ph-caret-down chev"
+                ></i>
+              </div>
+              <div class="sub">
+                <div class="item">
+                  <i class="ph-duotone ph-book-open"></i>Catalog
+                </div>
+                <div class="item">
+                  <i class="ph-duotone ph-receipt"></i>Create invoice
+                </div>
+                <div class="item">
+                  <i class="ph-duotone ph-paper-plane-tilt"></i>Send reply
+                </div>
+              </div>
+            </div>
+            <div
+              class="prof"
+              style="
+                border-top: 1px solid var(--border);
+                margin: 0;
+                border-radius: 0;
+                padding: 12px 14px;
+              "
+            >
+              <span class="gs">G</span>
+              <div>
+                <b>Priya Rao</b>
+                <div class="muted">Glow Studio · Owner</div>
+              </div>
+              <i class="ph ph-caret-up-down" style="margin-left: auto"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- C -->
+        <div class="opt">
+          <h2>C · Dark navy</h2>
+          <p class="d">
+            Sidebar in the Biz4Kit navy with the white logo. Strong brand,
+            content stays white. Like Razorpay / Stripe.
+          </p>
+          <div class="frame c">
+            <div style="padding: 16px 16px 10px">
+              <img
+                src="../brand/logo/biz4kit-lockup-white.svg"
+                alt="Biz4Kit"
+                style="height: 24px"
+              />
+            </div>
+            <div class="sec grow">
+              <div class="sum" style="color: #fff">
+                <i class="ph-duotone ph-squares-four"></i>Overview<i
+                  class="ph ph-caret-down chev"
+                ></i>
+              </div>
+              <div class="sub">
+                <div class="item on"><i class="ph ph-sun"></i>Today</div>
+                <div class="item"><i class="ph ph-kanban"></i>Board</div>
+                <div class="item"><i class="ph ph-chart-bar"></i>Reports</div>
+              </div>
+              <div class="sum">
+                <i class="ph-duotone ph-handshake"></i>Sales<span class="badge"
+                  >4</span
+                >
+              </div>
+              <div class="sum">
+                <i class="ph-duotone ph-briefcase"></i>Work<i
+                  class="ph ph-caret-right chev"
+                ></i>
+              </div>
+              <div class="sum">
+                <i class="ph-duotone ph-wallet"></i>Money<span class="badge"
+                  >4</span
+                >
+              </div>
+              <div class="sum">
+                <i class="ph-duotone ph-gear-six"></i>Setup<i
+                  class="ph ph-caret-right chev"
+                ></i>
+              </div>
+            </div>
+            <div
+              class="sec"
+              style="
+                border-top: 1px solid rgb(255 255 255 / 0.14);
+                padding-top: 6px;
+              "
+            >
+              <div class="sum">
+                <i class="ph-duotone ph-star"></i>Favourites<i
+                  class="ph ph-caret-down chev"
+                ></i>
+              </div>
+              <div class="sub">
+                <div class="item"><i class="ph ph-book-open"></i>Catalog</div>
+                <div class="item">
+                  <i class="ph ph-receipt"></i>Create invoice
+                </div>
+                <div class="item">
+                  <i class="ph ph-paper-plane-tilt"></i>Send reply
+                </div>
+              </div>
+            </div>
+            <div class="prof">
+              <span class="gs">G</span>
+              <div>
+                <b style="color: #fff">Priya Rao</b>
+                <div class="muted2">Glow Studio · Owner</div>
+              </div>
+              <i class="ph ph-caret-up-down" style="margin-left: auto"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>

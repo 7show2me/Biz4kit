@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Biz4Kit · V2 design and benchmark · 20 Oct 2026</title>
+    <link rel="stylesheet" href="../brand/theme.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400..700&family=Fraunces:opsz,wght@9..144,500..800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        font:
+          14px/1.5 "DM Sans",
+          system-ui,
+          sans-serif;
+      }
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 32px 24px 64px;
+      }
+      h1,
+      h2 {
+        font-family: "Fraunces", serif;
+        margin: 0;
+      }
+      h1 {
+        font-size: 30px;
+      }
+      h2 {
+        font-size: 22px;
+        margin: 36px 0 12px;
+      }
+      h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      a {
+        color: var(--secondary-foreground);
+      }
+      .muted {
+        color: var(--muted-foreground);
+      }
+      .mono {
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+      }
+      .grid4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      @media (max-width: 900px) {
+        .grid4,
+        .grid2 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 560px) {
+        .grid4,
+        .grid2 {
+          grid-template-columns: 1fr;
+        }
+      }
+      .score {
+        font-family: "Fraunces", serif;
+        font-size: 40px;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .from {
+        font-family: "Fraunces", serif;
+        font-size: 20px;
+        color: var(--muted-foreground);
+        text-decoration: line-through;
+        margin-right: 6px;
+      }
+      .of {
+        font-size: 16px;
+        color: var(--muted-foreground);
+      }
+      .bars {
+        margin-top: 10px;
+      }
+      .bar {
+        display: grid;
+        grid-template-columns: 70px 1fr 28px;
+        align-items: center;
+        gap: 8px;
+        margin: 5px 0;
+        font-size: 12px;
+      }
+      .bar span:first-child {
+        color: var(--muted-foreground);
+      }
+      .track {
+        position: relative;
+        height: 8px;
+        background: var(--muted);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .v1 {
+        position: absolute;
+        inset: 0 auto 0 0;
+        background: var(--border);
+      }
+      .v2 {
+        position: absolute;
+        inset: 0 auto 0 0;
+        background: var(--chart-1);
+        height: 4px;
+        top: 2px;
+        border-radius: 2px;
+      }
+      .legend {
+        display: flex;
+        gap: 14px;
+        font-size: 12px;
+        color: var(--muted-foreground);
+        margin-top: 8px;
+      }
+      .legend i {
+        display: inline-block;
+        width: 14px;
+        height: 6px;
+        border-radius: 3px;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+      .taps {
+        margin: 10px 0;
+        padding: 8px 10px;
+        background: var(--muted);
+        border-radius: 6px;
+        font-size: 13px;
+      }
+      .taps b {
+        font-family: "DM Mono", monospace;
+      }
+      ul,
+      ol {
+        margin: 6px 0 0;
+        padding-left: 18px;
+      }
+      li {
+        margin: 3px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th {
+        text-align: left;
+        font-weight: 600;
+        color: var(--muted-foreground);
+        background: var(--muted);
+        padding: 8px;
+      }
+      td {
+        padding: 8px;
+        border-top: 1px solid var(--border);
+        vertical-align: top;
+      }
+      .pill {
+        display: inline-block;
+        padding: 1px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .ok {
+        background: color-mix(in oklch, var(--chart-1) 14%, transparent);
+        color: var(--secondary-foreground);
+      }
+      .part {
+        background: color-mix(in oklch, var(--chart-5) 18%, transparent);
+        color: var(--foreground);
+      }
+      .rec {
+        color: var(--secondary-foreground);
+        font-weight: 600;
+      }
+      .shot {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .shot .card {
+        padding: 12px;
+      }
+      .side {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 8px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        margin-top: 6px;
+        font-size: 13px;
+      }
+      .dot {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 11px;
+      }
+      .b4k {
+        background: var(--primary);
+        color: var(--primary-foreground);
+        font-family: "Fraunces", serif;
+      }
+      .biz {
+        background: #9f1239;
+        color: #fff;
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <p class="mono muted">
+        reports/benchmark-v2-2026-10-20.html · design: design/screens-v2.html
+        (V1 kept as design/screens.html) · decisions D70–D78
+      </p>
+      <h1>V2: the four Quick jobs, re-benchmarked</h1>
+      <p class="muted">
+        Same rubric as the V1 benchmark (reports/benchmark-2026-10-20.html).
+        Competitor tap counts are estimates. V2's built-in Check:
+        <b>34 screens · 322 renders · 16,926 checks · 0 failed</b>, now
+        including number series, one money source, GST maths, the Manager limit
+        and logo placement.
+      </p>
+
+      <h2>Scorecard</h2>
+      <div class="grid4">
+        <div class="card">
+          <h3>Quick Catalog</h3>
+          <p>
+            <span class="from">3</span><span class="score">4</span
+            ><span class="of"> / 5</span>
+          </p>
+          <div class="bars">
+            <div class="bar">
+              <span>Speed</span>
+              <div class="track">
+                <div class="v1" style="width: 40%"></div>
+                <div class="v2" style="width: 80%"></div>
+              </div>
+              4
+            </div>
+            <div class="bar">
+              <span>Clarity</span>
+              <div class="track">
+                <div class="v1" style="width: 60%"></div>
+                <div class="v2" style="width: 80%"></div>
+              </div>
+              4
+            </div>
+            <div class="bar">
+              <span>Phone</span>
+              <div class="track">
+                <div class="v1" style="width: 60%"></div>
+                <div class="v2" style="width: 80%"></div>
+              </div>
+              4
+            </div>
+            <div class="bar">
+              <span>India fit</span>
+              <div class="track">
+                <div class="v1" style="width: 80%"></div>
+                <div class="v2" style="width: 90%"></div>
+              </div>
+              4.5
+            </div>
+          </div>
+          <div class="taps">
+            Share: dead end → <b>2 taps</b> · Add item: 6 fields → <b>2</b
+            ><br /><span class="muted">WhatsApp Business: 2–3. Level.</span>
+          </div>
+          <ul>
+            <li>
+              "Your page" card, Share price list (WhatsApp first, link, QR, PDF)
+            </li>
+            <li>Share one item from any row, also on phone</li>
+            <li>Quick add: name + price</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Quick Reply</h3>
+          <p>
+            <span class="from">2.5</span><span class="score">3.5</span
+            ><span class="of"> / 5</span>
+          </p>
+          <div class="bars">
+            <div class="bar">
+              <span>Speed</span>
+              <div class="track">
+                <div class="v1" style="width: 60%"></div>
+                <div class="v2" style="width: 80%"></div>
+              </div>
+              4
+            </div>
+            <div class="bar">
+              <span>Clarity</span>
+              <div class="track">
+                <div class="v1" style="width: 40%"></div>
+                <div class="v2" style="width: 70%"></div>
+              </div>
+              3.5
+            </div>
+            <div class="bar">
+              <span>Phone</span>
+              <div class="track">
+                <div class="v1" style="width: 60%"></div>
+                <div class="v2" style="width: 70%"></div>
+              </div>
+              3.5
+            </div>
+            <div class="bar">
+              <span>India fit</span>
+              <div class="track">
+                <div class="v1" style="width: 60%"></div>
+                <div class="v2" style="width: 80%"></div>
+              </div>
+              4
+            </div>
+          </div>
+          <div class="taps">
+            Priced reply: 5–6 → <b>2</b> from the list · Ready message: none →
+            <b>2</b><br /><span class="muted"
+              >WhatsApp quick replies: 2–3. Level.</span
+            >
+          </div>
+          <ul>
+            <li>Reply / Confirm straight from the Leads row</li>
+            <li>Ready messages 1–3: one chip, one message</li>
+            <li>One primary button: "Share and create PI-"</li>
+            <li>New lead by hand (walk-in, call)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Quick Invoice</h3>
+          <p>
+            <span class="from">2.5</span><span class="score">4</span
+            ><span class="of"> / 5</span>
+          </p>
+          <div class="bars">
+            <div class="bar">
+              <span>Speed</span>
+              <div class="track">
+                <div class="v1" style="width: 40%"></div>
+                <div class="v2" style="width: 80%"></div>
+              </div>
+              4
+            </div>
+            <div class="bar">
+              <span>Clarity</span>
+              <div class="track">
+                <div class="v1" style="width: 60%"></div>
+                <div class="v2" style="width: 70%"></div>
+              </div>
+              3.5
+            </div>
+            <div class="bar">
+              <span>Phone</span>
+              <div class="track">
+                <div class="v1" style="width: 60%"></div>
+                <div class="v2" style="width: 80%"></div>
+              </div>
+              4
+            </div>
+            <div class="bar">
+              <span>India fit</span>
+              <div class="track">
+                <div class="v1" style="width: 90%"></div>
+                <div class="v2" style="width: 90%"></div>
+              </div>
+              4.5
+            </div>
+          </div>
+          <div class="taps">
+            Walk-in: impossible → <b>4 taps</b>, 0 typing ("Same as last time" +
+            WhatsApp)<br /><span class="muted"
+              >Swipe 5–7, Vyapar 6–8, Razorpay link 4 + 2 fields. Level or
+              better.</span
+            >
+          </div>
+          <ul>
+            <li>New invoice sheet from Today, Invoices, Customer</li>
+            <li>Recent customers, catalog chips, live GST total</li>
+            <li>Draft → Proforma PI- → Tax invoice INV- states</li>
+            <li>"Paid now: record" for cash at the counter</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Quick Cashflow</h3>
+          <p>
+            <span class="from">2</span><span class="score">3.5</span
+            ><span class="of"> / 5</span>
+          </p>
+          <div class="bars">
+            <div class="bar">
+              <span>Speed</span>
+              <div class="track">
+                <div class="v1" style="width: 40%"></div>
+                <div class="v2" style="width: 80%"></div>
+              </div>
+              4
+            </div>
+            <div class="bar">
+              <span>Clarity</span>
+              <div class="track">
+                <div class="v1" style="width: 40%"></div>
+                <div class="v2" style="width: 70%"></div>
+              </div>
+              3.5
+            </div>
+            <div class="bar">
+              <span>Phone</span>
+              <div class="track">
+                <div class="v1" style="width: 40%"></div>
+                <div class="v2" style="width: 70%"></div>
+              </div>
+              3.5
+            </div>
+            <div class="bar">
+              <span>India fit</span>
+              <div class="track">
+                <div class="v1" style="width: 60%"></div>
+                <div class="v2" style="width: 80%"></div>
+              </div>
+              4
+            </div>
+          </div>
+          <div class="taps">
+            "How much this week?": sums by hand →
+            <b>0 taps</b> (₹17,110)<br /><span class="muted"
+              >Khatabook / OkCredit: 0–1. Level.</span
+            >
+          </div>
+          <ul>
+            <li>
+              Today opens with To collect this week · Overdue · To approve ·
+              Paid 30 days
+            </li>
+            <li>Every figure from one data source (checked)</li>
+            <li>Phone: "Who owes me" before the chart</li>
+            <li>Collected by method (UPI, bank, cash), money in only (D77)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i style="background: var(--border)"></i>V1</span
+        ><span><i style="background: var(--chart-1)"></i>V2</span>
+      </div>
+
+      <h2>Logo and wordmark (D78)</h2>
+      <div class="shot">
+        <div class="card">
+          <h3>Workspace (dashboard)</h3>
+          <div class="side">
+            <span class="dot b4k">4B</span><b>Biz4Kit</b
+            ><span class="muted"
+              >· top of the sidebar (4B mark only when collapsed and on
+              phone)</span
+            >
+          </div>
+          <div class="side" style="margin-top: 40px">
+            <span class="dot biz">GS</span
+            ><span
+              ><b>Glow Studio</b><br /><span class="muted"
+                >Priya Rao · Owner · bottom profile button: workspace + account
+                menu</span
+              ></span
+            >
+          </div>
+        </div>
+        <div class="card">
+          <h3>Customer pages</h3>
+          <div class="side">
+            <span class="dot biz">GS</span><b>Glow Studio</b
+            ><span class="muted">· business brand only</span>
+          </div>
+          <p class="muted" style="text-align: center; margin-top: 40px">
+            … page …<br /><span style="font-size: 12px">Made with Biz4Kit</span>
+            ← the only Biz4Kit, on every customer page
+          </p>
+          <p class="muted" style="font-size: 12px">
+            PDF and email carry no Biz4Kit mark (a document with money on it,
+            Market fit &amp; sales.md:29).
+          </p>
+        </div>
+      </div>
+
+      <h2>Flow logic: V1 issues in V2</h2>
+      <table class="card" style="padding: 0">
+        <thead>
+          <tr>
+            <th>V1 issue</th>
+            <th>V2</th>
+            <th>How</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              INV- number on unpaid invoices; PI- and INV- shared one counter
+            </td>
+            <td><span class="pill ok">Fixed</span></td>
+            <td>
+              Unpaid = PI- (D71); INV-0026 → 0029 in approval order, next 0030
+              (D60); each new PI belongs to one flow
+            </td>
+          </tr>
+          <tr>
+            <td>Manager could approve ₹9,440 over a ₹5,000 limit</td>
+            <td><span class="pill ok">Fixed</span></td>
+            <td>
+              Approve locked: "Owner must approve"; Settings says "Below" (D74)
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Pending proof counted as paid; lead "Paid" while part paid;
+              rejected lead that paid
+            </td>
+            <td><span class="pill ok">Fixed</span></td>
+            <td>
+              Paid only after approval; lead Paid = all invoices approved (D72)
+            </td>
+          </tr>
+          <tr>
+            <td>Anita's GST ₹3,410 on ₹25,500</td>
+            <td><span class="pill ok">Fixed</span></td>
+            <td>₹4,590 → ₹30,090; all sample totals are 18% (checked)</td>
+          </tr>
+          <tr>
+            <td>Due ₹19,293 vs ₹34,530; To approve ₹14,440 vs ₹9,440</td>
+            <td><span class="pill ok">Fixed</span></td>
+            <td>
+              One source; Due ₹10,030 · Overdue ₹12,980 · To approve ₹16,874 ·
+              Owed ₹39,884 on every screen
+            </td>
+          </tr>
+          <tr>
+            <td>Unpaid reply counted as money owed</td>
+            <td><span class="pill ok">Fixed</span></td>
+            <td>Reply ≠ bill; replies expire after pay-by (D75)</td>
+          </tr>
+          <tr>
+            <td>Reminder history different on each screen</td>
+            <td><span class="pill ok">Fixed</span></td>
+            <td>One reminder log</td>
+          </tr>
+          <tr>
+            <td>Booking data differed (calendar vs Today vs jobs)</td>
+            <td><span class="pill ok">Fixed</span></td>
+            <td>Same 6 bookings everywhere</td>
+          </tr>
+          <tr>
+            <td>No rejected-proof / expired states</td>
+            <td><span class="pill ok">Fixed</span></td>
+            <td>
+              Proof "Rejected" in approvals; reply "Expired"; pay page "No
+              longer valid" (D73)
+            </td>
+          </tr>
+          <tr>
+            <td>"Card" method, "Sent by Biz4Kit", "We reply on WhatsApp"</td>
+            <td><span class="pill ok">Fixed</span></td>
+            <td>UPI / bank / cash; "Sent as Glow Studio"; promise removed</td>
+          </tr>
+          <tr>
+            <td>Board states without a column</td>
+            <td><span class="pill part">Partly</span></td>
+            <td>
+              Every invoice/booking state mapped; snoozed and rejected leads
+              still have no column
+            </td>
+          </tr>
+          <tr>
+            <td>Void / cancel a PI</td>
+            <td><span class="pill part">Open</span></td>
+            <td>Needs your answer (question 5)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>
+        Questions for you
+        <span
+          class="muted"
+          style="font-size: 14px; font-family: &quot;DM Sans&quot;"
+          >(V2 did not guess these)</span
+        >
+      </h2>
+      <div class="grid2">
+        <div class="card">
+          <h3>1 · Customer pays less than the bill</h3>
+          <p>
+            A: stays PI- "Part paid" until the full amount is approved · B: each
+            approved payment becomes its own INV- with a new PI- for the rest ·
+            C: refuse part payments
+          </p>
+          <p class="rec">
+            Recommended: A (CA to confirm). WBS 2.5 still expects part payments.
+          </p>
+        </div>
+        <div class="card">
+          <h3>2 · Service before the reply is paid?</h3>
+          <p>
+            Anita's bridal trial is today while her ₹30,090 reply is unpaid.
+            Block it · allow with an "unpaid reply" warning · allow freely
+          </p>
+          <p class="rec">Recommended: allow with the warning</p>
+        </div>
+        <div class="card">
+          <h3>3 · What money can a Manager see?</h3>
+          <p>
+            No ₹ anywhere · ₹ on Money pages only, counts on Today (as V2 does
+            now) · ₹ everywhere
+          </p>
+          <p class="rec">
+            Recommended: Money pages only (they approve below the limit)
+          </p>
+        </div>
+        <div class="card">
+          <h3>4 · Can a Manager reject a proof above their limit?</h3>
+          <p>Yes · Owner only</p>
+          <p class="rec">Recommended: Owner only, mirroring approval</p>
+        </div>
+        <div class="card">
+          <h3>5 · Cancelling an unpaid PI</h3>
+          <p>
+            Void, Owner only, number kept · delete drafts only and let PIs
+            expire
+          </p>
+          <p class="rec">Recommended: Void, Owner only, number kept</p>
+        </div>
+        <div class="card">
+          <h3>6 · Owner records cash under the limit</h3>
+          <p>
+            Counts as approved at once · still goes to approval (V2 now) ·
+            approve-now option, logged
+          </p>
+          <p class="rec">
+            Recommended: approve-now option, logged (extends D74)
+          </p>
+        </div>
+      </div>
+
+      <h2>Still to do</h2>
+      <div class="grid2">
+        <div class="card">
+          <h3>Design (no decision needed)</h3>
+          <ol>
+            <li>
+              Ready messages and the price-list share pick the lead/customer;
+              today the samples always say Kiran / Anita.
+            </li>
+            <li>"Who owes me" on Today: a Remind button per row.</li>
+            <li>
+              On a 360px phone, the lead row has one primary action instead of
+              two.
+            </li>
+            <li>
+              Board: decide where snoozed and rejected leads live (filter, not a
+              column).
+            </li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>Docs out of date with D70–D78</h3>
+          <ol>
+            <li>
+              <span class="mono">docs/flow.html</span>: four Quick jobs,
+              two-invoice advance, lead Paid rule, Manager "below", replies
+              expire, D73, D78.
+            </li>
+            <li>
+              <span class="mono">docs/status-flow.html</span>: split Reply and
+              Bill statuses, drop "Part paid" (unless question 1 = A), add proof
+              Rejected.
+            </li>
+            <li>
+              <span class="mono">prep/Design inputs.md</span> 164–181,
+              <span class="mono">WBS.md</span> 2.5, 5.8: add "replaced by
+              D70–D78" notes (D41 practice).
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

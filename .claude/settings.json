@@ -11,6 +11,17 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "pnpm exec ultracite fix --hook",
+            "type": "command"
+          }
+        ],
+        "matcher": "Write|Edit"
+      }
     ]
   }
 }

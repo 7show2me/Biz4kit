@@ -1,15 +1,16 @@
 ---
 name: biz-record-decision
-description: Record answered business questions. Use when the user answers a question in chat, or when Linear BIZ questions are in the Answered state or have a new answer comment. Adds the next row to docs/decisions.md, comments on the issue, closes it out, and flags conflicts with Prep/ or earlier decisions. Not for asking new questions (use biz-linear-question).
+description: Record answered business questions. Use when the user answers a question in chat, or when Linear BIZ questions are in the Answered state or have a new answer comment. Adds the next row to docs/decisions.md, comments on the issue, closes it out, and flags conflicts with prep/ or earlier decisions. Not for asking new questions (use biz-linear-question).
 ---
 
 # biz-record-decision
 
-`docs/decisions.md` is the only place answers live. It overrides `Prep/` where they differ.
+`docs/decisions.md` is the only place answers live. It overrides `prep/` where they differ.
 
 ## Steps
+
 1. **Find answers.** `python .claude/skills/biz-linear-question/ask.py list --state Answered`, or read the issue: `linear issue view BIZ-n --no-pager` (comments are at the bottom). If the user answered in chat, use their words.
-2. **Check the answer is clear.** If it is vague, or contradicts `Prep/` or a numbered decision, do not pick a side: comment a precise follow-up on the issue and keep it in Needs answer.
+2. **Check the answer is clear.** If it is vague, or contradicts `prep/` or a numbered decision, do not pick a side: comment a precise follow-up on the issue and keep it in Needs answer.
 3. **Add one row** at the bottom of the table in `docs/decisions.md`:
    `| D<next> | <today> | BIZ-n | <question> | **<decision>** | <who decided> | <WBS ids> |`
    - Next number = last `D` + 1. Never edit an old row. A later row replaces an earlier one by citing its id ("replaces D3").

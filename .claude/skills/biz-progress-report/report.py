@@ -46,7 +46,7 @@ def wbs_today(day):
     if not day:
         return []
     out = []
-    for line in (ROOT / "Prep" / "WBS.md").read_text(encoding="utf-8").splitlines():
+    for line in (ROOT / "prep" / "WBS.md").read_text(encoding="utf-8").splitlines():
         c = [x.strip() for x in line.split("|")]
         if len(c) > 6 and re.match(r"^[A-Z]?\d+\.\d+", c[1]):
             m = re.match(r"(\d+)(?:\s*[–-]\s*(\d+))?", c[4])

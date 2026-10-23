@@ -20,7 +20,9 @@ python .claude/skills/biz-progress-report/report.py --days 3 --open
 - "Due" lists issues with a Linear due date. If none have one, the report says so; never invent dates.
 
 ## Publishing rule (important)
+
 Reports are shown **locally only**. Do not call the Artifact tool, upload, or send the report anywhere (claude.ai, Slack, email, a gist) unless the user asks in that conversation. Even then, ask once for confirmation first, and say it is going to a Claude/other server. If the user says never, never. See `CLAUDE.md` > Artifacts and uploads.
 
 ## After running
+
 Summarise in chat: done in the window, pending, what to do today, what is due, and any question still in Needs answer. Point to the local file path.

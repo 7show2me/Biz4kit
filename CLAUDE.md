@@ -1,12 +1,13 @@
 # Biz4Kit
 
-White-label workspace for small businesses (catalog, quick replies (proforma invoices), invoices, payments). Planning documents live in `prep/`. Read the `.md` versions; the `.docx` and `.pdf` files are copies.
+White-label workspace for small businesses (catalog, quick replies (proforma invoices), invoices, payments). Planning documents live in `prep/` as Markdown, rewritten on 2026-10-24 to match `docs/decisions.md`. The earlier versions and their `.docx` / `.pdf` copies are in `prep/archive/2026-10-24/`.
 
 - `prep/Outline.md`: product
 - `prep/WBS.md`: work packages
 - `prep/Workflow & final verification.md`: build rules, TDD, PII, security, go / no-go
 - `prep/Architecture & contracts.md`, `prep/Design inputs.md`, `prep/Legal & compliance.md`, `prep/Business plan.md`, `prep/Market fit & sales.md`
 - `docs/decisions.md`: answered business questions. These override `prep/` where they differ.
+- `design/app/`: the locked functional prototype and build spec (D94); `design/screens-v2.html` is its frozen look. `docs/implementation-notes.md`: prototype → product notes.
 - `docs/flow.html`: how Lead → Reply (proforma) → Booking → Job → Invoice → Paid fit together, who approves what, and how it changes by business type (open in a browser).
 
 ## Never assume a business fact

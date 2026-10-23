@@ -41,12 +41,12 @@ PROJECTS = {
     "questions": ("Business Questions", "Questions AI agents must not answer themselves (biz-linear-question skill)."),
 }
 
-AREAS = ["auth", "catalog", "quote", "invoice", "payments", "messages", "portal", "admin", "infra"]
+AREAS = ["auth", "catalog", "invoice", "payments", "messages", "portal", "admin", "infra"]
 Q_AREAS = ["product", "pricing", "gst", "legal", "sales", "vendor", "people"]
 
 AREA_OF = {
     "0.1": "infra", "1.1": "infra", "1.2": "infra", "1.3": "auth", "1.4": "admin", "1.5": "portal",
-    "1.6": "messages", "1.7": "infra", "2.1": "catalog", "2.2": "catalog", "2.3": "quote", "2.4": "quote",
+    "1.6": "messages", "1.7": "infra", "2.1": "catalog", "2.2": "catalog", "2.3": "invoice", "2.4": "invoice",  # D60: no Quote; a reply is a proforma invoice
     "2.5": "invoice", "2.6": "payments", "2.7": "messages", "2.8": "infra", "2.9": "messages",
     "3.1": "portal", "3.2": "portal", "3.3": "portal", "3.4": "portal", "3.5": "auth", "3.6": "admin",
     "3.7": "admin", "3.8": "admin", "3.9": "portal", "3.11": "portal", "4.1": "infra", "4.2": "catalog",
@@ -62,11 +62,14 @@ URGENT = {"B0.2", "B0.3"}  # D6, D7: no company, CA or lawyer yet
 # Decisions in docs/decisions.md that change WBS text. Each entry replaces a field.
 AMEND = {
     "1.1": {
-        "done": "Monorepo (web, mobile, api); backend (API + BullMQ workers) as Docker images, docker compose for local dev "
-                "(api, worker, Redis), deployed to Fly.io Mumbai (bom); Neon Postgres in AWS Mumbai with prod + staging "
-                "branches and a Neon branch per PR preview; point-in-time restore; preview deploys; error tracking",
-        "verify": "Deploy a hello-world to prod; restore a Neon branch to an earlier point in time",
-        "note": "D3, D4",
+        "done": "Monorepo (pnpm + Turborepo, D37: web, native, server); backend (API + BullMQ workers) as Docker images in ECR, "
+                "docker compose for local dev; deployed to ECS Fargate in Mumbai (ap-south-1) behind API Gateway HTTP API -> "
+                "VPC Link -> Cloud Map, no load balancer (D28, D38, D42); Terraform state in S3 with locking (D39); web app on "
+                "Vercel (D22); Upstash Redis for BullMQ (D33); Neon Postgres in AWS Mumbai with prod + staging branches and a "
+                "Neon branch per PR preview; point-in-time restore (D4); preview deploys; error tracking",
+        "verify": "Deploy a hello-world API to ECS Fargate behind API Gateway and the web app to Vercel; restore a Neon branch "
+                  "to an earlier point in time",
+        "note": "D3, D4, D22, D28, D33, D37, D38, D39, D42",
     },
     "B0.2": {"note": "D7: neither a CA nor a lawyer is engaged yet. Day-1 priority"},
     "B0.3": {"note": "D6: entity, PAN, GST and bank account are all still to be filed. Day-1 priority"},

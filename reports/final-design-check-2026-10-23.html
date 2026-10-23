@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Biz4Kit · Final design check · 23 Oct 2026</title>
+<style>
+  :root { --ink:#03035e; --text:#1c1b29; --muted:#5d5b70; --line:#e4e2ee; --bg:#f7f6fb; --card:#fff;
+    --ok:#15803d; --ok-s:#ecfdf3; --warn:#b45309; --warn-s:#fffbeb; --bad:#b91c1c; --bad-s:#fef2f2; --info:#1d4ed8; --info-s:#eff6ff; }
+  * { box-sizing: border-box; }
+  body { margin:0; font: 14px/1.5 "DM Sans", system-ui, sans-serif; color:var(--text); background:var(--bg); }
+  main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 48px; }
+  h1 { font: 700 26px/1.2 Fraunces, Georgia, serif; color:var(--ink); margin:0 0 4px; }
+  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color:var(--muted); margin: 28px 0 10px; }
+  .sub { color:var(--muted); margin:0 0 18px; }
+  .kpis { display:grid; grid-template-columns: repeat(4,1fr); gap:10px; }
+  .kpi { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; }
+  .kpi b { display:block; font-size:26px; color:var(--ink); }
+  .kpi span { color:var(--muted); font-size:12.5px; }
+  .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  table { width:100%; border-collapse: collapse; }
+  th, td { text-align:left; vertical-align: top; padding:8px 8px; border-top:1px solid var(--line); }
+  th { font-size:12px; color:var(--muted); font-weight:600; border-top:0; }
+  .pill { display:inline-block; padding:1px 8px; border-radius:99px; font-size:12px; font-weight:600; white-space:nowrap; }
+  .ok { background:var(--ok-s); color:var(--ok); } .warn { background:var(--warn-s); color:var(--warn); }
+  .bad { background:var(--bad-s); color:var(--bad); } .info { background:var(--info-s); color:var(--info); }
+  code { font: 12.5px ui-monospace, Menlo, Consolas, monospace; background:#f0eef7; padding:0 4px; border-radius:4px; }
+  .rec { color:var(--ink); font-weight:600; }
+  ul { margin:6px 0 0; padding-left:18px; } li { margin:3px 0; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:6px; }
+  .step { padding:6px 10px; border-radius:8px; border:1px solid var(--line); background:#fff; font-weight:600; font-size:13px; }
+  .step.done { background:var(--ok-s); border-color:#bbf7d0; color:var(--ok); }
+  .step.now { background:var(--warn-s); border-color:#fde68a; color:var(--warn); }
+  .arrow { color:var(--muted); }
+  @media (max-width: 760px) { .kpis { grid-template-columns: repeat(2,1fr); } .grid2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body><main>
+  <h1>Final design check before the screen lock</h1>
+  <p class="sub">23 Oct 2026 · prototype <code>design/app/</code> checked against <code>docs/decisions.md</code> (D1–D86), <code>prep/*.md</code> and Linear team BIZ (85 issues). Local only (D19).</p>
+
+  <div class="flow">
+    <span class="step done">Decisions D1–D86</span><span class="arrow">→</span>
+    <span class="step done">Prototype, 36 screens</span><span class="arrow">→</span>
+    <span class="step done">Owner calls (D87–D93)</span><span class="arrow">→</span><span class="step done">D87–D88 built</span><span class="arrow">→</span>
+    <span class="step now">Lock screens (D94)</span><span class="arrow">→</span>
+    <span class="step">Environments (BIZ-2)</span><span class="arrow">→</span>
+    <span class="step">End-to-end tests</span>
+  </div>
+
+  <h2>Where it stands</h2>
+  <div class="kpis">
+    <div class="kpi"><b>38</b><span>screens: the 34 of the prep map, serial lookup and warranty card (D85, D86), approve link and inbox (D87)</span></div>
+    <div class="kpi"><b>~36 / 46</b><span>design decisions fully in the app before today's fixes; 10 gaps found</span></div>
+    <div class="kpi"><b>28,121</b><span>checks, all green after 7 defect fixes and D87–D93</span></div>
+    <div class="kpi"><b>0</b><span>open questions in Linear; 7 asked, all recorded</span></div>
+  </div>
+
+  <h2>Fixed today (were defects against written rules)</h2>
+  <div class="card"><table>
+    <tr><th>Defect</th><th>Rule</th><th>Now</th></tr>
+    <tr><td>Reply with "Advance %" still asked for the full amount</td><td>D70 two invoices</td><td>The reply is the advance proforma (each line at the %, own GST); the balance is the rest</td></tr>
+    <tr><td>Balance bill short when GST is on (advance total incl. GST subtracted)</td><td>D70</td><td>Subtracts the advance's taxable value; GST from the package's item</td></tr>
+    <tr><td>IGST could never apply; PDF place of supply was always the business's state</td><td>CA checklist (Legal:126)</td><td>Customer state from their GSTIN; IGST and place of supply follow it. B2C rules: CA</td></tr>
+    <tr><td>HSN read from the live item, not the line; column said "SAC"</td><td>DI:142 lines are snapshots</td><td>HSN copied into the line; column "HSN/SAC"</td></tr>
+    <tr><td>Tax invoice PDF dated the proforma's share date</td><td>D85 cover from invoice date</td><td>Tax invoice dated when INV- is given; matches the warranty start. Proforma PDF says "Not a tax invoice"</td></tr>
+    <tr><td>No "Part paid" invoice status</td><td>D55 (teal)</td><td>Part paid pill, list filter, money buckets</td></tr>
+    <tr><td>Any writer could cancel an issued invoice</td><td>DI:177 Owner voids</td><td>Owner only; drafts still deleted by any writer. Also: Jobs-off link opened the wrong Settings tab; serial lookup area now Sales</td></tr>
+  </table></div>
+
+  <h2>Owner calls: answered 23 Oct, recorded as D87–D93</h2>
+  <div class="card"><table>
+    <tr><th>#</th><th>Question</th><th>Why</th><th>Answer</th></tr>
+    <tr><td>1</td><td>Ready messages 4–7 still say "your quote" and "Tap Accept"; 8 and 9 are "Quote accepted"</td><td>D60 removed quotes and Accept; 4 is what the Accept sheet sends</td><td class="rec">D93: 8 and 9 retired; 4–7 redrafted, marked for your approval <span class="pill ok">done</span></td></tr>
+    <tr><td>2</td><td>Phase 1 surfaces with no screen: approve-from-email page, in-app notification inbox, first-run checklist</td><td>WBS 2.6, 2.9, 3.9; go/no-go Workflow:199</td><td class="rec">D87: add all three, then lock <span class="pill ok">done</span></td></tr>
+    <tr><td>3</td><td>Fields prep asks for but screens lack: item photos, variants, add-ons, MOQ; job photos, time, materials; lead priority and location</td><td>WBS 2.1, 3.1, 3.3; DI data model</td><td class="rec">D87: item photos + MOQ, job photos + materials, lead priority; the rest Phase 2 <span class="pill ok">done</span></td></tr>
+    <tr><td>4</td><td>Job done: make a draft invoice at once, or keep the separate Bill step?</td><td>DI:160, Arch:63, WBS 3.3 say draft on done</td><td class="rec">D88: draft on done; "Review and send" <span class="pill ok">done</span></td></tr>
+    <tr><td>5</td><td>"Made with Biz4Kit" on the pay page and PDF</td><td>D78 footer on customer pages; DI:218 PDF footer on free plan; Market fit:29 never on money pages</td><td class="rec">D89: catalog, request, booking, My orders only <span class="pill ok">done</span></td></tr>
+    <tr><td>6</td><td>Wholesaler: tax invoice on dispatch (D56) or on payment approval (D71)?</td><td>The two decisions conflict</td><td class="rec">D90: INV- on approval for all <span class="pill ok">done (already so)</span></td></tr>
+    <tr><td>7</td><td>Accountant can record payments today; Arch:149 says read-only</td><td>Roles</td><td class="rec">D91: read-only plus export <span class="pill ok">done</span></td></tr>
+    <tr><td>8</td><td>Go/no-go needs CA and lawyer sign-off, but D23 brings them in after Phase 2</td><td>Gate cannot pass as written</td><td class="rec">D92: pilot gate without them; sign-off before paid plans <span class="pill ok">recorded</span></td></tr>
+  </table></div>
+
+  <div class="grid2">
+    <div>
+      <h2>Smaller, not blocking</h2>
+      <div class="card"><ul>
+        <li>Booking "Cancelled" and "To confirm" both grey (D55 unique colours). <span class="pill warn">pick a colour</span></li>
+        <li>Only the salon starter kit exists; 5 others say "not written yet" (WBS 4.2). <span class="pill info">needs content</span></li>
+        <li>Sidebar top shows the 4B mark alone; D79 says mark beside the name (D83 may cover it).</li>
+        <li>"Report this page" footer link, <code>/legal/*</code> pages, reserved-slug refusal, super-admin console: WBS 3.7, 3.8, 3.11, built later.</li>
+        <li>Customer pages say both "Ask for a price" and "Request a quote".</li>
+        <li>Optional lines: who ticks them on the pay page (DI:187) is not settled.</li>
+      </ul></div>
+    </div>
+    <div>
+      <h2>Linear tidy-up (read only so far)</h2>
+      <div class="card"><ul>
+        <li><b>BIZ-2</b> (1.1, In Progress) still says "deployed to Fly.io"; D28, D38, D42 say ECS Fargate + API Gateway; D39 S3 state.</li>
+        <li><b>BIZ-13</b> (2.5) lacks serial numbers and warranty (D85, D86).</li>
+        <li>BIZ-11, 12, 13 still labelled <code>area:quote</code> (D60).</li>
+        <li>Branch <code>biz-2-11-repo-cicd-environments</code>: BIZ-11 is the Doc editor; environments is BIZ-2 only.</li>
+        <li>Open business facts with no question yet: starter-kit content, SAC/HSN per vertical, opening hours, warranty terms.</li>
+      </ul></div>
+    </div>
+  </div>
+
+  <h2>Before environment setup and end-to-end tests</h2>
+  <div class="card"><ul>
+    <li>Commit the scaffold (<code>apps/</code>, <code>packages/</code>, root config) and <code>design/app/</code>; git-ignore <code>infra/.terraform/</code>.</li>
+    <li>Terraform state to S3 with locking (D39); then ECS Fargate, API Gateway, VPC Link, S3 bucket (D28, D31, D38, D42).</li>
+    <li>Database: Neon serverless Pool for numbering and approvals (transactions); money in paise.</li>
+    <li>Polar is in the scaffold but no decision chose it: ask before keeping it.</li>
+    <li>Add a <code>test</code> task, Vitest and Playwright; port the prototype's flows (list in <code>docs/implementation-notes.md</code> §6).</li>
+  </ul>
+  <p class="sub" style="margin:10px 0 0">Full notes: <code>docs/implementation-notes.md</code>. Prototype: <code>python design/app/serve.py</code>, then <code>#check</code>.</p></div>
+</main></body>
+</html>

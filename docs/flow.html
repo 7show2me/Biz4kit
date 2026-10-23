@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>How a sale moves through Biz4Kit</title>
     <!-- Local reading page (D19). Every fact carries a footnote to prep/ or docs/decisions.md.
-     Model: lead first, invoice as the reply (D59–D66, 20 Oct 2026; checked against D67–D81 and design/screens-v2.html, 22 Oct 2026). Colours and fonts from brand/theme.css. No scripts. -->
+     Model: lead first, invoice as the reply (D59–D66, 20 Oct 2026; checked against D67–D81 and design/screens-v2.html, 22 Oct 2026; re-checked against D82–D102 and the locked prototype design/app/, D94, 24 Oct 2026). Colours and fonts from brand/theme.css. No scripts. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -428,7 +428,7 @@
   <body>
     <main>
       <p class="label">
-        Biz4Kit · product model · local page · updated 22 Oct 2026
+        Biz4Kit · product model · local page · updated 24 Oct 2026
       </p>
       <h1>How a sale moves through Biz4Kit</h1>
       <p class="lead">
@@ -442,7 +442,7 @@
       </p>
       <p class="small">
         <span class="badge b-fact">Fact</span> stated in <code>prep/</code>,
-        with a footnote &nbsp; <span class="badge b-dec">D59–D81</span> decided
+        with a footnote &nbsp; <span class="badge b-dec">D59–D102</span> decided
         20–22 Oct 2026, in <code>docs/decisions.md</code> &nbsp;
         <span class="badge b-draft">Draft</span> wording for you to approve
         &nbsp; <span class="badge b-p2">Phase 2</span> later &nbsp;
@@ -503,27 +503,42 @@
           <div>
             Bill: <span class="pill mute">Draft</span
             ><span class="pill warn">Due</span
+            ><span class="pill teal">Part paid</span
             ><span class="pill bad">Overdue</span
             ><span class="pill ok">Paid</span
             ><span class="pill vio">Waiting for approval</span>
+            (Part paid: some approved, some still due; Overdue wins after the
+            due date, D55)
           </div>
           <div>
             Reply: <span class="pill info">Awaiting payment</span
             ><span class="pill vio">Waiting for approval</span
             ><span class="pill ok">Paid</span
-            ><span class="pill mute">Expired</span> (no <s>Part paid</s>, D70)
+            ><span class="pill mute">Expired</span> (a reply has no Part paid: an
+            advance and its balance are two invoices, D70)
           </div>
           <p class="who small">
             <b>Made by:</b> Staff, when they Accept a quoted lead, after a
             booked lead's service, or from manual lines.<sup
               ><a href="#s16">16</a></sup
             >
-            Void only by the Owner; keeps the number.<sup
+            A shared invoice is cancelled (void) only by the Owner and keeps its
+            number; a draft can be deleted by anyone who writes.<sup
               ><a href="#s5">5</a></sup
             >
           </p>
           <p class="not">
             Not: <s>bill</s>, <s>receipt</s>, <s>estimate</s>, <s>quotation</s>
+          </p>
+          <p class="who small">
+            <b>Serial numbers and warranty</b> (an extra, D85, D86): model and
+            warranty or guarantee on the proforma; the serial on the tax invoice;
+            one row per unit once serials are entered; a warranty card per row
+            with a serial.
+          </p>
+          <p class="who small">
+            <b>Optional lines:</b> the customer ticks them on the pay page and
+            the amount updates as they tick (D102).
           </p>
         </div>
         <div class="card def">
@@ -536,13 +551,16 @@
             <span class="pill mute">To confirm</span
             ><span class="pill teal">Agreed</span
             ><span class="pill info">In progress</span
-            ><span class="pill mute">Completed</span
+            ><span class="pill ok">Completed</span
             ><span class="pill bad">Cancelled</span
-            ><span class="pill mute">No-show</span>
+            ><span class="pill warn">No-show</span> (Cancelled red, D100)
           </div>
           <p class="who small">
             <b>Confirmed by:</b> the business, with a staff member assigned
-            (D62). A clash on member + time is refused.<sup
+            (D62). A clash on member + time is refused. Slots fall inside the
+            business's opening hours: up to two ranges per weekday, starting
+            every 30 minutes and fitting the package length; a day with no range
+            is closed (D97, D99).<sup
               ><a href="#s4">4</a></sup
             >
           </p>
@@ -555,7 +573,10 @@
           <h3>Job <span class="badge b-fact">extra</span></h3>
           <p>
             The work done for a paid reply or an Agreed booking (D69), with a
-            checklist and photos. An extra the owner switches on (D63).<sup
+            checklist, before / after photos and materials used (D87). Marking it
+            Done makes the draft invoice at once (a bill, or the balance after an
+            advance); the next step is <b>Review and send</b> (D88). An extra the
+            owner switches on (D63).<sup
               ><a href="#s3">3</a></sup
             >
           </p>
@@ -581,7 +602,9 @@
             ><span class="pill bad">Rejected</span>
           </div>
           <p class="who small">
-            <b>Uploaded by:</b> anyone. <b>Approved by:</b> Owner, or a Manager
+            <b>Uploaded by:</b> the customer on the pay page, or the Owner, a
+            Manager or Staff; the Accountant is read-only plus export (D91).
+            <b>Approved by:</b> Owner, or a Manager
             strictly below the limit the Owner sets (D57, D74). When the Owner
             is the only approver they may approve their own upload, logged as
             self-approved (D74). Approval above the open balance is refused
@@ -603,9 +626,12 @@
           </p>
           <p class="who small">
             <b>Sees:</b> the invoice page and a private <b>My orders</b> page
-            listing every request, booking, invoice and receipt.<sup
+            listing every request, booking, invoice and receipt; a warranty
+            card for each item with a serial (D86).<sup
               ><a href="#s2">2</a></sup
             >
+            “Made with Biz4Kit” shows only on the catalog, request, booking and
+            My orders pages, never on the pay page, PDF or warranty card (D89).
           </p>
           <p class="not">
             Not: <s>user</s>, <s>buyer</s>; “client” allowed for agencies and IT
@@ -637,7 +663,8 @@
           <h3>Book a package → <span class="chip">Booked</span> lead</h3>
           <p>
             Only for packages the owner marks bookable. The customer picks a
-            slot; the business assigns a staff member and confirms.<sup
+            slot inside the business's opening hours (D97, D99); the business
+            assigns a staff member and confirms.<sup
               ><a href="#s1">1</a></sup
             >
             The price is the package price.
@@ -691,8 +718,9 @@
           <div class="step">
             <b>Lead</b
             ><span
-              >Portal form or staff entry. Email to the assignee. Assign,
-              priority, snooze.<sup><a href="#s1">1</a></sup></span
+              >Portal form or staff entry. Email to the assignee and an item in
+              the in-app inbox (D87). Assign, priority normal / high (D87),
+              snooze.<sup><a href="#s1">1</a></sup></span
             >
           </div>
           <div class="arrow">→</div>
@@ -730,8 +758,8 @@
             ><b>System:</b> Replied on share or on booking confirm (D72);
             Contacted on Ask</span
           ><span
-            ><b>Ends:</b> Rejected (message 18,
-            <span class="badge b-draft">Draft</span>), Snoozed; an unpaid reply
+            ><b>Ends:</b> Rejected (message 18, wording approved D95), Snoozed;
+            an unpaid reply
             past its pay-by date turns Expired and gets message 6 (D75)</span
           >
         </div>
@@ -749,7 +777,8 @@
           <div class="step">
             <b>Payment request</b
             ><span
-              >The proforma page: amount, UPI deep link, QR, bank details.<sup
+              >The proforma page: amount, UPI deep link, QR, bank details; the
+              customer ticks any optional lines (D102).<sup
                 ><a href="#s2">2</a></sup
               >
               Phase 1 moves no money.</span
@@ -759,16 +788,18 @@
           <div class="step">
             <b>Proof uploaded</b
             ><span
-              >Customer taps “I have paid”, or staff record it. Required for UPI
-              / bank, optional for cash.<sup><a href="#s7">7</a></sup></span
+              >Customer taps “I have paid”, or the Owner, a Manager or Staff
+              record it (not the Accountant, D91). Required for UPI / bank,
+              optional for cash.<sup><a href="#s7">7</a></sup></span
             >
           </div>
           <div class="arrow">→</div>
           <div class="step money">
             <b>Approved</b
             ><span
-              >Owner (or Manager below the limit, D74), in-app or from the email
-              link. Rejected needs a note (message 16); re-upload as a new
+              >Owner (or Manager below the limit, D74), in-app or from the
+              approve-from-email link (48 h, single use, D57, D87). Rejected needs
+              a note (message 16); re-upload as a new
               payment. Never above the open balance; a payment against an older
               <code>PI-</code> version goes to the latest (D76). Rejected or
               expired replies cannot be paid; Snoozed shows a warning (D73).<sup
@@ -790,8 +821,9 @@
           <div class="step">
             <b>Service, then the rest</b
             ><span
-              >Booking or job (extras). A separate balance invoice after the
-              work when an advance was taken: <code>PI-</code>, then
+              >Booking or job (extras). Job done makes the draft invoice; staff
+              Review and send it (D88). A separate balance invoice after the work
+              when an advance was taken: <code>PI-</code>, then
               <code>INV-</code> on approval (D70, D71).<sup
                 ><a href="#s8">8</a></sup
               ></span
@@ -806,11 +838,13 @@
             approves</span
           ><span
             ><b>System:</b> Overdue past the pay-by date for a bill owed after
-            the service; an unpaid reply turns Expired instead (D75). No Part
-            paid: advance and balance are two invoices (D70)<sup
+            the service; an unpaid reply turns Expired instead (D75). A bill
+            with some approved and some still due is Part paid (D55); an advance
+            and its balance are two invoices (D70)<sup
               ><a href="#s5">5</a></sup
             ></span
-          ><span><b>Ends:</b> Void (Owner only, unpaid only, number kept)</span>
+          ><span><b>Ends:</b> Void (Owner only, no approved payment, number
+            kept)</span>
         </div>
       </div>
 
@@ -943,9 +977,10 @@
               <td>Accept, Edit or Reject a request</td>
               <td>The business (Staff, Manager, Owner)</td>
               <td>
-                Accept: price every line, pay-by date, advance if any. Reject: a
-                reason and the decline message (18,
-                <span class="badge b-draft">Draft</span>). D61.
+                Accept: price every line, pay-by date, advance % if any (the
+                reply is then the advance proforma, each line at that %, D70);
+                lines may be marked optional for the customer to tick (D102).
+                Reject: a reason and the decline message (18, wording D95). D61.
               </td>
               <td>
                 Accept creates and shares the proforma; Lead → Replied. Reject →
@@ -977,7 +1012,9 @@
                 Owner who is the only approver may approve their own upload,
                 logged as self-approved (D74). Never above the open balance
                 (D76); not for a rejected or expired reply (D73). In-app, or the
-                email link (single-use, 48 h).<sup><a href="#s7">7</a></sup>
+                approve-from-email link (single-use, 48 h, D57, D87).<sup
+                  ><a href="#s7">7</a></sup
+                >
               </td>
               <td>
                 Proforma → tax invoice <code>INV-</code>; Lead → Paid once every
@@ -989,7 +1026,8 @@
               <td>Void an invoice</td>
               <td>Owner only</td>
               <td>
-                Unpaid invoices only.<sup><a href="#s5">5</a></sup>
+                No approved payment on it. A draft (not yet shared) is simply
+                deleted by anyone who writes.<sup><a href="#s5">5</a></sup>
               </td>
               <td>Number kept; excluded from totals.</td>
             </tr>
@@ -999,7 +1037,8 @@
       <p class="small muted" style="margin-top: 8px">
         There is no customer-side Accept button any more: paying the proforma is
         the acceptance (D60). Staff cannot see reports or the approval queue;
-        the Accountant is read-only with export.<sup><a href="#s9">9</a></sup>
+        the Accountant is read-only with export: cannot record, approve or edit
+        (D91).<sup><a href="#s9">9</a></sup>
       </p>
 
       <h2>6. How it changes by business type</h2>
@@ -1007,7 +1046,12 @@
         The flow and the gates are identical. A starter kit changes the labels,
         the default units, whether HSN and MOQ fields show, and what follows a
         paid reply (D56, read with “quote” as “quoted lead” and “accept” as
-        “pays”, D66).<sup><a href="#s10">10</a></sup> Pilot verticals are salons
+        “pays”, D66; tax invoice on approval for every type, D90). Starter kits
+        for the five types after salon are drafted by Claude and approved by the
+        owner (D96) <span class="badge b-open">Open</span>.<sup
+          ><a href="#s10">10</a></sup
+        >
+        Pilot verticals are salons
         and design / IT agencies.<sup><a href="#s22">22</a></sup>
       </p>
       <div class="tbl-wrap">
@@ -1031,8 +1075,8 @@
               <td>per visit; per-stylist calendar</td>
               <td>Business sets it (bridal)</td>
               <td>
-                Booking → Job → balance invoice. Most sales start as a booked
-                lead, no price reply.
+                Booking → Job → invoice (the balance when an advance was taken).
+                Most sales start as a booked lead, no price reply.
               </td>
               <td>Same gates</td>
             </tr>
@@ -1047,20 +1091,30 @@
             <tr>
               <td>IndiaMART wholesaler</td>
               <td>Products, MOQ, rate, proforma, delivery terms</td>
-              <td>kg / pc / m; HSN per item; MOQ; quantity tiers</td>
+              <td>
+                kg / pc / m; HSN per item; MOQ and item photos (D87); quantity
+                tiers; serial numbers and warranty on by default (D85)
+              </td>
               <td>Proforma is the norm</td>
               <td>
-                No booking. Tax invoice on dispatch; a Job is optional for
-                packing.
+                No booking. Tax invoice <code>INV-</code> when the payment is
+                approved (D90, replaces “on dispatch” in D56); a Job is optional
+                for packing and dispatch.
               </td>
               <td>Same gates</td>
             </tr>
             <tr>
               <td>Small manufacturer</td>
               <td>Items, specification, lead time, dispatch</td>
-              <td>kg / pcs / m; GST / HSN</td>
+              <td>
+                kg / pcs / m; GST / HSN; serial numbers and warranty on by
+                default (D85)
+              </td>
               <td>Business sets it</td>
-              <td>Job (order → dispatch) → tax invoice</td>
+              <td>
+                Job (order → dispatch) → draft invoice on done (D88) → tax invoice
+                on approval (D90)
+              </td>
               <td>Same gates</td>
             </tr>
             <tr>
@@ -1130,9 +1184,9 @@
           <b>Invoiced</b>
           <div class="small">
             Bill: <span class="pill warn">Due</span
+            ><span class="pill teal">Part paid</span
             ><span class="pill bad">Overdue</span
-            ><span class="pill vio">Waiting for approval</span> (no Part paid,
-            D70)
+            ><span class="pill vio">Waiting for approval</span> (D55)
           </div>
         </div>
         <div>
@@ -1156,14 +1210,21 @@
             <li>
               Automatic anyway: Replied on share, Overdue past the pay-by date
               (bills only; an unpaid reply turns Expired, D75), tax invoice and
-              Paid when approvals reach the total, draft balance invoice on job
-              done.<sup><a href="#s5">5</a></sup>
+              Paid when approvals reach the total, draft invoice (bill or
+              balance) on job done (D88).<sup><a href="#s5">5</a></sup>
             </li>
             <li>
-              Email to the assignee for a new lead, to the owner when a proof
-              waits, copies to the customer when an email is known.<sup
+              Email to the assignee for a new lead, to the approver when a proof
+              waits (with the approve-from-email link), copies to the customer
+              when an email is known.<sup
                 ><a href="#s12">12</a></sup
               >
+              In-app notification inbox behind the bell, by role, with unread and
+              per-person mute (D87).
+            </li>
+            <li>
+              16 ready messages: 8 and 9 (“Quote accepted”) are retired; 4–7 and
+              18 wording approved (D93, D95).
             </li>
             <li>
               Paid means the owner approved a proof, not that a bank confirmed
@@ -1215,8 +1276,10 @@
           </li>
           <li>
             <b>Invoice statuses.</b> Outline says Draft → Sent → Paid → Overdue;
-            Design inputs has Part paid and Void. This page uses Design inputs,
-            without Part paid: advance and balance are two invoices (D70).
+            Design inputs has Part paid and Void. This page uses Design inputs:
+            Part paid (teal, D55) for a bill with some approved and some due; a
+            reply has none, because an advance and its balance are two invoices
+            (D70).
           </li>
           <li>
             <b>Board labels.</b> Outline lines 26 and 54 differ; both are
@@ -1235,8 +1298,10 @@
           </li>
         </ul>
         <p class="small muted" style="margin-top: 8px">
-          Fix in <code>prep/</code> with an inline note citing the decision
-          (D41), not by editing the .docx / .pdf copies.
+          <code>prep/</code> was rewritten on 24 Oct 2026 to follow the
+          decisions; the earlier versions (and the .docx / .pdf copies) are in
+          <code>prep/archive/2026-10-24/</code>. Line numbers in the sources
+          below refer to those archived versions.
         </p>
       </div>
 
@@ -1286,7 +1351,8 @@
           </li>
           <li id="s11">
             prep/Design inputs.md 230–260: ready messages 1–17 and the Phase 1
-            manual-share rule; message 18 (Request declined) is new in D61.
+            manual-share rule; message 18 (Request declined) is new in D61; 8
+            and 9 retired, 4–7 and 18 wording approved (D93, D95).
           </li>
           <li id="s12">
             Outline.md 54 (board), 85 (hand-offs and emails); Design inputs.md
@@ -1301,7 +1367,7 @@
           </li>
           <li id="s15">
             Architecture &amp; contracts.md 63; WBS 3.3; Design inputs.md 153:
-            job done creates the draft balance invoice.
+            job done creates the draft invoice; confirmed by D88.
           </li>
           <li id="s16">
             Outline.md 38 (invoice inputs, credit notes Phase 2); Design
@@ -1330,6 +1396,17 @@
             unpaid <code>PI-</code> not owed, overpayment, four Quick jobs,
             logo, sidebar sections Home · Sales · Schedule · Payments ·
             Business. Checked against design/screens-v2.html.
+          </li>
+          <li id="s24">
+            docs/decisions.md D82–D102 (22–24 Oct 2026): sidebar, prototype,
+            serial numbers and warranty (D85, D86), approve-from-email link,
+            inbox, first-run checklist, photos, MOQ, materials, lead priority
+            (D87), draft invoice on job done (D88), footer (D89), tax invoice
+            on approval for every type (D90), Accountant read-only (D91), pilot
+            gate (D92), ready messages (D93, D95), screens locked (D94), starter
+            kits (D96), opening hours (D97, D99), Polar (D98), Cancelled red
+            (D100), “Request a quote” (D101), optional lines (D102). Checked
+            against design/app/.
           </li>
           <li id="s21">WBS 1.5 (lite mode); Market fit &amp; sales.md 20.</li>
           <li id="s22">docs/decisions.md D1: pilot verticals.</li>

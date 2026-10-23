@@ -8,7 +8,9 @@
      viewer: phone / tablet / web, light / dark, four sample business brands. Local only (D19).
      Tokens are copied from brand/theme.css and brand/tailwind.css by design/sync_tokens.py (D52, D54).
      Layouts switch with container queries (@tab: 600px, @web: 1024px), so each device size is real.
-     URL hash keeps the view: #screen=dashboard&device=web&theme=light&brand=rose&state=0 -->
+     URL hash keeps the view: #screen=dashboard&device=web&theme=light&brand=rose&state=0
+     Frozen again 2026-10-24 after updating to D85–D102; design/app/ is the build spec (D94).
+     38 screens, numbered as in design/app/ (n35 Serial lookup, n36 Warranty card, n37 Approve link, n38 Inbox). -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -17,6 +19,11 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <!-- Sidebar icons only: Phosphor duotone (option B) and fill tiles (option A), reports/sidebar-options-2026-10-21.html.
+         Stylesheets, not the package script: its global `var link` would clash with the prototype's `link()`. -->
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
 
     <style>
       /* BEGIN brand/theme.css */
@@ -322,7 +329,7 @@
 /* Biz4Kit project tokens as Tailwind v4 utilities. Load order: tailwindcss, then theme.css,
    then this file. Values live in theme.css; this file only names them. Use these utilities,
    never raw px / hex / arbitrary values (D52). Keep the words "at-import" out of comments:
-   the Tailwind browser build used by design/screens.html fails on them. */
+   the Tailwind browser build used by design/screens-v2.html fails on them. */
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -681,6 +688,38 @@
             @apply flex-col;
           }
         }
+        /* Sidebar look (owner, 22 Oct, reports/sidebar-options-2026-10-21.html): layout of option B (duotone icons,
+           sections open to their pages on a dashed guide line, a bar marks the current page) and Favourites of
+           option A (label + amber icon tiles). The page tabs stay. */
+        .sb-sum {
+          @apply text-foreground hover:bg-muted flex cursor-pointer list-none items-center gap-2 px-2 font-semibold;
+        }
+        .sb-sum::-webkit-details-marker {
+          display: none;
+        }
+        .sb-sum i,
+        .sb-page i {
+          @apply text-muted-foreground text-[17px];
+        }
+        .sb-sub {
+          @apply border-border mt-0.5 mb-1.5 ml-4 space-y-0.5 border-l border-dashed pl-2;
+        }
+        .sb-page {
+          @apply text-muted-foreground hover:bg-muted hover:text-foreground relative flex items-center gap-2 px-2;
+        }
+        .sb-page[aria-current="page"] {
+          @apply bg-secondary text-secondary-foreground font-semibold;
+        }
+        .sb-page[aria-current="page"] i {
+          @apply text-info;
+        }
+        .sb-page[aria-current="page"]::before {
+          content: "";
+          @apply bg-info absolute top-1.5 bottom-1.5 -left-[9px] w-[3px] rounded-xs;
+        }
+        .sb-tile {
+          @apply rounded-control inline-flex size-6 shrink-0 items-center justify-center text-[15px];
+        }
         /* Choice cards (onboarding business type): one pressed per [data-choice] group. */
         .choice {
           @apply rounded-control border-border bg-card hover:bg-muted flex items-start gap-2.5 border p-3 text-left;
@@ -853,6 +892,9 @@
       /* ---------- helpers ---------- */
       const I = (n, c = "size-icon") =>
         `<i data-lucide="${n}" class="${c} shrink-0"></i>`;
+      /* Phosphor icon (sidebar only): weight duotone, fill or regular. */
+      const P = (n, w = "duotone", c = "") =>
+        `<i class="${w === "regular" ? "ph" : "ph-" + w} ph-${n} shrink-0 ${c}" aria-hidden="true"></i>`;
       const inr = (n) =>
         (n < 0 ? "−" : "") + "₹" + Math.abs(n).toLocaleString("en-IN");
       const M = (n) => `<span class="money">${inr(n)}</span>`;
@@ -963,14 +1005,22 @@
         tentative: ["To confirm", "calendar-clock", MUTE],
         invited: ["Invited", "mail", WARN],
         active: ["Active", "circle-check", OK],
+        /* booking Cancelled is red; grey is To confirm (D100) */
+        booking_cancelled: ["Cancelled", "circle-x", BAD],
+        completed: ["Completed", "circle-check", OK],
+        /* serial numbers and warranty (D85, D86) */
+        no_serial: ["Serials missing", "scan-barcode", WARN],
+        covered: ["In cover", "shield-check", OK],
+        ended: ["Cover ended", "shield-off", MUTE],
       };
       const FAMILY = {
         /* V2: a reply (proforma to a quoted lead) is not money owed (D75); a bill is owed after the service (D71). */
         Reply: ["awaiting", "pending", "paid", "expired"],
-        Invoice: ["draft", "due", "overdue", "paid", "pending"],
+        Invoice: ["draft", "due", "partial", "overdue", "paid", "pending"],
         Lead: ["new", "contacted", "replied", "snoozed", "rejected", "paid"],
         Job: ["open", "in_progress", "done", "invoiced"],
-        Booking: ["confirmed", "tentative"],
+        Booking: ["confirmed", "tentative", "completed", "booking_cancelled"],
+        Cover: ["no_serial", "covered", "ended"],
         Payment: ["pending", "approved", "rejected"],
         Member: ["invited", "active"],
       };
@@ -998,15 +1048,16 @@
         `<div class="field ${c}">${v}${I("chevron-down", "size-icon-sm ml-auto text-muted-foreground")}</div>`;
 
       /* ---------- workspace shell ----------
-         Sidebar = the five groups (icon; label on web; names: owner, 22 Oct, D80). A group's pages are tabs under the page header.
+         Sidebar = the five groups (names: owner, 22 Oct, D80). Web: each group opens to its pages, then Favourites
+         (option B layout + option A Favourites, owner 22 Oct); rail: group icons. A group's pages are also tabs under the page header.
          Phone: the same groups as the bottom bar. Each role sees only the pages its screen-map "who"
          allows (canSee); Super-admin sees every page read-only. */
       const NAV = [
         ["Home", "house", [["dashboard", "Today"], ["board", "Board"], ["reports", "Reports"]]],
-        ["Sales", "handshake", [["leads", "Leads", 4], ["customers", "Customers"]]],
+        ["Sales", "handshake", [["leads", "Leads", 4], ["customers", "Customers"], ["serials", "Serials"]]],
         ["Schedule", "calendar-days", [["bookings", "Bookings"], ["jobs", "Jobs"]]],
         ["Payments", "indian-rupee", [["invoices", "Invoices"], ["overdue", "Overdue", 2], ["approvals", "Approvals", 2]]],
-        ["Business", "store", [["catalog", "Catalog"], ["packages", "Packages"], ["settings", "Settings"]]],
+        ["Business", "store", [["catalog", "Catalog"], ["packages", "Packages"]]],
       ];
       const ROLES = {
         superadmin: "Super-admin",
@@ -1045,6 +1096,8 @@
         export: (r) => r === "owner" || r === "accountant",
         catalog: (r) => r === "owner" || r === "manager",
         settings: (r) => r === "owner",
+        /* cancel an issued invoice: Owner only (Design inputs: void by the Owner); Accountant read-only + export (D91) */
+        void: (r) => r === "owner",
       };
       function applyRole(root) {
         root.querySelectorAll("[data-app] [data-need]").forEach((el) => {
@@ -1071,74 +1124,62 @@
         ["Create invoice", "file-plus", "invoices", "new-invoice", "write"],
         ["Send reply", "send", "leads", "price-reply", "write"],
       ];
-      /* shadcn-style group under the main menu: a collapsible "Favourites" item with its links as
-         sub-items on a guide line. Icon rail (tablet, collapsed sidebar): the three icons only. */
+      /* Favourites as in option A (owner, 22 Oct): a small label and each job on an amber icon tile, under the
+         sections. Icon rail (tablet, collapsed sidebar): the tiles only. */
+      const FAV_ICON = { catalog: "book-open", invoices: "receipt", leads: "paper-plane-tilt" };
+      const FAV_TONE = { catalog: "bg-teal-soft text-teal", invoices: "bg-info-soft text-info", leads: "bg-violet-soft text-violet" };
       const favLinks = () => {
         const items = FAVS.filter((f) => canSee(screen(f[2])) && (st.role === "superadmin" || NEED[f[4]](st.role)));
         if (!items.length) return "";
         const a = (f, cls, inner) => `<a ${link(f[2])} ${f[3] ? `data-then="${f[3]}"` : ""} data-fav title="${f[0]}" class="${cls}">${inner}</a>`;
-        return `<div class="shrink-0 mx-2 pt-1 pb-1 border-t border-border" role="group" aria-label="Favourites">
-        <div class="sb-text"><p class="label px-2 h-control-sm flex items-center gap-1.5">${I("star", "size-icon-sm")}Favourites</p>
-          <ul class="space-y-0.5">${items.map((f) => `<li>${a(f, "flex items-center gap-2 h-nav-item px-2 rounded-control hover:bg-muted", `${I(f[1])}<span class="truncate">${f[0]}</span>`)}</li>`).join("")}</ul></div>
-        <div class="sb-mark flex-col gap-1 pt-1">${items.map((f) => a(f, "sb-item flex items-center justify-center h-nav-item rounded-control hover:bg-muted", `${I(f[1])}<span class="sr-only">${f[0]}</span>`)).join("")}</div>
+        const tile = (f) => `<span class="sb-tile ${FAV_TONE[f[2]]}">${P(FAV_ICON[f[2]], "fill")}</span>`;
+        return `<div role="group" aria-label="Favourites" class="mt-2 pt-2 border-t border-border">
+        <div class="sb-text"><p class="label px-2 h-control-sm flex items-center">Favourites</p>
+          <ul class="space-y-0.5">${items.map((f) => `<li>${a(f, "flex items-center gap-2 h-nav-item px-2 rounded-control hover:bg-muted", `${tile(f)}<span class="truncate">${f[0]}</span>`)}</li>`).join("")}</ul></div>
+        <div class="sb-mark flex-col gap-0.5">${items.map((f) => a(f, "sb-item flex items-center justify-center h-nav-item px-2 rounded-control hover:bg-muted", `${tile(f)}<span class="sr-only">${f[0]}</span>`)).join("")}</div>
       </div>`;
       };
-      /* Expanded sidebar, after the shadcnblocks dashboards the owner shared (D52): a label per group, every page
-         as an item, and a parent item whose pages sit on a guide line (Catalog → Items, Packages). */
+      /* Sidebar icons (Phosphor duotone, option B). */
+      const GROUP_ICON = { Home: "house", Sales: "handshake", Schedule: "calendar-blank", Payments: "currency-inr", Business: "storefront" };
       const PAGE_ICON = {
-        dashboard: "layout-dashboard",
-        board: "square-kanban",
-        reports: "chart-column",
-        leads: "inbox",
+        dashboard: "sun",
+        board: "kanban",
+        reports: "chart-bar",
+        leads: "tray",
         customers: "users",
-        bookings: "calendar",
+        bookings: "calendar-check",
         jobs: "wrench",
         invoices: "receipt",
-        overdue: "circle-alert",
-        approvals: "badge-check",
+        overdue: "warning-circle",
+        approvals: "seal-check",
         catalog: "book-open",
         packages: "package",
-        settings: "settings",
+        settings: "gear-six",
+        serials: "barcode",
       };
-      /* Sidebar after shadcnblocks dashboard5 (owner, 21 Oct: "I want it like this"): small section labels, flat
-         items with icons, and one parent per section whose pages open as sub-items on a guide line
-         (Money → Invoices → All invoices, Overdue, Approvals; Setup → Catalog → Items, Packages). */
-      const TREE = [
-        ["Main", ["dashboard", "board", "reports"]],
-        ["Sales", ["leads", "customers"]],
-        ["Schedule", ["bookings", "jobs"]],
-        ["Payments", [["Invoices", "receipt", ["invoices", "overdue", "approvals"], { invoices: "All invoices" }]]],
-        ["Business", [["Catalog", "book-open", ["catalog", "packages"], { catalog: "Items" }], "settings"]],
-      ];
-      /* Sub-items whose page icon would repeat the parent's. */
-      const SUB_ICON = { invoices: "files", catalog: "list" };
       const PAGE = Object.fromEntries(NAV.flatMap((g) => g[2].map((pg) => [pg[0], pg])));
-      const navTree = (active) =>
-        TREE.map(([label, entries]) => {
-          const on = (id) => id === active;
-          const ok = (id) => canSee(screen(id));
-          const item = (id, sub = false, name = PAGE[id][1]) =>
-            `<a ${link(id)} data-page ${on(id) ? 'aria-current="page"' : ""} class="flex items-center gap-2 h-nav-item px-2 rounded-control ${on(id) ? "bg-secondary text-secondary-foreground font-medium" : "hover:bg-muted"}">${I(sub && SUB_ICON[id] ? SUB_ICON[id] : PAGE_ICON[id], sub ? "size-icon text-muted-foreground" : "size-icon")}<span class="truncate">${name}</span>${PAGE[id][2] ? `<span class="ml-auto count">${PAGE[id][2]}</span>` : ""}</a>`;
-          const body = entries
-            .map((e) => {
-              if (typeof e === "string") return ok(e) ? item(e) : "";
-              const [name, icon, kids, rename] = e;
-              const show = kids.filter(ok);
-              if (!show.length) return "";
-              const here = show.some(on);
-              const saved = navOpen["p:" + name];
-              const open = saved === undefined ? here : saved;
-              return `<details ${open ? "open" : ""} data-grp-tree="${name}" class="group/nav"><summary class="flex items-center gap-2 h-nav-item px-2 rounded-control cursor-pointer list-none [&::-webkit-details-marker]:hidden hover:bg-muted ${here ? "font-medium" : ""}">${I(icon)}<span class="truncate">${name}</span>${(() => { const n = show.reduce((t, id) => t + (PAGE[id][2] || 0), 0); return (n ? `<span class="ml-auto count group-open/nav:hidden">${n}</span>` : "") + I("chevron-right", `size-icon-sm ${n ? "ml-1.5 group-open/nav:ml-auto" : "ml-auto"} text-muted-foreground transition-transform group-open/nav:rotate-90`); })()}</summary>
-          <ul class="ml-4 mt-0.5 mb-1 pl-2 border-l-2 border-muted-foreground/25 space-y-0.5">${show.map((id) => `<li>${item(id, true, (rename && rename[id]) || PAGE[id][1])}</li>`).join("")}</ul></details>`;
-            })
-            .join("");
-          return body ? `<div class="pt-3 first:pt-1"><p class="label px-2 h-control-sm flex items-center">${label}</p><div class="space-y-0.5">${body}</div></div>` : "";
+      /* Option B: each section opens to its pages on a dashed guide line; only the current section starts open; a closed
+         section shows its count, an open one shows it per page. The page tabs stay (owner, 22 Oct). */
+      const navTree = (grp, active) =>
+        NAV.map((g) => {
+          const pages = pagesOf(g);
+          if (!pages.length) return "";
+          const open = g === grp;
+          const n = pages.reduce((t, pg) => t + (pg[2] || 0), 0);
+          return `<details ${open ? "open" : ""} data-grp-tree="${g[0]}" class="group/nav"><summary class="sb-sum h-nav-item rounded-control">${P(GROUP_ICON[g[0]])}<span class="truncate">${g[0]}</span>${n ? `<span class="ml-auto count bg-info text-info-foreground group-open/nav:hidden">${n}</span>` : ""}${P("caret-right", "regular", `${n ? "ml-1.5 group-open/nav:ml-auto" : "ml-auto"} text-muted-foreground transition-transform group-open/nav:rotate-90`)}</summary>
+          <ul class="sb-sub">${pages.map((pg) => `<li><a ${link(pg[0])} data-page ${pg[0] === active ? 'aria-current="page"' : ""} class="sb-page h-nav-item rounded-control">${P(PAGE_ICON[pg[0]])}<span class="truncate">${pg[1]}</span>${pg[2] ? `<span class="ml-auto count">${pg[2]}</span>` : ""}</a></li>`).join("")}</ul></details>`;
         }).join("");
+      /* Settings on its own under a divider (owner, 22 Oct: "keep setting tab separate"). */
+      const settingsLink = (active) => {
+        if (!canSee(screen("settings"))) return "";
+        const on = active === "settings" ? 'aria-current="page"' : "";
+        return `<div class="mt-2 pt-2 border-t border-border" data-settings><a ${link("settings")} data-page ${on} class="sb-full sb-page h-nav-item rounded-control">${P("gear-six")}<span class="truncate">Settings</span></a><a ${link("settings")} ${on} title="Settings" class="sb-mark sb-item items-center justify-center h-nav-item px-2 rounded-control ${on ? "bg-secondary text-secondary-foreground" : "hover:bg-muted"}">${P("gear-six", "duotone", "text-[17px]")}<span class="sr-only">Settings</span></a></div>`;
+      };
       const navGroup = (g, here) => {
         const pages = pagesOf(g);
         if (!pages.length) return "";
         const badge = pages.reduce((n, pg) => n + (pg[2] || 0), 0);
-        return `<a ${link(pages[0][0])} data-grp="${g[0]}" title="${g[0]}" ${here ? 'aria-current="page"' : ""} class="sb-item relative flex items-center gap-2.5 h-nav-item px-2 rounded-control ${here ? "bg-secondary text-secondary-foreground font-medium" : "hover:bg-muted"}">${I(g[1])}<span class="sb-text truncate">${g[0]}</span>${badge ? `<span class="sb-full ml-auto count">${badge}</span><span class="sb-rail absolute top-1 right-1 size-2 rounded-pill bg-destructive"></span>` : ""}</a>`;
+        return `<a ${link(pages[0][0])} data-grp="${g[0]}" title="${g[0]}" ${here ? 'aria-current="page"' : ""} class="sb-item relative flex items-center gap-2.5 h-nav-item px-2 rounded-control ${here ? "bg-secondary text-secondary-foreground font-medium" : "hover:bg-muted"}">${P(GROUP_ICON[g[0]], "duotone", "text-[17px]")}<span class="sb-text truncate">${g[0]}</span>${badge ? `<span class="sb-full ml-auto count">${badge}</span><span class="sb-rail absolute top-1 right-1 size-2 rounded-pill bg-destructive"></span>` : ""}</a>`;
       };
       const pageTabs = (g, active) => {
         const pages = g ? pagesOf(g) : [];
@@ -1179,14 +1220,14 @@
            Neutral frame; the page sits in a white inset panel; the sidebar is transparent on the frame. */
         return `<div data-app class="relative h-full flex bg-background text-foreground">
     <aside class="sb ${navOpen.sidebar === false ? "is-collapsed" : ""} hidden @tab:flex flex-col shrink-0">
-      <div class="sb-head flex items-center gap-1 mx-2 mt-3 mb-2 h-control-lg">
+      <div class="sb-head flex items-center gap-1 mx-2 mt-3 mb-2 pb-2 box-content h-control-lg border-b border-border">
         <a ${link("dashboard")} class="sb-item flex items-center gap-2.5 px-1.5 min-w-0 flex-1" aria-label="Go to Today"><span class="size-8 shrink-0 rounded-control bg-primary text-primary-foreground inline-flex items-center justify-center" role="img" aria-label="Biz4Kit mark">${mark("h-4")}</span></a>
         <button class="sb-web btn btn-ghost btn-sm btn-icon shrink-0 text-muted-foreground" data-act="sidebar" aria-label="Collapse or expand sidebar" title="Collapse sidebar">${I("panel-left", "size-icon-sm")}</button>
       </div>
-      <nav class="flex-1 overflow-y-auto noscroll px-2 pt-1" aria-label="Workspace"><div class="sb-railnav space-y-0.5">${NAV.map((g) => navGroup(g, g === grp)).join("")}</div></nav>
+      <nav class="flex-1 overflow-y-auto noscroll px-2 pt-1" aria-label="Workspace"><div class="sb-mark flex-col gap-0.5">${NAV.map((g) => navGroup(g, g === grp)).join("")}</div><div class="sb-text space-y-0.5">${navTree(grp, active)}</div>${favLinks()}${settingsLink(active)}</nav>
       <details class="dd relative m-2" data-menu>
         <summary class="sb-item flex items-center gap-2.5 p-2 rounded-control border border-border bg-card hover:bg-muted cursor-pointer" aria-label="Account and workspace menu">
-          ${bizMark("size-9 shrink-0 rounded-pill")}<div class="sb-text min-w-0 leading-tight"><div class="font-semibold truncate">Glow Studio</div><div class="text-caption text-muted-foreground truncate">College Road, Nashik</div><div class="text-caption text-muted-foreground truncate">${C("GSTIN 27AAKFG4821M1Z3")}</div></div>
+          ${bizMark("size-8 shrink-0 rounded-pill")}<div class="sb-text min-w-0 leading-tight"><div class="font-semibold truncate">Glow Studio</div><div class="text-caption text-muted-foreground truncate">${name} · ${ROLES[st.role]}</div></div>
           <span class="sb-full ml-auto text-muted-foreground">${I("chevrons-up-down", "size-icon-sm")}</span></summary>
         <div class="menu w-72 left-full bottom-0 ml-2 @web:left-0 @web:bottom-full @web:ml-0 @web:mb-1">
           <div class="flex items-start gap-2.5 p-2">${bizMark("size-10 shrink-0 rounded-pill")}<div class="min-w-0 leading-tight space-y-0.5"><p class="font-semibold truncate">Glow Studio</p><p class="text-caption text-muted-foreground">Shop 4, College Road, Nashik 422005</p><p class="text-caption text-muted-foreground">${C("GSTIN 27AAKFG4821M1Z3")}</p><p class="text-caption text-muted-foreground"><span class="money">+91 98220 41567</span> · ${C("glow.biz4kit.com")}</p></div></div>
@@ -1209,7 +1250,7 @@
         <div class="ml-auto flex items-center gap-2">
           <div class="relative hidden @web:block">${search("Search customers, leads, invoices", "w-72 pr-12")}<span class="kbd absolute right-2 top-1.5">⌘K</span></div>
           <button class="@web:hidden btn btn-ghost btn-icon" aria-label="Search">${I("search")}</button>
-          <button class="btn btn-outline btn-icon relative" aria-label="Inbox">${I("bell")}<span class="absolute -top-1.5 -right-1.5 count bg-destructive text-destructive-foreground">3</span></button>
+          <a ${link("inbox")} class="btn btn-outline btn-icon relative" aria-label="Notifications, 11 unread">${I("bell")}<span class="absolute -top-1.5 -right-1.5 count bg-destructive text-destructive-foreground">11</span></a>
           <button class="hidden @tab:inline-flex btn btn-outline btn-icon" aria-label="Help">${I("circle-help")}</button>
         </div>
       </header>
@@ -1436,15 +1477,16 @@
   ${back ? `<span class="text-customer-muted">${I("chevron-left")}</span>` : ""}${bizLogo("h-6")}
   <nav class="hidden @web:flex items-center gap-6 ml-8 text-body text-customer-muted"><a class="text-customer-text font-medium">Services</a><a>Packages</a><a>Bridal</a><a>Visit us</a></nav>
   <a class="ml-auto inline-flex items-center gap-2 h-touch px-3 rounded-sm bg-biz-soft text-biz font-medium" aria-label="Call">${I("phone")}<span class="hidden @tab:inline money">+91 98220 41567</span></a></div></header>`;
-      /* D78: on customer pages Biz4Kit appears only as this footer line. Documents that carry money (PDF,
-         email) never show it (Market fit & sales.md:29). */
+      /* D78, D89: "Made with Biz4Kit" only on the catalog, request, booking and My orders pages. Never on the
+         pay page, the invoice PDF, the email or the warranty card. */
       const madeWith = `<p class="py-6 text-center text-caption text-customer-muted">Made with Biz4Kit</p>`;
       const cust = (inner, bar = "") =>
         `<div class="h-full flex flex-col font-customer bg-customer-page text-customer-text"><div class="flex-1 min-h-0 overflow-y-auto">${inner}</div>${bar}</div>`;
       const cBar = (b) =>
         `<div class="@web:hidden shrink-0 p-3 bg-customer-page border-t border-customer-border">${b}</div>`;
-      const ok = (icon, title, body, rest = "") =>
-        `${cHeader()}<div class="mx-auto max-w-md px-6 pt-12 @tab:pt-20 text-center"><span class="mx-auto size-16 rounded-pill bg-biz-soft text-biz flex items-center justify-center">${I(icon)}</span><h1 class="mt-4 text-heading font-bold">${title}</h1><p class="mt-1 text-body text-customer-muted">${body}</p>${rest}</div>${madeWith}`;
+      /* foot: the "Made with Biz4Kit" line; left off pages that carry money (D89). */
+      const ok = (icon, title, body, rest = "", foot = madeWith) =>
+        `${cHeader()}<div class="mx-auto max-w-md px-6 pt-12 @tab:pt-20 text-center"><span class="mx-auto size-16 rounded-pill bg-biz-soft text-biz flex items-center justify-center">${I(icon)}</span><h1 class="mt-4 text-heading font-bold">${title}</h1><p class="mt-1 text-body text-customer-muted">${body}</p>${rest}</div>${foot}`;
 
       /* ---------- dialogs shared by screens ---------- */
       /* Share sheet. WhatsApp and SMS carry the ready message; email adds a subject and a one-line
@@ -1613,7 +1655,7 @@
       const quickItem = () => `<div class="space-y-3"><div><label class="flabel">Name <span class="text-destructive">*</span></label><div class="field">Beard trim</div></div>
         <div class="grid grid-cols-2 gap-3"><div><label class="flabel">Price <span class="text-destructive">*</span></label><div class="field">${M(300)}</div></div><div><label class="flabel">Category</label>${sel("Hair")}</div></div>
         <label class="flex items-center">Show price on catalog<span class="ml-auto">${toggle(1)}</span></label>
-        <a ${link("item")} class="inline-flex items-center gap-1 text-caption underline">${I("sliders-horizontal", "size-icon-sm")}More details: photos, variants, add-ons, GST</a></div>
+        <a ${link("item")} class="inline-flex items-center gap-1 text-caption underline">${I("sliders-horizontal", "size-icon-sm")}More details: photos, MOQ, GST</a></div>
       <p class="hint">Unit "per visit" and GST 18% come from the starter kit; change them in More details.</p>
       <div class="mt-4 flex gap-2 justify-end"><button class="btn btn-ghost" data-close>Cancel</button><button data-need="catalog" class="btn btn-primary">${I("plus")}Add item</button></div>`;
 
@@ -1965,19 +2007,45 @@
         who: "All",
         notes:
           "V2 (21 Oct): laid out after the shadcnblocks dashboards the owner shared (dashboard3, 4, 28). Four KPI cards; a bar chart (paid per day, 7-day average as a line) beside Money owed; Leads to answer beside Today work; Recent invoices beside Recent activity. 1100px+ content width: 12-column grid (8 + 4); 640–1099px: two columns; phone: one column with Money owed right after the numbers. Owner: money. Manager: counts only, Team today instead of Money owed, Jobs in service instead of Recent invoices. Accountant: Who owes me and To approve, Paid in the last 7 days, Export. Staff keeps My day. Money in only (D77); every figure from one source.",
-        html: () =>
-          app(
-            "dashboard",
-            {
-              icon: st.role === "staff" ? "sun" : "layout-dashboard",
-              title: st.role === "staff" ? "My day" : "Today",
-              fab: st.role === "manager" ? `${I("plus")}New lead` : `${I("plus")}New invoice`,
-              fabOpen: st.role === "manager" ? "new-lead" : "new-invoice",
-              dialogs: (st.role === "manager" ? "" : newInvoiceDialogs()) + modal("share-catalog", "Share your price list", shareCatalog()) + modal("new-lead", "New lead", newLead()),
-            },
-            st.role === "staff" ? page(myDay()) : dashboard()
-          ),
+        states: [
+          [
+            "Default",
+            () =>
+              app(
+                "dashboard",
+                {
+                  icon: st.role === "staff" ? "sun" : "layout-dashboard",
+                  title: st.role === "staff" ? "My day" : "Today",
+                  fab: st.role === "manager" ? `${I("plus")}New lead` : `${I("plus")}New invoice`,
+                  fabOpen: st.role === "manager" ? "new-lead" : "new-invoice",
+                  dialogs: (st.role === "manager" ? "" : newInvoiceDialogs()) + modal("share-catalog", "Share your price list", shareCatalog()) + modal("new-lead", "New lead", newLead()),
+                },
+                st.role === "staff" ? page(myDay()) : dashboard()
+              ),
+          ],
+          [
+            "First run",
+            () => app("dashboard", { icon: "layout-dashboard", title: "Today" }, page(firstRun())),
+          ],
+        ],
       });
+      /* First-run checklist (D87): Owner only, until the first reply is shared or the Owner hides it. Steps come from the data. */
+      function firstRun() {
+        const steps = [
+          ["Business details", "Address, phone, and UPI or bank", 1, "details"],
+          ["Brand", "Your logo or colours", 1, "brand"],
+          ["Catalog", "Three or more items", 0, "catalog"],
+          ["Team", "Invite anyone besides you", 0, "settings"],
+          ["Share your price list", "Ready message 1", 0, "catalog"],
+          ["First reply", "Price a request and share it", 0, "leads"],
+        ];
+        const done = steps.filter((x) => x[2]).length;
+        return `${st.role === "owner" || st.role === "superadmin" ? `<div class="card p-card-sm @tab:p-card"><div class="flex items-center gap-2"><h2 class="text-title font-semibold">Get set up</h2><span class="text-caption text-muted-foreground">${done} of ${steps.length}</span><button data-need="settings" class="ml-auto btn btn-ghost btn-sm">Hide</button></div>
+      <div class="mt-2 h-2 rounded-pill bg-muted overflow-hidden"><div class="h-full bg-primary" style="width:${Math.round((done / steps.length) * 100)}%"></div></div>
+      <ul class="mt-3 grid @tab:grid-cols-2 gap-2">${steps.map((x) => `<li><a ${link(x[3])} class="flex items-center gap-3 p-2 rounded-control border border-border hover:bg-muted">${x[2] ? I("circle-check", "size-icon text-success") : I("circle", "size-icon text-muted-foreground")}<span class="min-w-0"><span class="block font-medium ${x[2] ? "line-through text-muted-foreground" : ""}">${x[0]}</span><span class="block text-caption text-muted-foreground">${x[1]}</span></span></a></li>`).join("")}</ul>
+      <p class="hint">Shows until your first reply is shared. <span class="italic">[Draft wording, owner to approve]</span></p></div>` : ""}
+    <div class="card p-card text-center text-muted-foreground">Your numbers, chart and tables fill in here once leads and invoices come in.</div>`;
+      }
 
       /* Small chart pieces for the dashboard (no library): a bar chart and a stacked progress bar. */
       const bars = (series, { max, unit = "", on = series.length - 2, h = "h-28" }) =>
@@ -2464,7 +2532,7 @@
       /* LEADS */
       /* [customer, request, source, type, status, assignee, age]. Type = quoted or booked (D59). */
       const LEADS = [
-        ["Kiran Rao", "Party makeup for 3 people on Sat 24 Oct", "Instagram", "quoted", "new", "", "12 min"],
+        ["Kiran Rao", "Party makeup for 3 people on Sat 24 Oct", "Instagram", "quoted", "new", "", "12 min", "high"],
         ["Divya M.", "Monthly hair care · Tue 20 Oct 10:30", "QR", "booked", "new", "Rahul", "1 h"],
         ["Anita Sharma", "Bridal makeup, wedding on 14 Nov", "Web", "quoted", "replied", "Priya", "2 d"],
         ["Farah Khan", "Hair colour, advice on shade", "Referral", "quoted", "contacted", "Pooja", "2 d"],
@@ -2475,6 +2543,8 @@
         ["Tanvi B.", "Bridesmaid makeup", "Web", "quoted", "snoozed", "Priya", "5 d"],
         ["Pallavi Rao", "Keratin on Sun 18 Oct", "Web", "quoted", "rejected", "Priya", "6 d"],
       ];
+      /* Lead priority, normal or high (D87): a flag, never a status colour (D55). High leads come first in Leads to answer. */
+      const priFlag = `<span class="inline-flex text-destructive" title="High priority">${I("flag", "size-icon-sm")}</span>`;
       const typeChip = (t) =>
         t === "booked" ? chip("Booked", "calendar-check") : chip("Quoted", "indian-rupee");
       add({
@@ -2520,7 +2590,7 @@
         { t: "", role: "act" },
       ],
       rows: LEADS.map((l) => [
-        `<span class="font-medium">${l[0]}</span>`,
+        `<span class="font-medium inline-flex items-center gap-1">${l[0]}${l[7] === "high" ? priFlag : ""}</span>`,
         `<span class="block max-w-64 truncate">${l[1]}</span>`,
         typeChip(l[3]),
         chip(l[2]),
@@ -2539,7 +2609,7 @@
       const leadAside = (name, phone, email, assigned = "Unassigned") =>
         `<div class="space-y-4">
       <div class="card p-card-sm"><p class="label">Customer</p><p class="mt-1 font-medium">${name}</p><p class="code">${phone}</p><p class="text-muted-foreground">${email}</p><button class="mt-2 btn btn-outline w-full">${I("phone")}Call</button></div>
-      <div class="card p-card-sm space-y-3"><div><p class="flabel">Assigned to</p>${sel(assigned)}</div><div><p class="flabel">Priority</p>${seg(["Low", "Normal", "High"], 2)}</div></div>
+      <div class="card p-card-sm space-y-3"><div><p class="flabel">Assigned to</p>${sel(assigned)}</div><div><p class="flabel">Priority</p>${seg(["Normal", `${I("flag", "size-icon-sm")}High`], 1)}<p class="hint">High leads come first in Leads to answer (D87).</p></div></div>
     </div>`;
       const leadActivity = (rows) =>
         `<div class="card p-card-sm @tab:p-card"><h3 class="text-title font-semibold mb-2">Activity</h3>
@@ -2555,7 +2625,7 @@
         action: "Accept / Edit / Reject, or Confirm",
         who: "All",
         notes:
-          'Quoted lead: Accept prices it and shares a proforma PI- by Email or SMS; Edit changes the request first; Reject shares a decline (ready message 18, draft). Booked lead: assign a staff member and Confirm (message 10). Replied: the linked proforma and the reply log. Paying is the acceptance (D60–D62).',
+          'Quoted lead: Accept prices it and shares a proforma PI- by Email or SMS; Edit changes the request first; Reject shares a decline (ready message 18, D95). Booked lead: assign a staff member and Confirm (message 10). Replied: the linked proforma and the reply log. Paying is the acceptance (D60–D62).',
         states: [
           [
             "Quoted lead",
@@ -2695,7 +2765,7 @@
         action: "Add item, reorder, import CSV",
         who: "Owner, Manager",
         notes:
-          'V2 Quick Catalog: "Your page" card on top; Share price list opens the share sheet (WhatsApp first, link, QR, PDF, ready message 1); each row shares one item; Add item asks only name and price. Drag order = public page order; "Ask for a quote" hides a price.',
+          'V2 Quick Catalog: "Your page" card on top; Share price list opens the share sheet (WhatsApp first, link, QR, PDF, ready message 1); each row shares one item; Add item asks only name and price. Drag order = public page order; "Request a quote" hides a price.',
         html: () =>
           app(
             "catalog",
@@ -2729,7 +2799,7 @@
         r[1],
         "per " + r[2],
         C("18%"),
-        r[4] ? chip("Price shown", "eye") : chip("Ask for a quote", "eye-off"),
+        r[4] ? chip("Price shown", "eye") : chip("Request a quote", "eye-off"),
         M(r[3]),
         `<span class="flex justify-end gap-1"><button class="btn btn-ghost btn-sm btn-icon" data-open="share-item" aria-label="Share this item" title="Share this item">${I("share-2", "size-icon-sm")}</button>${more}</span>`,
       ]),
@@ -2745,7 +2815,7 @@
         action: "Save",
         who: "Owner, Manager",
         notes:
-          "HSN shows only for goods units; a price change never alters a shared reply or invoice (lines are copied).",
+          "HSN shows only for goods units; a price change never alters a shared reply or invoice (lines are copied). Photos and MOQ (D87); variants and add-ons move to Phase 2 (D87). The Serial number and warranty block shows when the feature is on (D85).",
         html: () =>
           app(
             "catalog",
@@ -2767,23 +2837,14 @@
       ]
         .map((f) => `<div><label class="flabel">${f[0]}</label>${f[1]}</div>`)
         .join("")}</div>
-      ${[
-        [
-          "Variants",
-          [
-            ["Short hair", 1500],
-            ["Long hair", 1900],
-          ],
-        ],
-        ["Add-ons", [["Scalp serum", 400]]],
-      ]
-        .map(
-          (
-            g
-          ) => `<div><div class="flex items-center mb-1"><span class="flabel mb-0">${g[0]}</span><button class="ml-auto btn btn-ghost btn-sm">${I("plus", "size-icon-sm")}Add</button></div>
-        <div class="space-y-2">${g[1].map((v) => `<div class="flex gap-2"><div class="field flex-1">${v[0]}</div><div class="field w-32">${M(v[1])}</div></div>`).join("")}</div></div>`
-        )
-        .join("")}
+      <div class="grid grid-cols-2 gap-3"><div><label class="flabel">HSN / SAC code</label><div class="field text-muted-foreground">Optional</div><p class="hint">Printed on the tax invoice when set. [Codes: CA to confirm]</p></div><div><label class="flabel">Minimum order (MOQ)</label><div class="field text-muted-foreground">None</div><p class="hint">Shown as "Min. order" on your page when set (D87).</p></div></div>
+      <fieldset class="rounded-control border border-border p-3 space-y-3"><legend class="px-1 flabel mb-0">Serial number and warranty</legend>
+        <label class="flex items-center gap-3"><span class="flex-1"><span class="block font-medium">Serial number for each unit</span><span class="block text-caption text-muted-foreground">Each unit sold gets its own invoice row and serial (D85). Off for services.</span></span>${toggle(0)}</label>
+        <div class="grid grid-cols-2 gap-3"><div><label class="flabel">Model name</label><div class="field text-muted-foreground">Optional</div></div><div><label class="flabel">Model number</label><div class="field text-muted-foreground code">Optional</div></div></div>
+        <div class="grid grid-cols-2 gap-3"><div><label class="flabel">Cover</label>${sel("None")}</div><div><label class="flabel">Months</label><div class="field text-muted-foreground money">12</div></div></div>
+        <label class="flex items-center gap-3"><span class="flex-1"><span class="block font-medium">Batch / lot number</span><span class="block text-caption text-muted-foreground">Asks for the plant's batch or lot on each row.</span></span>${toggle(0)}</label>
+        <p class="hint">Shown when Serial numbers and warranty is on in Settings, Extras. Model and cover show on the proforma and tax invoice; the serial only on the tax invoice (D86).</p>
+      </fieldset>
       <div class="flex justify-end gap-2 pt-3 border-t border-border"><button class="btn btn-ghost">Cancel</button><button data-need="catalog" class="btn btn-primary">${I("check")}Save</button></div>
     </div>
     <div class="space-y-4">
@@ -2796,7 +2857,7 @@
           (t) =>
             `<label class="flex items-center">${t[0]}<span class="ml-auto">${toggle(t[1])}</span></label>`
         )
-        .join("")}<p class="hint">Off shows "Ask for a quote" instead.</p></div>
+        .join("")}<p class="hint">Off shows "Request a quote" instead.</p></div>
     </div>
   </div>`)
           ),
@@ -2921,7 +2982,8 @@
         (b) =>
           `<div class="flex items-center gap-3 px-4 py-2.5 min-h-touch">${C(b[5])}<span class="w-1 self-stretch rounded-xs ${b[6] ? "bg-muted-foreground" : "bg-chart-1"}"></span><div class="min-w-0 flex-1"><div class="font-medium truncate">${b[3]}</div><div class="text-caption text-muted-foreground">${b[4]} · ${STAFF[b[0] - 1]}</div></div>${pill(b[6] ? "tentative" : "confirmed")}</div>`
       )
-      .join("")}</div>`)
+      .join("")}</div>
+    <div class="flex flex-wrap items-center gap-2 text-caption text-muted-foreground"><span>Booking statuses:</span>${FAMILY.Booking.map((k) => pill(k)).join("")}<span>· Cancelled is red, To confirm grey (D100).</span></div>`)
           ),
       });
 
@@ -2933,7 +2995,7 @@
         route: "/w/:slug/jobs",
         action: "Open job",
         who: "Staff, Manager",
-        notes: "Done → draft invoice created automatically.",
+        notes: "Done → draft invoice created automatically; the job's next step is Review and send (D88).",
         html: () =>
           app(
             "jobs",
@@ -3008,7 +3070,7 @@
         action: "Mark done",
         who: "Staff",
         notes:
-          'Built for the phone: one hand, patchy network, 44px targets, offline banner (1.7). State "My day" is the staff day view (3.3).',
+          'Built for the phone: one hand, patchy network, 44px targets, offline banner (1.7). Before / after photos and materials (D87; time logged moves to Phase 2). Mark done makes the draft invoice at once; the next step is "Review and send" (D88). State "My day" is the staff day view (3.3).',
         states: [
           [
             "Job",
@@ -3040,13 +3102,26 @@
           .join("")}</div></div>
       <div class="space-y-3">
         <div class="grid grid-cols-2 gap-2">${["Before", "After"].map((t, i) => `<div class="card p-2"><p class="text-caption text-muted-foreground mb-1">${t}</p><div class="aspect-square rounded-control ${i ? "border-2 border-dashed border-border flex items-center justify-center" : "bg-muted"}">${i ? I("camera", "size-icon text-muted-foreground") : ""}</div></div>`).join("")}</div>
-        <div class="card p-card-sm flex items-center gap-3">${I("timer", "size-icon text-muted-foreground")}<div><p class="font-medium">Time</p>${C("1 h 42 m")}</div><button data-need="catalog" class="ml-auto btn btn-outline h-touch">${I("pause")}Pause</button></div>
-        <div class="card p-card-sm"><p class="flabel">Materials</p><div class="field">Airbrush kit, lashes ×1</div></div>
+        ${jobMaterials()}
       </div>
     </div>
     <div class="flex-1"></div>
     <div class="sticky bottom-0 p-4 bg-card border-t border-border"><button data-need="write" class="btn btn-primary w-full @web:w-auto @web:px-8 h-touch text-body">${I("circle-check")}Mark done</button><p class="hint">3 items left on the checklist</p></div>
   </div>`
+              ),
+          ],
+          [
+            "Done: review and send",
+            () =>
+              app(
+                "jobs",
+                { icon: "wrench", title: "Bridal trial", crumb: "Job", back: "jobs" },
+                `<div class="min-h-full flex flex-col"><div class="p-4 @tab:p-page grid @web:grid-cols-2 gap-4">
+      <div><h1 class="font-serif text-heading font-semibold">Bridal trial</h1><p class="text-muted-foreground">Anita Sharma · Today 10:00–13:00 · Rahul</p><div class="mt-1.5">${pill("done")}</div>
+        <div class="mt-3 card p-card-sm"><p class="label mb-1">Draft invoice</p><div class="flex items-center gap-2">${pill("draft")}<span class="text-caption text-muted-foreground">Made when Rahul marked the job done (D88) · not numbered</span><span class="ml-auto">${M(4130)}</span></div>
+          <div class="mt-2 grid grid-cols-2 gap-2"><a ${link("invoice-editor")} class="btn btn-outline">${I("pencil")}Edit lines</a><button data-need="write" class="btn btn-primary">${I("send")}Review and send</button></div>
+          <p class="hint">Sending gives it the next proforma number; it becomes the tax invoice when the payment is approved (D71).</p></div></div>
+      <div class="space-y-3">${jobMaterials()}</div></div></div>`
               ),
           ],
           [
@@ -3060,6 +3135,18 @@
           ],
         ],
       });
+      /* Job photos (before / after) and materials, no prices (D87). */
+      function jobMaterials() {
+        return `<div class="grid grid-cols-2 gap-2">${["Before", "After"].map((x, i) => `<div class="card p-2"><p class="text-caption text-muted-foreground mb-1">${x} · ${i ? 0 : 2}</p><div class="grid grid-cols-2 gap-1.5">${i ? "" : `<div class="aspect-square rounded-control bg-muted"></div><div class="aspect-square rounded-control bg-muted"></div>`}<div class="aspect-square rounded-control border-2 border-dashed border-border flex items-center justify-center">${I("camera", "size-icon text-muted-foreground")}</div></div></div>`).join("")}</div>
+        <div class="card p-card-sm"><div class="flex items-center"><p class="flabel mb-0">Materials</p><button data-need="write" class="ml-auto btn btn-ghost btn-sm">${I("plus", "size-icon-sm")}Add</button></div>
+          <div class="mt-1 divide-y divide-border">${[
+            ["Airbrush kit", "1", "set", ""],
+            ["False lashes", "1", "pair", "Client's choice"],
+            ["Hair flowers", "6", "pc", ""],
+          ]
+            .map((m) => `<div class="flex items-center gap-2 py-1.5"><span class="flex-1">${m[0]}${m[3] ? `<span class="block text-caption text-muted-foreground">${m[3]}</span>` : ""}</span><span class="money">${m[1]} ${m[2]}</span><button class="btn btn-ghost btn-sm btn-icon" aria-label="Remove ${m[0]}">${I("x", "size-icon-sm")}</button></div>`)
+            .join("")}</div><p class="hint">No prices on materials (not decided).</p></div>`;
+      }
       /* Staff day view: the job screen's My day state and the Staff dashboard. */
       function myDay() {
         return `<div><h1 class="font-serif text-heading font-semibold">My day</h1><p class="text-muted-foreground">Rahul · Monday 19 October</p></div>
@@ -3211,7 +3298,8 @@
         more,
       ]),
     })}
-    <p class="text-caption text-muted-foreground">Replies awaiting payment (${inr(total(MONEY.replies))}) are not counted as money owed; past the pay-by date they turn Expired (D75).</p>`)
+    <p class="text-caption text-muted-foreground">Replies awaiting payment (${inr(total(MONEY.replies))}) are not counted as money owed; past the pay-by date they turn Expired (D75).</p>
+    <div class="flex flex-wrap items-center gap-2 text-caption text-muted-foreground"><span>Status filter:</span>${FAMILY.Invoice.map((k) => pill(k)).join("")}<span>· a bill with some approved and some due is Part paid (teal, D55).</span><span>With Serial numbers and warranty on, an invoice whose tracked units lack serials also shows</span>${pill("no_serial")}<span>(D86).</span></div>`)
           ),
       });
 
@@ -3226,7 +3314,7 @@
           : kind === "pi"
             ? `<div class="flex items-center gap-2">${pill("pending")}<span class="text-caption text-muted-foreground">Proof by Pooja, 12:40</span></div>
       <div class="hidden @tab:flex gap-2"><a ${link("approvals")} class="btn btn-primary flex-1">${I("badge-check")}Review proof</a><a ${link("invoice-pdf")} class="btn btn-outline btn-icon" aria-label="PDF" title="PDF">${I("file-down")}</a></div>
-      <div class="grid grid-cols-2 gap-2"><button data-need="write" class="btn btn-outline" data-open="share-invoice">${I("indian-rupee")}Ask again</button><button data-need="write" class="btn btn-outline" data-open="record">${I("wallet")}Record payment</button></div>
+      <div class="grid grid-cols-2 gap-2"><button data-need="write" class="btn btn-outline" data-open="share-invoice">${I("indian-rupee")}Ask again</button><button data-need="write" class="btn btn-outline" data-open="record">${I("wallet")}Record payment</button><button data-need="void" class="btn btn-ghost text-destructive col-span-2">${I("circle-x")}Cancel (number kept, Owner only)</button></div>
       <p class="flex gap-1.5 text-caption text-muted-foreground">${I("info", "size-icon-sm mt-0.5")}Becomes tax invoice ${C("INV-")} with the next number when the payment is approved. Edits before that are versions of ${C("PI-2627-0045")}; a payment made on an older version applies to the latest (D76).</p>`
             : `<div class="flex items-center gap-2">${pill("paid")}<span class="text-caption text-muted-foreground">Approved by Priya, 13:10</span></div>
       <div class="hidden @tab:flex gap-2"><button data-need="write" class="btn btn-primary flex-1" data-open="share-invoice">${I("send")}Send receipt</button><a ${link("invoice-pdf")} class="btn btn-outline btn-icon" aria-label="PDF" title="PDF">${I("file-down")}</a></div>
@@ -3295,8 +3383,50 @@
           ["Draft", () => invState("draft", "Draft", "Komal Jain")],
           ["Proforma", () => invState("pi", "Proforma", "PI-2627-0045")],
           ["Tax invoice (after approval)", () => invState("inv", "Invoice", "INV-2627-0030")],
+          ["Serial numbers (D85, D86)", () => serialState()],
         ],
       });
+      /* Serial numbers on, a 3-unit line: the panel splits it into one row per unit (D86); the proforma shows model
+         and cover, never the serial; the aside counts serials and links each warranty card. */
+      function serialState() {
+        const meta = `<span class="block text-caption text-customer-muted">Model Breeze 1200 · No. BZ-1200-W · 24-month warranty</span>`;
+        const units = [["BZ24-00117", "L-2610"], ["BZ24-00118", ""], ["", ""]];
+        const panel = `<div class="card p-card-sm max-w-2xl mx-auto mb-4"><div class="flex items-center gap-2"><h2 class="text-title font-semibold">Serial numbers</h2><span class="ml-auto text-caption text-muted-foreground">2 of 3 entered</span></div>
+    <p class="hint">One row per unit: saving splits a line of qty 3 into 3 rows of 1, amounts unchanged (D86). Serials can be added later, even after payment. A serial can be used once in your business (D85).</p>
+    <div class="mt-3 field">${I("scan-barcode", "size-icon text-muted-foreground")}<span class="code text-muted-foreground">Scan a barcode or type a serial, then Enter</span></div>
+    <div class="mt-3 overflow-x-auto rounded-control border border-border"><table class="w-full border-collapse"><thead class="bg-muted"><tr>${["#", "Item", "Serial number", "Batch / lot", "Cover", "Months"].map((x) => `<th class="th">${x}</th>`).join("")}</tr></thead><tbody>${units
+      .map((u, k) => `<tr><td class="td text-muted-foreground">${k + 1}</td><td class="td"><div class="font-medium">Ceiling fan</div><div class="text-caption text-muted-foreground">Breeze 1200</div></td><td class="td"><span class="field h-control-sm code ${u[0] ? "" : "text-muted-foreground"}">${u[0] || "Not entered"}</span></td><td class="td"><span class="field h-control-sm code w-28 ${u[1] ? "" : "text-muted-foreground"}">${u[1] || "Optional"}</span></td><td class="td">${sel("Warranty", "h-control-sm w-32")}</td><td class="td"><span class="field h-control-sm w-16 money">24</span></td></tr>`)
+      .join("")}</tbody></table></div>
+    <p class="mt-3 font-medium">${I("chevron-right", "size-icon-sm")}Paste a list</p>
+    <div class="mt-3 flex gap-2 justify-end"><button class="btn btn-ghost">Cancel</button><button data-need="write" class="btn btn-primary">${I("check")}Save serials</button></div></div>`;
+        const d = doc({
+          kind: "Proforma invoice",
+          no: "PI-2627-0047",
+          sub: "Mon 19 Oct · Due Wed 28 Oct",
+          toLabel: "Bill to",
+          to: "Meera Kulkarni",
+          toSub: "Gangapur Road, Nashik 422013",
+          rightLabel: "Due",
+          right: "Wed 28 Oct",
+          gst: true,
+          extra: `<div class="px-4 @tab:px-8 py-2 text-caption text-customer-muted border-b border-customer-border">Proforma: not a tax invoice. The tax invoice follows once your payment is approved.</div>`,
+          lines: [0, 1, 2].map(() => ({ name: "Ceiling fan", desc: `1200 mm, 3 blades${meta}`, rate: 2400 })),
+          totals: [
+            ["Taxable", 7200],
+            ["CGST 9%", 648],
+            ["SGST 9%", 648],
+          ],
+          total: 8496,
+        });
+        const aside = `<aside class="w-full @web:w-aside shrink-0 border-t @web:border-t-0 @web:border-l border-border p-4 @tab:p-card-sm space-y-3">
+      <div class="flex items-center gap-2">${pill("due")}<span class="text-caption text-muted-foreground">Due Wed 28 Oct</span></div>
+      <div class="rounded-control bg-muted p-3 space-y-1"><div class="flex justify-between"><span>Total</span>${M(8496)}</div><div class="flex justify-between"><span>Approved</span>${M(0)}</div><div class="flex justify-between font-medium"><span>Still due</span>${M(8496)}</div></div>
+      <div><p class="label mb-1">Serial numbers</p><div class="rounded-control border border-border p-2 space-y-2"><div class="flex items-center gap-2">${pill("no_serial")}<span class="text-caption text-muted-foreground">2 of 3</span><button data-need="write" class="ml-auto btn btn-outline btn-sm">${I("scan-barcode", "size-icon-sm")}Enter</button></div>
+        <ul class="space-y-1">${["BZ24-00117", "BZ24-00118"].map((s) => `<li><a ${link("p-warranty")} class="flex items-center gap-1.5 hover:underline">${I("shield-check", "size-icon-sm text-muted-foreground")}<span class="code">${s}</span><span class="ml-auto text-caption text-muted-foreground">Warranty card</span></a></li>`).join("")}</ul></div></div>
+      <div><p class="label mb-1">Customer sees</p><div class="grid grid-cols-2 gap-2"><a ${link("invoice-pdf")} class="btn btn-outline">${I("file-text")}PDF</a><a ${link("p-pay")} class="btn btn-outline">${I("smartphone")}Pay page</a></div></div>
+    </aside>`;
+        return app("invoices", { icon: "receipt", title: "PI-2627-0047", crumb: "Proforma", back: "invoices" }, `<div class="min-h-full flex flex-col @web:flex-row"><div class="flex-1 min-w-0 bg-muted p-4 @tab:p-page">${panel}${d}</div>${aside}</div>`);
+      }
       function invState(kind, crumb, title) {
         return app(
           "invoices",
@@ -3459,7 +3589,7 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
         action: "Download, attach to email",
         who: "Customer, Accountant",
         notes:
-          "Same blocks as the editor and pay page, laid out for A4. GST fields from the CA checklist (supplier and customer GSTIN, place of supply, SAC per line, CGST + SGST, total in words). SAC codes, terms and the computer-generated note are samples until the CA signs off. No Biz4Kit mark on a document that carries money (D78, Market fit & sales.md:29).",
+          "Same blocks as the editor and pay page, laid out for A4. GST fields from the CA checklist (supplier and customer GSTIN, place of supply from the customer's GSTIN state, HSN/SAC per line copied into the line, CGST + SGST or IGST, total in words). The tax invoice is dated when INV- is given; the proforma says 'Not a tax invoice'. No 'Made with Biz4Kit' (D89). With serial numbers on, tax-invoice lines also carry model, S/N and batch (D86). SAC codes, terms and the computer-generated note are samples until the CA signs off. No Biz4Kit mark on a document that carries money (D78, Market fit & sales.md:29).",
         states: [
           ["Proforma", () => pdfPage("pi")],
           ["Tax invoice (after approval)", () => pdfPage("inv")],
@@ -3476,13 +3606,13 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
           return `<div class="h-full overflow-auto bg-muted p-4 @tab:p-page">
     <div class="doc a4 font-customer bg-customer-surface text-customer-text text-caption shadow-lg flex flex-col">
       <div class="bg-biz text-biz-foreground px-12 py-8 flex items-center gap-4"><span class="bg-customer-surface text-customer-text rounded-control px-3 py-2">${bizLogo("h-10")}</span>
-        <div class="ml-auto text-right"><div class="text-heading font-bold tracking-wide">${pi ? "PROFORMA INVOICE" : "TAX INVOICE"}</div><div class="font-mono text-body">${no}</div></div></div>
+        <div class="ml-auto text-right"><div class="text-heading font-bold tracking-wide">${pi ? "PROFORMA INVOICE" : "TAX INVOICE"}</div><div class="font-mono text-body">${no}</div>${pi ? `<div class="text-caption">Not a tax invoice</div>` : ""}</div></div>
       <div class="px-12 py-6 grid grid-cols-3 gap-6 border-b border-customer-border">
         <div><p class="text-label uppercase tracking-wider text-customer-muted">From</p><p class="mt-1 text-body font-semibold">Glow Studio</p><p>Priya Rao, proprietor</p><p>College Road, Nashik 422005</p><p>Maharashtra</p><p class="mt-1">GSTIN <span class="code">27AAKFG4821M1Z3</span></p><p class="money">+91 98220 41567</p></div>
         <div><p class="text-label uppercase tracking-wider text-customer-muted">Bill to</p><p class="mt-1 text-body font-semibold">Meera Kulkarni</p><p>Gangapur Road, Nashik 422013</p><p>Maharashtra</p><p class="mt-1">GSTIN <span class="code">27AAPFM5521K1Z8</span></p></div>
         <div class="space-y-0.5">${field(pi ? "Proforma no." : "Invoice no.", C(no))}${field("Date", "19 Oct 2026")}${field(pi ? "Due date" : "Paid on", pi ? "28 Oct 2026" : "19 Oct 2026")}${field("Place of supply", "Maharashtra (27)")}${field("Reverse charge", "No")}</div>
       </div>
-      <div class="px-12 pt-6"><table class="w-full border-collapse"><thead><tr class="bg-biz text-biz-foreground">${th("#", 0)}${th("Description", 0)}${th("SAC", 0)}${th("Qty")}${th("Rate")}${th("Taxable")}${th("CGST 9%")}${th("SGST 9%")}${th("Amount")}</tr></thead><tbody>
+      <div class="px-12 pt-6"><table class="w-full border-collapse"><thead><tr class="bg-biz text-biz-foreground">${th("#", 0)}${th("Description", 0)}${th("HSN/SAC", 0)}${th("Qty")}${th("Rate")}${th("Taxable")}${th("CGST 9%")}${th("SGST 9%")}${th("Amount")}</tr></thead><tbody>
         ${PDF_LINES.map(
           (l, i) =>
             `<tr class="border-b border-customer-border align-top"><td class="py-2 px-2">${i + 1}</td><td class="py-2 px-2"><div class="font-medium text-body-sm">${l[0]}</div><div class="text-customer-muted">${l[1]}</div></td><td class="py-2 px-2 code">999721</td><td class="py-2 px-2 text-right money">1 visit</td><td class="py-2 px-2 text-right money">${inr(l[2])}</td><td class="py-2 px-2 text-right money">${inr(l[2])}</td><td class="py-2 px-2 text-right money">${inr(tax(l[2]))}</td><td class="py-2 px-2 text-right money">${inr(tax(l[2]))}</td><td class="py-2 px-2 text-right money font-semibold">${inr(l[2] + 2 * tax(l[2]))}</td></tr>`
@@ -3856,6 +3986,33 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
         },
       });
 
+      /* Settings tabs (D81) and the cards added with D85, D93–D99. */
+      const settingsTabs = (on) =>
+        `<div class="overflow-x-auto noscroll">${seg(["Brand", "Business", "Numbering", "Team", "Roles", "Messages", "Devices"], on)}</div>`;
+      const HOURS = [
+        ["Monday", [["10:00", "13:30"], ["14:30", "20:00"]]],
+        ["Tuesday", [["10:00", "20:00"]]],
+        ["Wednesday", [["10:00", "20:00"]]],
+        ["Thursday", [["10:00", "20:00"]]],
+        ["Friday", [["10:00", "20:00"]]],
+        ["Saturday", [["09:00", "21:00"]]],
+        ["Sunday", []],
+      ];
+      const tbox = (v) => `<span class="field h-control-sm w-24 money">${v || "--:--"}</span>`;
+      const openingHours = () => `<div class="card p-card-sm @tab:p-card"><div class="flex items-start gap-2">${I("clock", "size-icon text-muted-foreground mt-0.5")}<div><h3 class="text-title font-semibold">Opening hours</h3><p class="text-muted-foreground">Customers can book only inside these hours. Up to two ranges a day, e.g. 09:00 to 13:00 and 16:00 to 20:00 (D99). A day switched off is closed.</p></div></div>
+      <div class="mt-3 divide-y divide-border">${HOURS.map(([day, r]) => `<div class="flex flex-wrap items-center gap-3 py-2"><span class="w-28 font-medium">${day}</span>${toggle(r.length)}${r.length ? `<span class="flex items-center gap-1.5">${tbox(r[0][0])}<span class="text-muted-foreground">to</span>${tbox(r[0][1])}</span><span class="flex items-center gap-1.5"><span class="text-caption text-muted-foreground">and</span>${tbox(r[1]?.[0])}<span class="text-muted-foreground">to</span>${tbox(r[1]?.[1])}</span>` : `<span class="text-caption text-muted-foreground">Closed</span>`}</div>`).join("")}</div>
+      <div class="pt-3 flex items-center gap-2"><p class="hint">Slots start every 30 minutes and must end before closing. A new business has no hours: the booking page shows it closed until they are set (D97).</p><button data-need="settings" class="ml-auto btn btn-primary">${I("check")}Save</button></div></div>`;
+      const extrasCard = () => `<div class="card p-card-sm @tab:p-card"><div class="flex items-start gap-2">${I("puzzle", "size-icon text-muted-foreground mt-0.5")}<div><h3 class="text-title font-semibold">Extras</h3><p class="text-muted-foreground">Lite mode (D63): turn off what you do not use. The sidebar updates at once.</p></div></div>
+      <div class="mt-2 divide-y divide-border">${[
+        ["Board", "Leads as cards from New to Paid.", 1],
+        ["Customers", "A list of everyone you have served.", 1],
+        ["Jobs", "Checklists for work after a booking.", 1],
+        ["Serial numbers and warranty", "Model, serial number and warranty or guarantee on invoice rows, a lookup by serial and a warranty card for the customer. On by default for wholesalers and manufacturers (D85).", 0],
+      ].map((r) => `<div class="flex items-center gap-3 py-2.5"><div class="min-w-0 flex-1"><p class="font-medium">${r[0]}</p><p class="text-caption text-muted-foreground">${r[1]}</p></div>${toggle(r[2])}</div>`).join("")}</div></div>`;
+      const MESSAGES = [[1, "Price list", "Owner taps share on the catalog", "Prospect", "Our price list — {business}", "Hi {customer_first}, here is our current price list from {business}. Tap to browse and request a quote: {link} — {sender}, {business}"], [2, "Quote request received", "Portal form submitted", "Customer", "We received your request — {business}", "Thanks {customer_first}, {business} has your request. We will send a quote shortly. Questions? Reply here."], [3, "Need more details", "Staff taps \"ask customer\" on a lead", "Customer", "A quick question about your request", "Hi {customer_first}, to prepare your quote {business} needs a little more detail: {question}. Reply here when convenient."], [4, "Reply (proforma) shared", "Reply shared", "Customer", "Your price {doc_no} from {business}", "Hi {customer_first}, here is our price {doc_no} for your request: {link}. It is valid until {valid_until}; paying on the page confirms it. — {sender}"], [5, "Reply revised", "New version shared", "Customer", "Updated price {doc_no}", "Hi {customer_first}, {business} has updated {doc_no}. The same link shows the new version: {link}"], [6, "Reply follow-up, also when a reply expires", "Staff taps follow-up (+3 days default)", "Customer", "Following up on {doc_no}", "Hi {customer_first}, just checking whether {doc_no} works for you. Happy to adjust anything: {link} — {sender}, {business}"], [7, "Reply expiring", "2 days before valid_until", "Customer", "{doc_no} is valid until {valid_until}", "Hi {customer_first}, {doc_no} from {business} is valid until {valid_until}. Pay on the page to keep this price: {link}"], [10, "Booking confirmed", "Booking confirmed", "Customer", "Booking confirmed — {date} {time}", "Hi {customer_first}, you are booked with {business} on {date} at {time} for {service} with {staff}. Details: {link}"], [11, "Booking reminder", "24 h before", "Customer", "Reminder: tomorrow at {time}", "Reminder from {business}: {service} tomorrow, {date} at {time}. Reply if you need to reschedule."], [12, "Invoice & payment request", "Invoice shared", "Customer", "Invoice {invoice_no} — {amount} due {due_date}", "Hi {customer_first}, invoice {invoice_no} from {business} for {amount} is ready: {link}. Pay by UPI to {upi_id} or scan the QR on the page. Due {due_date}."], [13, "Payment reminder +3", "up to 6 days overdue (D64); never for an unpaid reply (D75)", "Customer", "Reminder: invoice {invoice_no}", "Hi {customer_first}, a gentle reminder that invoice {invoice_no} ({amount}) from {business} is due. Pay here: {link}"], [14, "Payment reminder +7 / +14", "from day 7 overdue (D64); never for an unpaid reply (D75)", "Customer", "Overdue: invoice {invoice_no}", "Hi {customer_first}, invoice {invoice_no} for {amount} is now {days} days overdue. Please pay at {link} or reply if there is an issue. — {business}"], [15, "Payment received", "Owner approves proof", "Customer", "Receipt for {invoice_no}", "Thank you {customer_first}! {business} has received {amount} for invoice {invoice_no}. Receipt: {link}"], [16, "Proof rejected (internal)", "Owner rejects", "Uploader", "", "Proof for {invoice_no} was not approved: {reject_note}. Please re-upload."], [17, "Job completed", "Staff marks done", "Customer", "Work completed — {business}", "Hi {customer_first}, {service} is complete. Thank you for choosing {business}. Your invoice follows shortly."], [18, "Request declined", "Business rejects a quoted lead", "Customer", "About your request to {business}", "Hi {customer_first}, thank you for asking {business}. We can't take on this request right now. — {sender}"]];
+      const messagesList = () => `<div class="card overflow-hidden"><div class="flex items-center gap-2 px-4 @tab:px-card-sm h-header">${I("message-square-text", "size-icon text-muted-foreground")}<h2 class="text-title font-semibold">Ready messages</h2><span class="count">${MESSAGES.length}</span><span class="ml-auto text-caption text-muted-foreground">8 and 9 retired (D93); 4–7 and 18 approved (D95)</span></div>
+      <ul class="divide-y divide-border border-t border-border">${MESSAGES.map((m) => `<li class="px-4 @tab:px-card-sm py-2.5"><div class="flex items-center gap-2"><span class="count">${m[0]}</span><span class="font-medium">${m[1]}</span><span class="ml-auto text-caption text-muted-foreground">${m[2]} · ${m[3]}</span></div>${m[4] && m[4] !== "None" ? `<p class="mt-1 text-caption font-medium">${m[4]}</p>` : ""}<p class="text-caption text-muted-foreground">${m[5]}</p></li>`).join("")}</ul></div>`;
+
       /* SETTINGS */
       add({
         area: "Settings",
@@ -3865,13 +4022,10 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
         action: "Save",
         who: "Owner",
         notes:
-          "Tabs: Brand, Business, Numbering, Team, Roles, Messages, Devices. Re-auth before billing and deletion (1.3).",
-        html: () =>
-          app(
-            "settings",
-            { icon: "settings", title: "Settings" },
-            page(`
-    <div class="overflow-x-auto noscroll">${seg(["Brand", "Business", "Numbering", "Team", "Roles", "Messages", "Devices"], 3)}</div>
+          "Tabs: Brand, Business, Numbering, Team, Roles, Messages, Devices. Re-auth before billing and deletion (1.3). Business: opening hours, up to two ranges per weekday (D97, D99). Numbering: Extras incl. Serial numbers and warranty (D85). Messages: 16 ready messages, 8 and 9 retired (D93, D95).",
+        states: [
+          ["Team", () => app("settings", { icon: "settings", title: "Settings" }, page(`
+    <div class="overflow-x-auto noscroll">${settingsTabs(3)}</div>
     ${dataTable({
       icon: "users",
       title: "Team",
@@ -3905,8 +4059,11 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
       <div class="card p-card-sm @tab:p-card"><div class="flex items-center"><h3 class="text-title font-semibold">Payment approvals</h3><span class="ml-auto">${toggle(1)}</span></div><p class="text-muted-foreground">Managers can approve payments below an amount you choose (D57, D74).</p><div class="mt-3 w-40"><label class="flabel">Below</label><div class="field">${M(5000)}</div></div></div>
       <div class="card p-card-sm @tab:p-card"><h3 class="text-title font-semibold">Transfer ownership</h3><p class="text-muted-foreground">You sign in again with Google first.</p><button data-need="settings" class="mt-3 btn btn-outline">${I("key-round")}Transfer</button></div>
     </div>
-    <div class="flex justify-end"><button data-need="settings" class="btn btn-primary">${I("check")}Save</button></div>`)
-          ),
+    <div class="flex justify-end"><button data-need="settings" class="btn btn-primary">${I("check")}Save</button></div>`))],
+          ["Business", () => app("settings", { icon: "settings", title: "Settings", crumb: "Business" }, page(`${settingsTabs(1)}${openingHours()}`))],
+          ["Extras", () => app("settings", { icon: "settings", title: "Settings", crumb: "Numbering" }, page(`${settingsTabs(2)}${extrasCard()}`))],
+          ["Messages", () => app("settings", { icon: "settings", title: "Settings", crumb: "Messages" }, page(`${settingsTabs(5)}${messagesList()}`))],
+        ],
       });
 
       /* PORTAL */
@@ -3919,7 +4076,7 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
         action: "Request a quote",
         who: "Customer",
         notes:
-          'Business brand only (pick one in the toolbar); Biz4Kit appears only in the "Made with Biz4Kit" footer (D78). "Ask for a quote" where a price is hidden. LCP ≤ 2.5 s on Slow 4G.',
+          'Business brand only (pick one in the toolbar); Biz4Kit appears only in the "Made with Biz4Kit" footer (D78). "Request a quote" where a price is hidden. LCP ≤ 2.5 s on Slow 4G.',
         states: [
           [
             "Catalog",
@@ -3938,7 +4095,7 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
               it,
               i
             ) => `<div class="ccard overflow-hidden flex @tab:flex-col"><div class="w-24 @tab:w-full @tab:aspect-[4/3] shrink-0 bg-biz-soft"></div><div class="p-3 flex-1 min-w-0"><p class="font-semibold">${it[0]}</p><p class="text-caption text-customer-muted">${it[5]}</p>
-          <div class="mt-2 flex items-center gap-2">${it[4] ? M(it[3]) : '<span class="text-caption text-customer-muted">Ask for a quote</span>'}<button class="ml-auto h-control-md px-3 rounded-control border border-biz text-biz font-medium" aria-label="${i === 1 ? "Added" : "Add"}">${i === 1 ? I("check", "size-icon-sm") : "Add"}</button></div></div></div>`
+          <div class="mt-2 flex items-center gap-2">${it[4] ? M(it[3]) : '<span class="text-caption text-customer-muted">Request a quote</span>'}<button class="ml-auto h-control-md px-3 rounded-control border border-biz text-biz font-medium" aria-label="${i === 1 ? "Added" : "Add"}">${i === 1 ? I("check", "size-icon-sm") : "Add"}</button></div></div></div>`
           )
           .join("")}</div>
         <div class="mt-4 p-4 rounded-card bg-biz-soft"><p class="text-label uppercase tracking-wider text-biz font-semibold">Package</p><p class="font-semibold">Bridal · from ${inr(18000)}</p><p class="text-caption text-customer-muted">Basic, Standard or Premium. Book a slot.</p></div>
@@ -3988,7 +4145,7 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
           [
             "Form",
             () =>
-              cust(`${cHeader(true)}<div class="mx-auto max-w-xl px-4 py-5"><h1 class="text-heading font-bold">Ask for a quote</h1><p class="text-caption text-customer-muted">We usually reply within a few hours.</p>
+              cust(`${cHeader(true)}<div class="mx-auto max-w-xl px-4 py-5"><h1 class="text-heading font-bold">Request a quote</h1><p class="text-caption text-customer-muted">We usually reply within a few hours.</p>
     <div class="mt-3 ccard p-3 flex items-center gap-3"><div class="size-control-lg rounded-xs bg-biz-soft"></div><div><p class="font-medium">Hair spa · Short hair</p><p class="text-customer-muted">${M(1500)}</p></div><span class="ml-auto text-customer-muted">${I("x")}</span></div>
     <div class="mt-3 space-y-3">
       <div><label class="flabel">Tell us what you need</label><div class="cfield h-24 items-start py-2.5 text-customer-muted">Also want a haircut, same day if possible.</div></div>
@@ -4022,7 +4179,7 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
         action: "Confirm slot",
         who: "Customer",
         notes:
-          "Bookable packages only; staff then slot from availability; confirmation uses ready message 10 wording, add-to-calendar.",
+          "Bookable packages only; slots come from the business's opening hours: every 30 minutes, the package must end inside a range; a day with no range is closed (D97, D99). Confirmation uses ready message 10 wording, add-to-calendar.",
         states: [
           [
             "Pick",
@@ -4042,11 +4199,22 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
           `<div class="h-14 rounded-sm flex flex-col items-center justify-center ${d[2] ? "bg-biz text-biz-foreground" : "bg-customer-surface border border-customer-border"}"><span class="text-caption">${d[0]}</span><span class="text-title font-semibold">${d[1]}</span></div>`
       )
       .join("")}</div>
-    <p class="mt-4 font-semibold">Time</p><div class="mt-1.5 grid grid-cols-3 @tab:grid-cols-6 gap-2">${[["09:00"], ["10:00", 0, 1], ["11:00", 1], ["13:00"], ["14:00", 0, 1], ["15:00"]].map((t) => `<div class="h-touch rounded-sm flex items-center justify-center money ${t[1] ? "bg-biz-soft border-2 border-biz text-biz font-semibold" : t[2] ? "text-customer-muted line-through border border-dashed border-customer-border" : "bg-customer-surface border border-customer-border"}">${t[0]}</div>`).join("")}</div>
+    <p class="mt-4 font-semibold">Time</p><div class="mt-1.5 grid grid-cols-3 @tab:grid-cols-6 gap-2">${[["10:00"], ["10:30", 0, 1], ["11:00", 1], ["11:30"], ["12:00", 0, 1], ["12:30"]].map((t) => `<div class="h-touch rounded-sm flex items-center justify-center money ${t[1] ? "bg-biz-soft border-2 border-biz text-biz font-semibold" : t[2] ? "text-customer-muted line-through border border-dashed border-customer-border" : "bg-customer-surface border border-customer-border"}">${t[0]}</div>`).join("")}</div>
     <p class="mt-1.5 text-caption text-customer-muted">Crossed-out times are taken.</p><div class="hidden @web:block mt-6"><button class="cbtn cbtn-biz">Confirm Thu 22 Oct, 11:00</button></div></div>${madeWith}`,
                 cBar(
                   `<button class="cbtn cbtn-biz">Confirm Thu 22 Oct, 11:00</button>`
                 )
+              ),
+          ],
+          [
+            "Closed day",
+            () =>
+              cust(
+                `${cHeader(true)}<div class="mx-auto max-w-xl px-4 py-5"><h1 class="text-heading font-bold">Book Bridal · Standard</h1><p class="text-caption text-customer-muted">4 hours · ${inr(24000)}</p>
+    <p class="mt-4 font-semibold">Day</p><div class="mt-1.5 grid grid-cols-5 gap-2">${[["Fri", 23], ["Sat", 24], ["Sun", 25, 1], ["Mon", 26], ["Tue", 27]]
+      .map((d) => `<div class="h-14 rounded-sm flex flex-col items-center justify-center ${d[2] ? "bg-biz text-biz-foreground" : "bg-customer-surface border border-customer-border"}"><span class="text-caption">${d[0]}</span><span class="text-title font-semibold">${d[1]}</span></div>`)
+      .join("")}</div>
+    <p class="mt-4 font-semibold">Time</p><p class="mt-1.5 text-customer-muted">Glow Studio is closed on Sun 25 Oct. Pick another day.</p></div>${madeWith}`
               ),
           ],
           [
@@ -4096,7 +4264,7 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
       <div class="space-y-3 @web:row-start-1 @web:col-start-2"><a class="cbtn cbtn-biz">${I("smartphone")}Pay ${inr(9440)} by UPI</a><p class="text-center text-caption text-customer-muted">Opens GPay, PhonePe, Paytm or any UPI app</p>
         <div class="ccard p-4 flex gap-4 items-center"><div class="w-28 shrink-0">${qr(112)}</div><div><p class="font-semibold">Or scan</p><p class="code">glowstudio@okaxis</p><button class="mt-1 text-caption text-biz underline">Copy UPI ID</button></div></div>
         <button class="cbtn border-2 border-biz text-biz">I have paid</button></div>
-    </div>${madeWith}`),
+    </div>`),
           ],
           [
             "Upload proof",
@@ -4105,7 +4273,7 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
     <div class="mt-4 h-40 rounded-card border-2 border-dashed border-customer-border flex flex-col items-center justify-center gap-1 text-customer-muted">${I("image-up")}<span>Tap to choose a file</span></div>
     <div class="mt-3 cfield">${I("file-image", "size-icon text-biz")}gpay-screenshot.jpg<span class="ml-auto text-customer-muted">${I("x")}</span></div>
     <button class="mt-4 cbtn cbtn-biz">Send proof</button>
-    <div class="mt-4 p-3 rounded-sm bg-biz-soft flex gap-2">${I("hourglass", "size-icon text-biz")}<span>Shown as received once Priya confirms. You will get a receipt.</span></div></div>${madeWith}`),
+    <div class="mt-4 p-3 rounded-sm bg-biz-soft flex gap-2">${I("hourglass", "size-icon text-biz")}<span>Shown as received once Priya confirms. You will get a receipt.</span></div></div>`),
           ],
           [
             "No longer valid",
@@ -4114,10 +4282,37 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
                 ok(
                   "calendar-x",
                   "This price is no longer valid",
-                  "Ritu, the price PI-2627-0037 from Glow Studio expired on Fri 16 Oct, so it cannot be paid. Ask for a new price and we will send one.",
-                  `<a class="mt-6 cbtn cbtn-biz">${I("message-circle")}Ask Glow Studio</a><a class="mt-2 cbtn cbtn-line">${I("phone")}<span class="money">+91 98220 41567</span></a><p class="mt-3 text-caption text-customer-muted italic">[Draft wording, owner to approve]</p>`
+                  "Ritu, the price PI-2627-0037 from Glow Studio expired on Fri 16 Oct, so it cannot be paid. Request a new quote and we will send one.",
+                  `<a class="mt-6 cbtn cbtn-biz">${I("message-circle")}Ask Glow Studio</a><a class="mt-2 cbtn cbtn-line">${I("phone")}<span class="money">+91 98220 41567</span></a><p class="mt-3 text-caption text-customer-muted italic">[Draft wording, owner to approve]</p>`,
+                  ""
                 )
               ),
+          ],
+          [
+            "Optional extras",
+            () =>
+              cust(`${cHeader()}<div class="mx-auto max-w-5xl px-4 py-5 grid @web:grid-cols-[1fr_360px] gap-6">
+      <div class="min-w-0 space-y-3"><div><p class="text-label uppercase tracking-wider text-customer-muted">Proforma invoice PI-2627-0046</p><p class="font-mono text-money-lg">${inr(30090)}</p><p class="text-caption text-customer-muted">Pay by Sat 31 Oct · Anita Sharma</p><div class="mt-1.5">${pill("awaiting")}</div></div>
+        <div class="ccard p-4 space-y-1">${[
+          ["Bridal makeup", 18000],
+          ["Hair styling", 3500],
+          ["Pre-bridal facial", 2500],
+          ["Draping assistance", 1500],
+          ["CGST 9%", 2295],
+          ["SGST 9%", 2295],
+        ]
+          .map((r) => `<div class="flex"><span class="text-customer-muted">${r[0]}</span><span class="ml-auto">${M(r[1])}</span></div>`)
+          .join("")}<div class="flex pt-2 border-t border-customer-border font-semibold"><span>Total</span><span class="ml-auto">${M(30090)}</span></div></div>
+        <div class="ccard p-4"><p class="font-semibold">Optional extras</p><p class="text-caption text-customer-muted">Tick what you want; the total updates. Fixed once a payment is made (D102).</p>
+          <ul class="mt-2 space-y-1">${[
+            ["Draping assistance", 1500, 1],
+            ["Pre-wedding trial", 2500, 0],
+          ]
+            .map((o) => `<li class="flex items-center gap-3 min-h-touch"><button role="checkbox" aria-checked="${o[2] ? "true" : "false"}" aria-label="${o[0]}" class="size-6 shrink-0 rounded-xs border-2 ${o[2] ? "bg-biz border-biz text-biz-foreground" : "border-customer-border"} flex items-center justify-center">${o[2] ? I("check", "size-icon-sm") : ""}</button><span class="flex-1">${o[0]}</span><span class="money">${inr(o[1])}</span></li>`)
+            .join("")}</ul></div></div>
+      <div class="space-y-3 @web:row-start-1 @web:col-start-2"><a class="cbtn cbtn-biz">${I("smartphone")}Pay ${inr(30090)} by UPI</a><p class="text-center text-caption text-customer-muted">Opens GPay, PhonePe, Paytm or any UPI app</p>
+        <button class="cbtn border-2 border-biz text-biz">I have paid</button></div>
+    </div>`),
           ],
         ],
       });
@@ -4158,6 +4353,200 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
       )
       .join("")}</div>
     <p class="mt-4 text-caption text-customer-muted">This page shows your requests, bookings and invoices with Glow Studio. Ask Glow Studio to update or delete your details at any time. <span class="italic">[Draft, lawyer to finalise]</span></p></div>${madeWith}`),
+      });
+
+      /* ---------- D85–D87: serial lookup, warranty card, approve link, inbox (n35–n38, as design/app) ---------- */
+      const SERIALS = [
+        ["BZ24-00117", "Ceiling fan", "Breeze 1200 · BZ-1200-W", "Meera Kulkarni", "INV-2627-0031", "19 Oct 2028", "covered"],
+        ["BZ24-00118", "Ceiling fan", "Breeze 1200 · BZ-1200-W", "Meera Kulkarni", "INV-2627-0031", "19 Oct 2028", "covered"],
+        ["BZ22-00841", "Hair dryer", "Aura 2000 · AD-2000", "Kavya Joshi", "INV-2627-0009", "2 Sep 2025", "ended"],
+        ["", "Ceiling fan", "Breeze 1200 · BZ-1200-W", "Nisha Verma", "PI-2627-0047", "—", "no_serial"],
+      ];
+      add({
+        area: "Customers",
+        id: "serials",
+        name: "Serial lookup",
+        route: "/w/:slug/serials",
+        action: "Find by serial, open the warranty card",
+        who: "All",
+        notes:
+          "Optional feature (D85): every tracked invoice row, searchable by serial, model, batch or customer. Status: In cover, Cover ended, Serials missing. Cover runs from the invoice date. Shown with the feature on in Settings, Extras.",
+        states: [
+          [
+            "Lookup",
+            () =>
+              app(
+                "serials",
+                { icon: "scan-barcode", title: "Serial numbers" },
+                page(`<p class="text-muted-foreground">Scan or type a serial in the search box to find who bought it, the invoice and whether it is still in cover. Cover runs from the invoice date (D85).</p>
+    ${dataTable({
+      icon: "scan-barcode",
+      title: "Serial numbers",
+      ph: "Serial, model or customer",
+      filters: [["Status", "list-filter"]],
+      select: false,
+      go: "invoice-editor",
+      cols: [
+        { t: "Serial", role: "title" },
+        { t: "Item", role: "sub" },
+        { t: "Customer", m: 1 },
+        { t: "Invoice", m: 1, web: 1 },
+        { t: "Cover ends", m: 1, web: 1 },
+        { t: "Status", role: "status" },
+        { t: "" },
+      ],
+      rows: SERIALS.map((r) => [
+        r[0] ? C(r[0]) : '<span class="text-caption text-muted-foreground">Not entered</span>',
+        `<span class="font-medium">${r[1]}</span><span class="block text-caption text-muted-foreground">${r[2]}</span>`,
+        r[3],
+        C(r[4]),
+        r[5],
+        pill(r[6]),
+        r[0] ? `<a ${link("p-warranty")} class="btn btn-ghost btn-sm">${I("shield-check", "size-icon-sm")}Card</a>` : "",
+      ]),
+    })}`)
+              ),
+          ],
+          [
+            "Feature off",
+            () =>
+              app(
+                "serials",
+                { icon: "scan-barcode", title: "Serial numbers" },
+                page(`<div class="card flex flex-col items-center justify-center gap-2 p-8 text-center"><span class="size-control-lg rounded-pill bg-muted text-muted-foreground flex items-center justify-center">${I("scan-barcode")}</span><p class="text-title font-semibold">Serial numbers are off</p><p class="text-muted-foreground max-w-sm">Turn on Serial numbers and warranty in Settings, Extras. It adds model, serial number and warranty or guarantee to invoice rows (D85).</p><a ${link("settings")} class="btn btn-outline">${I("settings")}Open Settings</a></div>`)
+              ),
+          ],
+        ],
+      });
+
+      add({
+        area: "Portal",
+        id: "p-warranty",
+        name: "Warranty card",
+        route: "/wc/:token",
+        action: "Show, print, call for service",
+        who: "Customer",
+        notes:
+          'One card per row with a serial (D86). Private link, open to anyone who has it; customer phone masked. Business brand only; no "Made with Biz4Kit" (D89).',
+        html: () =>
+          cust(`${cHeader()}<div class="mx-auto max-w-xl px-4 py-5 space-y-3">
+    <div class="ccard overflow-hidden">
+      <div class="bg-biz text-biz-foreground px-4 py-4 flex items-center gap-3">${I("shield-check")}<div><p class="text-label uppercase tracking-wider">Warranty card</p><p class="font-semibold">Glow Studio</p></div></div>
+      <div class="px-4 py-4"><p class="text-heading font-bold">Ceiling fan</p><p class="text-customer-muted">Model Breeze 1200 · No. BZ-1200-W</p></div>
+      <div class="border-t border-customer-border">${[
+        ["Serial number", `<span class="code">BZ24-00117</span>`],
+        ["Batch / lot", `<span class="code">L-2610</span>`],
+        ["Tax invoice", `<span class="code">INV-2627-0031</span>`],
+        ["Invoice date", "19 Oct 2026"],
+        ["Warranty period", "24 months, to 19 Oct 2028"],
+        ["Bought by", `Meera Kulkarni · <span class="money">+91 ••••• •2334</span>`],
+      ]
+        .map((r) => `<div class="flex gap-3 px-4 min-h-row items-center border-b border-customer-border last:border-0"><span class="w-32 shrink-0 text-customer-muted">${r[0]}</span><span class="ml-auto text-right font-medium">${r[1]}</span></div>`)
+        .join("")}</div>
+    </div>
+    <div class="p-4 rounded-sm bg-success-soft text-success flex items-center gap-2">${I("shield-check")}<span class="font-semibold">In warranty until 19 Oct 2028</span></div>
+    <div class="grid grid-cols-2 gap-2"><a class="cbtn cbtn-biz">${I("phone")}Call for service</a><button class="cbtn cbtn-line">${I("printer")}Print or save PDF</button></div>
+    <p class="text-caption text-customer-muted">Show this card, or quote the serial number, when you ask Glow Studio for service. <span class="italic">[Warranty terms: business to supply]</span></p>
+  </div>`),
+      });
+
+      /* Approve-from-email: minimal Biz4Kit chrome like Sign in (D57, D87). */
+      const approveFrame = (body) => `<div class="h-full overflow-y-auto flex items-start @tab:items-center justify-center bg-sidebar p-4">
+    <div class="card w-full max-w-md p-card @tab:p-page shadow-lg">
+      <div class="flex items-center gap-2">${lockup("h-6")}<span class="ml-auto text-caption text-muted-foreground truncate">Glow Studio</span></div>
+      ${body}
+    </div></div>`;
+      const proofFacts = `<div class="mt-3 rounded-control border border-border px-3">${[
+        ["Customer", "Meera Kulkarni"],
+        ["Invoice", C("PI-2627-0045")],
+        ["Amount", M(9440)],
+        ["Method", "UPI"],
+        ["Reference", C("UTR 4417 2210 0981")],
+        ["Proof", "gpay-meera.jpg"],
+        ["Uploaded", "Rahul, Mon 19 Oct 12:40"],
+        ["Open balance", M(9440)],
+      ]
+        .map((r) => `<div class="flex gap-3 py-2 border-b border-border last:border-0"><span class="w-28 shrink-0 text-muted-foreground">${r[0]}</span><span class="ml-auto text-right font-medium min-w-0">${r[1]}</span></div>`)
+        .join("")}</div>`;
+      add({
+        area: "Payments",
+        id: "approve-link",
+        name: "Approve from email",
+        route: "/a/:token",
+        action: "Approve or reject a payment proof",
+        who: "Owner, Manager",
+        notes:
+          "Landing page of the proof-waiting email (D57, D87): one payment, the same approval rules as the Approvals screen. The link lasts 48 h from the upload and works once; after that it says expired or already decided.",
+        states: [
+          [
+            "Link",
+            () =>
+              approveFrame(`<h1 class="mt-4 font-sans text-heading font-semibold">Payment proof waiting</h1>
+    <p class="text-muted-foreground">Check the proof, then approve or reject. Approved payments count as paid; the tax invoice number comes when the total is covered (D71).</p>
+    ${proofFacts}
+    <button class="mt-4 btn btn-primary btn-lg w-full">${I("badge-check")}Approve ${inr(9440)}</button>
+    <div class="mt-3"><label class="flabel">Or reject with a note</label><div class="field h-auto py-2 text-muted-foreground">What is wrong with the proof</div><button class="mt-2 btn btn-outline w-full text-destructive">${I("circle-x")}Reject</button></div>
+    <p class="mt-3 hint">This link works once and lasts 48 hours from the upload (D57).</p>`),
+          ],
+          [
+            "Expired",
+            () =>
+              approveFrame(`<h1 class="mt-4 font-sans text-heading font-semibold">Payment proof waiting</h1>${proofFacts}
+    <div class="mt-4 p-3 rounded-control bg-warning-soft text-warning flex items-start gap-2">${I("clock", "size-icon mt-0.5")}<div><p class="font-medium">This link has expired</p><p class="text-caption">Email links last 48 hours from the upload (D57). The payment still waits in Approvals.</p></div></div>
+    <a ${link("approvals")} class="mt-3 btn btn-primary w-full">${I("badge-check")}Open Approvals</a>`),
+          ],
+          [
+            "Email",
+            () => `<div class="h-full overflow-y-auto bg-muted p-4 @tab:p-page"><div class="mx-auto max-w-xl card overflow-hidden">
+    <div class="px-5 py-3 border-b border-border text-caption space-y-0.5"><p><span class="text-muted-foreground">From</span> Glow Studio</p><p><span class="text-muted-foreground">To</span> priya@glowstudio.in</p><p><span class="text-muted-foreground">Subject</span> <span class="font-medium">Payment proof waiting: PI-2627-0045 · ${inr(9440)}</span></p></div>
+    <div class="px-5 py-5 space-y-3"><p>Hi Priya,</p><p>Rahul recorded ${inr(9440)} from Meera Kulkarni on PI-2627-0045. Check the proof and approve or reject it.</p>
+      <a ${link("approve-link")} class="btn btn-primary">${I("badge-check")}Approve or reject</a>
+      <p class="text-caption text-muted-foreground">The link works once and lasts 48 hours (D57). <span class="italic">[Draft wording, owner to approve]</span></p></div></div></div>`,
+          ],
+        ],
+      });
+
+      const INBOX = [
+        ["calendar-clock", "Asha Nair on Mon 19 Oct 17:00: booking still To confirm", "Bookings to confirm · Mon 19 Oct 17:00", 1, "bookings"],
+        ["inbox", "Kiran Rao: Party makeup for 3 people on Sat 24 Oct", "New leads to answer · Mon 19 Oct 13:48", 1, "lead"],
+        ["badge-check", "Meera Kulkarni paid ₹9,440 on PI-2627-0045: check the proof", "Payments waiting for approval · Mon 19 Oct 12:40", 1, "approvals"],
+        ["badge-check", "Kavya Joshi paid ₹7,434 on PI-2627-0044: check the proof", "Payments waiting for approval · Sun 18 Oct", 1, "approvals"],
+        ["wrench", "Party makeup for Asha Nair is done: send the invoice", "Jobs done, invoice to send · Sat 17 Oct", 0, "job"],
+        ["circle-alert", "PI-2627-0035 for Rohan Desai is 4 days overdue", "Overdue bills · Fri 16 Oct", 0, "overdue"],
+        ["calendar-x", "PI-2627-0046 for Anita Sharma expires in 2 days", "Replies expiring · Thu 15 Oct", 0, "invoice-editor"],
+      ];
+      const MUTES = [
+        ["inbox", "New leads to answer", 1],
+        ["badge-check", "Payments waiting for approval", 1],
+        ["circle-alert", "Overdue bills", 1],
+        ["calendar-clock", "Bookings to confirm", 1],
+        ["wrench", "Jobs done, invoice to send", 0],
+        ["calendar-x", "Replies expiring", 1],
+      ];
+      const inboxPage = (unread) =>
+        app(
+          "dashboard",
+          { icon: "bell", title: "Notifications" },
+          page(`<div class="flex flex-wrap items-center gap-2">${seg([`All (${INBOX.length})`, `Unread (${INBOX.filter((x) => x[3]).length})`], unread ? 1 : 0)}<button class="ml-auto btn btn-outline btn-sm">${I("check-check", "size-icon-sm")}Mark all read</button></div>
+    <div class="grid @web:grid-cols-[1fr_var(--size-aside)] gap-4 items-start"><div class="card overflow-hidden"><ul class="divide-y divide-border">${INBOX.filter((x) => !unread || x[3])
+      .map((x) => `<li><a ${link(x[4])} class="flex items-start gap-3 px-4 py-3 hover:bg-muted ${x[3] ? "" : "text-muted-foreground"}">${I(x[0], "size-icon mt-0.5 shrink-0")}<span class="min-w-0 flex-1"><span class="block ${x[3] ? "font-medium text-foreground" : ""}">${x[1]}</span><span class="block text-caption text-muted-foreground">${x[2]}</span></span>${x[3] ? '<span class="mt-1.5 size-2 rounded-pill bg-info shrink-0" title="Unread"></span>' : ""}</a></li>`)
+      .join("")}</ul></div>
+    <div class="card p-card-sm"><p class="font-medium">What shows here</p><p class="text-caption text-muted-foreground">Only for you. Off hides it from this list and the bell count.</p>
+      <div class="mt-2 divide-y divide-border">${MUTES.map((m) => `<div class="flex items-center gap-3 py-2">${I(m[0], "size-icon-sm text-muted-foreground")}<span class="flex-1">${m[1]}</span>${toggle(m[2])}</div>`).join("")}</div></div></div>`)
+        );
+      add({
+        area: "Workspace",
+        id: "inbox",
+        name: "Notifications",
+        route: "/w/:slug/inbox",
+        action: "Open the record",
+        who: "All",
+        notes:
+          "The header bell (D87). Built from the data, by role: new leads, proofs to approve (only those you may approve), overdue bills, bookings to confirm, jobs to invoice, replies expiring in 2 days. Unread since you last looked; mute per kind, for you only.",
+        states: [
+          ["All", () => inboxPage(false)],
+          ["Unread", () => inboxPage(true)],
+        ],
       });
 
       /* ---------- viewer ---------- */
@@ -4597,21 +4986,28 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
         st.role = "staff";
         test(at("dashboard").textContent.includes("My day"), { id: "dashboard", name: "Staff dashboard", dev: "web", state: 0, role: "staff" }, "Staff dashboard is not My day");
         st.role = "owner";
-        /* Sidebar (owner, 21 Oct): only the five sections; no sub-items, no Favourites; a section's pages are tabs. */
+        /* Sidebar (owner, 22 Oct): option B layout, the five sections open to their pages; option A Favourites;
+           a section's pages stay as tabs too. */
         {
           const d = at("dashboard");
           const w = { id: "dashboard", name: "Sidebar", dev: "web", state: 0, role: "owner" };
-          const menu = d.querySelector('aside nav[aria-label="Workspace"]');
-          test([...menu.querySelectorAll("a")].map((a) => a.dataset.grp).join() === NAV.map((g) => g[0]).join(), w, "the sidebar must list only the sections");
-          test(!menu.querySelector("details, ul, [data-page]"), w, "the sidebar must have no sub-items");
-          test(menu.querySelector('[aria-current="page"]')?.dataset.grp === "Home", w, "the current section is not marked");
-          test(!d.querySelector('aside [aria-label="Favourites"], aside [data-fav]'), w, "Favourites was removed (owner, 21 Oct)");
+          const tree = [...d.querySelectorAll('aside nav [data-grp-tree]')];
+          test(tree.map((t) => t.dataset.grpTree).join() === NAV.map((g) => g[0]).join(), w, "the sidebar must list the five sections in order");
+          test(tree.every((t) => t.querySelectorAll("[data-page]").length === pagesOf(NAV.find((g) => g[0] === t.dataset.grpTree)).length), w, "a section does not list all its pages");
+          test(d.querySelector('aside nav .sb-text [aria-current="page"]')?.dataset.go === "dashboard" && d.querySelector('aside [data-grp-tree="Home"]').open, w, "the current page is not marked or its section is closed");
+          const fav = d.querySelector('aside [aria-label="Favourites"]');
+          test(!!fav && fav.querySelectorAll(".sb-text [data-fav] .sb-tile").length === FAVS.length, w, "Favourites must show each job on a tile (option A)");
+          test(new Set([...fav.querySelectorAll(".sb-text .sb-tile")].map((t) => [...t.classList].find((c) => c.startsWith("text-")))).size === FAVS.length, w, "each Favourite needs its own icon colour");
+          const set = d.querySelector("aside [data-settings]");
+          test(!!set && !set.closest("details") && !NAV.some((g) => g[2].some((pg) => pg[0] === "settings")), w, "Settings must be its own item, not a Business page");
+          test([d.querySelector("aside .sb-head"), fav, set].every((el) => el && el.classList.contains(el.matches(".sb-head") ? "border-b" : "border-t")), w, "dividers missing under the brand, above Favourites or above Settings");
+          test([...d.querySelectorAll('aside i[class*="ph-"]')].every((el) => !["none", "normal", '""'].includes(getComputedStyle(el, "::before").content)), w, "a sidebar icon name is unknown to Phosphor");
           for (const id of ["invoices", "leads", "catalog"]) {
             const t = at(id).querySelector("[data-tabs]");
             test(!!t && getComputedStyle(t).display !== "none" && t.querySelectorAll("a").length >= 2, { id, name: "Section tabs", dev: "web", state: 0, role: "owner" }, "the section's pages are not shown as tabs");
           }
           at("invoice-editor");
-          test(stage.querySelector('aside nav [aria-current="page"]')?.dataset.grp === "Payments", w, "a detail screen does not mark its section");
+          test(stage.querySelector('aside nav [data-grp][aria-current="page"]')?.dataset.grp === "Payments" && stage.querySelector('aside [data-grp-tree="Payments"]').open, w, "a detail screen does not mark its section");
         }
         /* Standard KPI strips have four cards on every page that has one; sidebar sub-items carry an icon. */
         for (const id of ["invoices", "overdue", "reports"]) {
@@ -4682,13 +5078,14 @@ Glow Studio · College Road, Nashik · +91 98220 41567</pre></div></div>`,
           st.role = "owner";
           /* D78: Biz4Kit lockup in the workspace; customer pages show Biz4Kit only as the footer; never on PDF or email. */
           test(!!at("dashboard").querySelector('aside [aria-label="Biz4Kit mark"] svg') && !at("dashboard").querySelector('[data-app] svg[aria-label="Biz4Kit"]'), { id: "dashboard", name: "Biz4Kit mark, no wordmark", dev: "web", state: 0, role: "owner" }, "the workspace shows the 4B mark only, never the Biz4Kit wordmark (D79)");
-          test(!!at("dashboard").querySelector('aside summary[aria-label="Account and workspace menu"] [aria-label="Glow Studio"]') && /Glow Studio.*GSTIN/s.test(at("dashboard").querySelector('aside summary[aria-label="Account and workspace menu"]').textContent), { id: "dashboard", name: "Business logo", dev: "web", state: 0, role: "owner" }, "business logo is not on the profile button");
+          test(!!at("dashboard").querySelector('aside summary[aria-label="Account and workspace menu"] [aria-label="Glow Studio"]') && /Glow Studio.*Priya Rao · Owner/s.test(at("dashboard").querySelector('aside summary[aria-label="Account and workspace menu"]').textContent) && !/GSTIN/.test(at("dashboard").querySelector('aside summary[aria-label="Account and workspace menu"]').textContent), { id: "dashboard", name: "Business logo", dev: "web", state: 0, role: "owner" }, "business logo is not on the profile button");
           for (const s of S.filter((x) => x.id.startsWith("p-") || x.id === "invoice-pdf" || x.id === "invoice-email"))
             for (let k = 0; k < (s.states ? s.states.length : 1); k++) {
               const t = page(s.id, k);
               const n = (t.match(/Biz4Kit/g) || []).length;
-              const doc = !s.id.startsWith("p-");
-              test(doc ? n === 0 : n === 1 && t.includes("Made with Biz4Kit"), { id: s.id, name: "Biz4Kit on customer pages", dev: "web", state: k, role: "owner" }, doc ? "a money document shows Biz4Kit" : `shows Biz4Kit ${n} times; only the footer is allowed (D78)`);
+              /* D89: the footer only on catalog, request, booking and My orders; never on money pages or the warranty card. */
+              const doc = !["p-catalog", "p-request", "p-book", "p-orders"].includes(s.id);
+              test(doc ? n === 0 : n === 1 && t.includes("Made with Biz4Kit"), { id: s.id, name: "Biz4Kit on customer pages", dev: "web", state: k, role: "owner" }, doc ? "a money page or the warranty card shows Biz4Kit (D89)" : `shows Biz4Kit ${n} times; only the footer is allowed (D78, D89)`);
             }
         }
         /* D64: the dashboard Overdue card opens the Overdue page. */

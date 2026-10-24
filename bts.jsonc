@@ -16,7 +16,7 @@
   "backend": "hono",
   "runtime": "node",
   "frontend": ["tanstack-start", "native-uniwind"],
-  "addons": ["evlog", "fumadocs", "oxlint", "turborepo", "ultracite"],
+  "addons": ["evlog", "oxlint", "turborepo", "ultracite"],
   "examples": [],
   "auth": "better-auth",
   "payments": "polar",

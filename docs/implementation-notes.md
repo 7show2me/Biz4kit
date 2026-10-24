@@ -14,7 +14,7 @@ Written 2026-10-23, after the final design check (`reports/final-design-check-20
 |---|---|
 | `apps/web` | TanStack Start scaffold (routes `index`, `login`, `success`, `_auth/dashboard`). Title "My App", `class="dark"` hard-coded. |
 | `apps/server` | Hono on :3000; Better Auth at `/api/auth/*`, oRPC at `/rpc`, OpenAPI at `/api-reference`. Dockerfile on node:24-slim. |
-| `apps/native`, `apps/fumadocs` | Scaffolds (Expo, docs). Not Phase 1 screens. |
+| `apps/native` | Expo scaffold. Not Phase 1 screens. The fumadocs scaffold was deleted (D108). |
 | `packages/api` | `publicProcedure`, `protectedProcedure`; router has only `healthCheck`, `privateData`. |
 | `packages/auth` | Better Auth email + password, Drizzle adapter, Polar plugin with placeholder product id. |
 | `packages/db` | Drizzle on `neon-http`; only the auth tables; no migrations. |

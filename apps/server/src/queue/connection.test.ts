@@ -7,7 +7,9 @@ const PASSWORD = "test-password-not-real";
 
 describe("redisConnection", () => {
   it("uses TLS for an Upstash rediss:// URL (D33)", () => {
-    const options = redisConnection(`rediss://default:${PASSWORD}@example.upstash.io:6379`);
+    const options = redisConnection(
+      `rediss://default:${PASSWORD}@example.upstash.io:6379`
+    );
 
     expect(options).toMatchObject({
       host: "example.upstash.io",
@@ -36,12 +38,18 @@ describe("redisConnection", () => {
   });
 
   it("refuses the Upstash REST URL (BullMQ needs the TCP endpoint, D29)", () => {
-    expect(() => redisConnection("https://example.upstash.io")).toThrow(/REDIS_URL/u);
+    expect(() => redisConnection("https://example.upstash.io")).toThrow(
+      /REDIS_URL/u
+    );
   });
 
   it("never puts the password in the error message", () => {
-    expect(() => redisConnection(`http://default:${PASSWORD}@example.upstash.io`)).toThrow(
-      expect.objectContaining({ message: expect.not.stringContaining(PASSWORD) }),
+    expect(() =>
+      redisConnection(`http://default:${PASSWORD}@example.upstash.io`)
+    ).toThrow(
+      expect.objectContaining({
+        message: expect.not.stringContaining(PASSWORD),
+      })
     );
   });
 });

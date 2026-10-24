@@ -15,14 +15,15 @@
 **/.alchemy
 **/.expo
 **/.vercel
+**/.evlog
 *.log
 
 Dockerfile
 **/Dockerfile
 docker-compose.yml
 
-# Env value files stay out of COPY layers; runtime env comes from compose env_file,
-# build-time configuration uses BuildKit secrets; public values use build args
+# Env value files stay out of COPY layers; runtime env comes from compose env_file
+# locally and Secrets Manager on ECS. Never bake secrets into the image.
 **/.env
 **/.env.*
 !**/.env.example
@@ -31,3 +32,13 @@ docker-compose.yml
 local.db
 local.db-*
 .data
+
+# Not needed to build the API image.
+infra
+design
+docs
+prep
+reports
+brand
+apps/native
+apps/fumadocs

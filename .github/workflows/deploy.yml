@@ -1,0 +1,148 @@
+# Staging on every merge to main; production from a tag pushed by the human
+# (Workflow doc: Deploy). Rollback: run this workflow by hand on the previous
+# tag; the image for that commit is already in ECR, so nothing is rebuilt.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Where to deploy the selected ref
+        type: choice
+        options: [staging, production]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  target:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.pick.outputs.environment }}
+    steps:
+      - id: pick
+        run: |
+          if [ -n "${{ inputs.environment }}" ]; then
+            echo "environment=${{ inputs.environment }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.ref_type }}" = "tag" ]; then
+            echo "environment=production" >> "$GITHUB_OUTPUT"
+          else
+            echo "environment=staging" >> "$GITHUB_OUTPUT"
+          fi
+
+  api:
+    name: API and workers (ECS Fargate)
+    needs: target
+    runs-on: ubuntu-latest
+    environment: ${{ needs.target.outputs.environment }}
+    concurrency:
+      group: deploy-api-${{ needs.target.outputs.environment }}
+    env:
+      ENVIRONMENT: ${{ needs.target.outputs.environment }}
+      REPOSITORY: biz4kit-api
+      IMAGE_TAG: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ap-south-1
+      - uses: aws-actions/amazon-ecr-login@v2
+        id: ecr
+      - name: Image for this commit exists?
+        id: image
+        run: |
+          if aws ecr describe-images --repository-name "$REPOSITORY" --image-ids imageTag="$IMAGE_TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: docker/setup-buildx-action@v3
+        if: steps.image.outputs.exists == 'false'
+      - uses: docker/build-push-action@v6
+        if: steps.image.outputs.exists == 'false'
+        with:
+          context: .
+          file: apps/server/Dockerfile
+          push: true
+          tags: ${{ steps.ecr.outputs.registry }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Current task definitions
+        run: |
+          for svc in api worker; do
+            aws ecs describe-task-definition --task-definition "biz4kit-$ENVIRONMENT-$svc" \
+              --query taskDefinition > "$svc-task.json"
+          done
+      - uses: aws-actions/amazon-ecs-render-task-definition@v1
+        id: api-task
+        with:
+          task-definition: api-task.json
+          container-name: api
+          image: ${{ steps.ecr.outputs.registry }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+      - uses: aws-actions/amazon-ecs-render-task-definition@v1
+        id: worker-task
+        with:
+          task-definition: worker-task.json
+          container-name: worker
+          image: ${{ steps.ecr.outputs.registry }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+      - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.api-task.outputs.task-definition }}
+          cluster: biz4kit-${{ env.ENVIRONMENT }}
+          service: api
+          wait-for-service-stability: true
+      - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.worker-task.outputs.task-definition }}
+          cluster: biz4kit-${{ env.ENVIRONMENT }}
+          service: worker
+          wait-for-service-stability: true
+      - name: Health check through API Gateway
+        run: |
+          curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors \
+            "${{ vars.API_URL }}/health"
+
+  web:
+    name: Web (Vercel)
+    needs: target
+    runs-on: ubuntu-latest
+    environment: ${{ needs.target.outputs.environment }}
+    concurrency:
+      group: deploy-web-${{ needs.target.outputs.environment }}
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      # Vercel "production" target only for the production environment; staging
+      # is a preview deployment pinned to the staging alias.
+      VERCEL_TARGET: ${{ needs.target.outputs.environment == 'production' && 'production' || 'preview' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm dlx vercel@latest pull --yes --environment="$VERCEL_TARGET" --token="$VERCEL_TOKEN"
+      - run: |
+          if [ "$VERCEL_TARGET" = "production" ]; then
+            pnpm dlx vercel@latest build --prod --token="$VERCEL_TOKEN"
+          else
+            pnpm dlx vercel@latest build --token="$VERCEL_TOKEN"
+          fi
+      - name: Deploy
+        run: |
+          if [ "$VERCEL_TARGET" = "production" ]; then
+            url=$(pnpm dlx vercel@latest deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          else
+            url=$(pnpm dlx vercel@latest deploy --prebuilt --token="$VERCEL_TOKEN")
+            if [ -n "${{ vars.STAGING_WEB_DOMAIN }}" ]; then
+              pnpm dlx vercel@latest alias set "$url" "${{ vars.STAGING_WEB_DOMAIN }}" --token="$VERCEL_TOKEN"
+            fi
+          fi
+          echo "Deployed $url"

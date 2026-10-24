@@ -58,7 +58,7 @@ tmp
 temp
 
 # Terraform (state is in S3, D39)
-infra/.terraform/
+**/.terraform/
 *.tfstate
 *.tfstate.*
 crash.log

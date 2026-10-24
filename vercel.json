@@ -14,5 +14,10 @@
         "service": "web"
       }
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "main": false
+    }
+  }
 }

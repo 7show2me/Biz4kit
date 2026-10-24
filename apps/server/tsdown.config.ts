@@ -1,11 +1,11 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  entry: "./src/index.ts",
+  entry: ["./src/index.ts", "./src/worker.ts"],
   format: "esm",
   outDir: "./dist",
   clean: true,
   deps: {
-    alwaysBundle: [/@Biz4kit\/.*/],
+    alwaysBundle: [/@Biz4kit\/.*/u],
   },
 });

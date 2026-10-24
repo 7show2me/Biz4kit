@@ -69,7 +69,7 @@ function RootDocument() {
         <HeadContent />
       </head>
       <body>
-        <div className="grid h-svh grid-rows-[auto_1fr]">
+        <div className="flex h-svh flex-col">
           <Header />
           <Outlet />
         </div>

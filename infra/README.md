@@ -53,7 +53,7 @@ terraform apply -var environment=staging -var aws_profile=biz4kit \
 Fill in each secret once. Terraform creates the secrets empty and never holds the values:
 
 ```sh
-for name in DATABASE_URL REDIS_URL BETTER_AUTH_SECRET POLAR_ACCESS_TOKEN; do
+for name in DATABASE_URL REDIS_URL BETTER_AUTH_SECRET; do
   aws secretsmanager put-secret-value --profile biz4kit \
     --secret-id "biz4kit/staging/$name" --secret-string "<value>"
 done
@@ -61,7 +61,7 @@ done
 
 - `DATABASE_URL`: the Neon `dev` branch for staging (`prod` for production), pooled connection string (D105).
 - `REDIS_URL`: the Upstash **TCP** endpoint, `rediss://…` (D29, D33), not the REST URL.
-- `POLAR_ACCESS_TOKEN`: Polar is unwired in Phase 1 (D98), but the server's env schema still requires a value.
+- Polar is unwired in Phase 1 (D98): `POLAR_ACCESS_TOKEN` is optional and has no secret until WBS 5.5.
 
 Then force a new deployment: `aws ecs update-service --cluster biz4kit-staging --service api --force-new-deployment` (do the same for `worker`). Check it with `curl $(terraform output -raw api_url)/health`, which should return `{"status":"ok"}`.
 

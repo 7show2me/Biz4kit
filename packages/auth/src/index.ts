@@ -11,8 +11,30 @@ export interface AuthConfig {
   BETTER_AUTH_URL: string;
   BETTER_AUTH_SECRET: string;
   CORS_ORIGIN: string;
-  POLAR_ACCESS_TOKEN: string;
-  POLAR_SUCCESS_URL: string;
+  POLAR_ACCESS_TOKEN?: string;
+  POLAR_SUCCESS_URL?: string;
+}
+
+// Polar billing is Phase 2 (D98, WBS 5.5): without a token there is no Polar
+// plugin, so sign-up never calls Polar. Products are set in 5.5.
+function polarPlugins({ POLAR_ACCESS_TOKEN, POLAR_SUCCESS_URL }: AuthConfig) {
+  if (!POLAR_ACCESS_TOKEN) {
+    return [];
+  }
+  return [
+    polar({
+      client: createPolarClient({ POLAR_ACCESS_TOKEN }),
+      createCustomerOnSignUp: true,
+      use: [
+        checkout({
+          products: [{ productId: "your-product-id", slug: "pro" }],
+          successUrl: POLAR_SUCCESS_URL,
+          authenticatedUsersOnly: true,
+        }),
+        portal(),
+      ],
+    }),
+  ];
 }
 
 export function createAuth(
@@ -42,21 +64,7 @@ export function createAuth(
         httpOnly: true,
       },
     },
-    plugins: [
-      polar({
-        client: createPolarClient(env),
-        createCustomerOnSignUp: true,
-        use: [
-          checkout({
-            products: [{ productId: "your-product-id", slug: "pro" }],
-            successUrl: env.POLAR_SUCCESS_URL,
-            authenticatedUsersOnly: true,
-          }),
-          portal(),
-        ],
-      }),
-      expo(),
-    ],
+    plugins: [...polarPlugins(env), expo()],
   });
 }
 

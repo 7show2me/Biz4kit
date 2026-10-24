@@ -16,13 +16,12 @@ locals {
   image    = "${data.aws_ecr_repository.api.repository_url}:${var.image_tag}"
 
   # Values are set by a person with the AWS CLI, never in Terraform (README).
-  secret_names = ["DATABASE_URL", "REDIS_URL", "BETTER_AUTH_SECRET", "POLAR_ACCESS_TOKEN"]
+  secret_names = ["DATABASE_URL", "REDIS_URL", "BETTER_AUTH_SECRET"]
 
   environment = [
     { name = "NODE_ENV", value = "production" },
     { name = "CORS_ORIGIN", value = var.web_origin },
     { name = "BETTER_AUTH_URL", value = aws_apigatewayv2_api.api.api_endpoint },
-    { name = "POLAR_SUCCESS_URL", value = "${var.web_origin}/success" },
     { name = "SENTRY_DSN", value = var.sentry_dsn },
     { name = "SENTRY_ENVIRONMENT", value = var.environment },
     { name = "SENTRY_RELEASE", value = var.image_tag },

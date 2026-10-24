@@ -1,0 +1,7 @@
+# Same fixes as CI's `pnpm check`, on staged files only, before each commit.
+pre-commit:
+  jobs:
+    - name: ultracite
+      run: pnpm exec ultracite fix {staged_files}
+      glob: "*.{js,jsx,ts,tsx,mjs,cjs,json,jsonc,css}"
+      stage_fixed: true

@@ -5,6 +5,8 @@ allowBuilds:
   esbuild: true
   sharp: true
   msgpackr-extract: false
+  # Hooks are installed by the root "prepare" script instead.
+  lefthook: false
 catalog:
   zod: ^4.6.7
   "@types/node": ^26.4.1

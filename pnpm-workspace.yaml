@@ -4,6 +4,7 @@ packages:
 allowBuilds:
   esbuild: true
   sharp: true
+  msgpackr-extract: false
 catalog:
   zod: ^4.5.4
   "@types/node": ^26.4.1
@@ -24,3 +25,4 @@ catalog:
   "@polar-sh/better-auth": ^1.8.4
   "@better-auth/expo": 1.7.7
   drizzle-orm: 1.0.0-rc.4
+  vitest: ^5.0.5

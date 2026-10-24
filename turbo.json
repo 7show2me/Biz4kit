@@ -33,6 +33,10 @@
     "db:studio": {
       "cache": false,
       "persistent": true
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": []
     }
   },
   "globalEnv": [
@@ -45,6 +49,7 @@
     "NODE_ENV",
     "POLAR_ACCESS_TOKEN",
     "POLAR_SUCCESS_URL",
+    "REDIS_URL",
     "VERCEL",
     "VERCEL_ENV",
     "VERCEL_PROJECT_PRODUCTION_URL",

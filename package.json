@@ -32,7 +32,9 @@
     "postinstall": "varlock codegen --path ./apps/web/ && varlock codegen --path ./apps/server/ && varlock codegen --path ./apps/native/ && varlock codegen --path ./packages/db/",
     "auth:generate": "cd apps/server && pnpm run auth:generate",
     "check": "ultracite check",
-    "fix": "ultracite fix"
+    "fix": "ultracite fix",
+    "test": "turbo run test",
+    "test:infra": "terraform -chdir=infra init -backend=false -input=false && terraform -chdir=infra test && terraform -chdir=infra/bootstrap init -backend=false -input=false && terraform -chdir=infra/bootstrap test"
   },
   "dependencies": {
     "zod": "catalog:"

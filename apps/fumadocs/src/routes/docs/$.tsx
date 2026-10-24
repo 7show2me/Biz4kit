@@ -27,7 +27,9 @@ export const Route = createFileRoute("/docs/$")({
     return data;
   },
   head: ({ loaderData }) => ({
-    meta: loaderData ? [{ property: "og:image", content: loaderData.imageUrl }] : [],
+    meta: loaderData
+      ? [{ property: "og:image", content: loaderData.imageUrl }]
+      : [],
   }),
 });
 
@@ -59,7 +61,7 @@ function Content({ path, markdownUrl }: { path: string; markdownUrl: string }) {
     <DocsPage toc={toc}>
       <DocsTitle>{page.title}</DocsTitle>
       <DocsDescription>{page.description}</DocsDescription>
-      <div className="flex flex-row gap-2 items-center border-b -mt-4 pb-6">
+      <div className="-mt-4 flex flex-row items-center gap-2 border-b pb-6">
         <MarkdownCopyButton markdownUrl={markdownUrl} />
         <ViewOptionsPopover
           markdownUrl={markdownUrl}
@@ -74,7 +76,9 @@ function Content({ path, markdownUrl }: { path: string; markdownUrl: string }) {
 }
 
 function Page() {
-  const { pageTree, path, markdownUrl } = useFumadocsLoader(Route.useLoaderData());
+  const { pageTree, path, markdownUrl } = useFumadocsLoader(
+    Route.useLoaderData()
+  );
 
   return (
     <DocsLayout {...baseOptions()} tree={pageTree}>

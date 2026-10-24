@@ -9,12 +9,21 @@ export const Route = createFileRoute("/_auth/dashboard")({
   component: RouteComponent,
 });
 
+async function handlePortal() {
+  await authClient.customer.portal();
+}
+
+async function handleUpgrade() {
+  await authClient.checkout({ slug: "pro" });
+}
+
 function RouteComponent() {
   const { session, customerState } = Route.useRouteContext();
 
   const privateData = useQuery(orpc.privateData.queryOptions());
 
-  const hasProSubscription = (customerState?.activeSubscriptions?.length ?? 0) > 0;
+  const hasProSubscription =
+    (customerState?.activeSubscriptions?.length ?? 0) > 0;
 
   return (
     <div>
@@ -23,21 +32,9 @@ function RouteComponent() {
       <p>API: {privateData.data?.message}</p>
       <p>Plan: {hasProSubscription ? "Pro" : "Free"}</p>
       {hasProSubscription ? (
-        <Button
-          onClick={async function handlePortal() {
-            await authClient.customer.portal();
-          }}
-        >
-          Manage Subscription
-        </Button>
+        <Button onClick={handlePortal}>Manage Subscription</Button>
       ) : (
-        <Button
-          onClick={async function handleUpgrade() {
-            await authClient.checkout({ slug: "pro" });
-          }}
-        >
-          Upgrade to Pro
-        </Button>
+        <Button onClick={handleUpgrade}>Upgrade to Pro</Button>
       )}
     </div>
   );

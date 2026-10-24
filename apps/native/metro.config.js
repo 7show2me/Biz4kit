@@ -1,7 +1,12 @@
-const { withVarlockMetroConfig } = require("@varlock/expo-integration/metro-config");
+/* oxlint-disable unicorn/prefer-module, node/global-require -- Metro and Babel load CommonJS config */
+const {
+  withVarlockMetroConfig,
+} = require("@varlock/expo-integration/metro-config");
 const { getDefaultConfig } = require("expo/metro-config");
 const { withUniwindConfig } = require("uniwind/metro");
-const { wrapWithReanimatedMetroConfig } = require("react-native-reanimated/metro-config");
+const {
+  wrapWithReanimatedMetroConfig,
+} = require("react-native-reanimated/metro-config");
 
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);

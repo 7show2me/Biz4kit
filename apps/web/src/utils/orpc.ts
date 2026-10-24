@@ -26,7 +26,7 @@ export function createQueryClient() {
 }
 
 const link = new RPCLink({
-  url: `${ENV.VITE_SERVER_URL.replace(/\/$/, "")}/rpc`,
+  url: `${ENV.VITE_SERVER_URL.replace(/\/$/u, "")}/rpc`,
   fetch(url, options) {
     return fetch(url, {
       ...options,

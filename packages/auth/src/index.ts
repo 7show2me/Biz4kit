@@ -7,18 +7,18 @@ import { betterAuth } from "better-auth";
 
 import { createPolarClient } from "./lib/payments";
 
-export type AuthConfig = {
+export interface AuthConfig {
   BETTER_AUTH_URL: string;
   BETTER_AUTH_SECRET: string;
   CORS_ORIGIN: string;
   POLAR_ACCESS_TOKEN: string;
   POLAR_SUCCESS_URL: string;
-};
+}
 
 export function createAuth(
   env: AuthConfig,
   database: Database,
-  desktopOrigins: readonly string[] = [],
+  desktopOrigins: readonly string[] = []
 ) {
   return betterAuth({
     database: drizzleAdapter(database, {

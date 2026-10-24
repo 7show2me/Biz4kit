@@ -11,11 +11,13 @@
   },
   "dependencies": {
     "@Biz4kit/api": "workspace:*",
+    "@Biz4kit/monitoring": "workspace:*",
     "@Biz4kit/ui": "workspace:*",
     "@orpc/client": "catalog:",
     "@orpc/server": "catalog:",
     "@orpc/tanstack-query": "catalog:",
     "@polar-sh/better-auth": "catalog:",
+    "@sentry/tanstackstart-react": "11.9.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-form": "catalog:",
     "@tanstack/react-query": "catalog:",

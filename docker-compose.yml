@@ -32,7 +32,7 @@ services:
 
   worker:
     image: biz4kit-api:local
-    command: ["node", "dist/worker.mjs"]
+    command: ["node", "--enable-source-maps", "dist/worker.mjs"]
     init: true
     env_file:
       - path: apps/server/.env

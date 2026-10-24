@@ -84,12 +84,16 @@ jobs:
           task-definition: api-task.json
           container-name: api
           image: ${{ steps.ecr.outputs.registry }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+          # Sentry groups errors by the build that raised them (D104).
+          environment-variables: SENTRY_RELEASE=${{ env.IMAGE_TAG }}
       - uses: aws-actions/amazon-ecs-render-task-definition@v1
         id: worker-task
         with:
           task-definition: worker-task.json
           container-name: worker
           image: ${{ steps.ecr.outputs.registry }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+          # Sentry groups errors by the build that raised them (D104).
+          environment-variables: SENTRY_RELEASE=${{ env.IMAGE_TAG }}
       - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.api-task.outputs.task-definition }}
@@ -118,6 +122,14 @@ jobs:
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      # Sentry (D104): browser and SSR errors, plus a source-map upload when the
+      # auth token is set.
+      VITE_SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+      VITE_SENTRY_ENVIRONMENT: ${{ needs.target.outputs.environment }}
+      VITE_SENTRY_RELEASE: ${{ github.sha }}
+      SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       # Vercel "production" target only for the production environment; staging
       # is a preview deployment pinned to the staging alias.
       VERCEL_TARGET: ${{ needs.target.outputs.environment == 'production' && 'production' || 'preview' }}

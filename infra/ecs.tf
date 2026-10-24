@@ -69,7 +69,7 @@ resource "aws_ecs_task_definition" "worker" {
     name        = "worker"
     image       = local.image
     essential   = true
-    command     = ["node", "dist/worker.mjs"]
+    command     = ["node", "--enable-source-maps", "dist/worker.mjs"]
     environment = local.environment
     secrets     = local.secrets
     logConfiguration = {

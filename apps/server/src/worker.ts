@@ -1,5 +1,7 @@
+import * as Sentry from "@sentry/node";
 import { Worker } from "bullmq";
 
+import "./instrument";
 import { ENV } from "./env.server";
 import { redisConnection } from "./queue/connection";
 import { DEFAULT_QUEUE, processJob } from "./queue/jobs";
@@ -18,10 +20,12 @@ worker.on("failed", (job, error) => {
   console.error(
     `job ${job?.name ?? "unknown"} ${job?.id ?? ""} failed: ${error.message}`
   );
+  Sentry.captureException(error, { tags: { job: job?.name ?? "unknown" } });
 });
 
 const shutdown = async () => {
   await worker.close();
+  await Sentry.close(2000);
   process.exit(0);
 };
 

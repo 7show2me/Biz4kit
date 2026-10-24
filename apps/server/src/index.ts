@@ -5,6 +5,7 @@ import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
+import * as Sentry from "@sentry/node";
 import { initLogger } from "evlog";
 import { createAuthMiddleware } from "evlog/better-auth";
 import type { BetterAuthInstance } from "evlog/better-auth";
@@ -16,6 +17,7 @@ import { cors } from "hono/cors";
 
 import { createContext } from "./context";
 import { ENV } from "./env.server";
+import "./instrument";
 import { health } from "./health";
 import { auth } from "./services";
 
@@ -80,11 +82,18 @@ app.get("/polar/success", (c) => {
 });
 
 // Message and stack only, never request input: it can hold customer details.
+// Sentry gets the same error after scrubbing (D104).
 const logError = (cause: unknown) => {
   console.error(
     cause instanceof Error ? (cause.stack ?? cause.message) : "unknown error"
   );
+  Sentry.captureException(cause);
 };
+
+app.onError((cause, c) => {
+  logError(cause);
+  return c.text("Internal Server Error", 500);
+});
 
 export const apiHandler = new OpenAPIHandler(appRouter, {
   plugins: [

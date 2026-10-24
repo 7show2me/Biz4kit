@@ -46,6 +46,17 @@ variable "log_retention_days" {
   }
 }
 
+variable "sentry_dsn" {
+  # D104. Not a secret: the same DSN ships in the web app's browser bundle.
+  description = "Sentry project DSN the API and workers report errors to."
+  type        = string
+
+  validation {
+    condition     = can(regex("^https://[^@]+@[^/]+/[0-9]+$", var.sentry_dsn))
+    error_message = "sentry_dsn must be a Sentry DSN (https://<key>@<host>/<project id>)."
+  }
+}
+
 variable "vpc_cidr" {
   description = "Address range of this environment's VPC."
   type        = string

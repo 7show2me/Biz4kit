@@ -57,6 +57,7 @@ variables {
   image_tag          = "test"
   web_origin         = "https://staging.example.test"
   log_retention_days = 30
+  sentry_dsn         = "https://key@o1.ingest.sentry.io/1"
 }
 
 run "api_runs_on_fargate_without_a_load_balancer" {
@@ -150,7 +151,7 @@ run "workers_take_no_inbound_traffic" {
   }
 
   assert {
-    condition     = jsondecode(aws_ecs_task_definition.worker.container_definitions)[0].command == ["node", "dist/worker.mjs"]
+    condition     = jsondecode(aws_ecs_task_definition.worker.container_definitions)[0].command == ["node", "--enable-source-maps", "dist/worker.mjs"]
     error_message = "The worker runs the BullMQ entry point from the same image."
   }
 }
@@ -230,4 +231,28 @@ run "rejects_a_retention_cloudwatch_does_not_support" {
   }
 
   expect_failures = [var.log_retention_days]
+}
+
+run "api_and_worker_report_errors_to_sentry" {
+  command = apply
+
+  assert {
+    condition = alltrue([
+      for td in [aws_ecs_task_definition.api, aws_ecs_task_definition.worker] :
+      lookup({ for e in jsondecode(td.container_definitions)[0].environment : e.name => e.value }, "SENTRY_DSN", "") == "https://key@o1.ingest.sentry.io/1" &&
+      lookup({ for e in jsondecode(td.container_definitions)[0].environment : e.name => e.value }, "SENTRY_ENVIRONMENT", "") == "staging" &&
+      lookup({ for e in jsondecode(td.container_definitions)[0].environment : e.name => e.value }, "SENTRY_RELEASE", "") == "test"
+    ])
+    error_message = "API and worker send errors to Sentry tagged with environment and image tag (D104)."
+  }
+}
+
+run "rejects_a_sentry_dsn_that_is_not_https" {
+  command = plan
+
+  variables {
+    sentry_dsn = "not-a-dsn"
+  }
+
+  expect_failures = [var.sentry_dsn]
 }

@@ -23,6 +23,9 @@ locals {
     { name = "CORS_ORIGIN", value = var.web_origin },
     { name = "BETTER_AUTH_URL", value = aws_apigatewayv2_api.api.api_endpoint },
     { name = "POLAR_SUCCESS_URL", value = "${var.web_origin}/success" },
+    { name = "SENTRY_DSN", value = var.sentry_dsn },
+    { name = "SENTRY_ENVIRONMENT", value = var.environment },
+    { name = "SENTRY_RELEASE", value = var.image_tag },
   ]
 
   secrets = [

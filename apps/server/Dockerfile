@@ -1,6 +1,6 @@
 # One image for the API and the BullMQ workers (D28, D38).
 # API:    node dist/index.mjs   (default)
-# Worker: node dist/worker.mjs  (ECS task definition overrides the command)
+# Worker: node --enable-source-maps dist/worker.mjs  (ECS task definition overrides the command)
 FROM node:24-slim AS builder
 RUN corepack enable
 WORKDIR /app
@@ -25,4 +25,4 @@ EXPOSE 3000
 WORKDIR /app/apps/server
 HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=5 \
   CMD ["node", "-e", "fetch('http://localhost:3000/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
-CMD ["node", "dist/index.mjs"]
+CMD ["node", "--enable-source-maps", "dist/index.mjs"]

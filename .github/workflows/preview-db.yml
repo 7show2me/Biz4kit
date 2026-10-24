@@ -1,5 +1,5 @@
-# A Neon branch per pull request, copied from staging and deleted when the PR
-# closes (D4). Staging holds generated demo data only, never real customers.
+# A Neon branch per pull request, copied from dev and deleted when the PR
+# closes (D105). Dev holds generated demo data only, never real customers.
 # The preview API that uses it waits on BIZ-87; migrations run here from 1.2.
 name: Preview database
 
@@ -23,7 +23,7 @@ jobs:
         id: branch
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
-          parent_branch: staging
+          parent_branch: dev
           branch_name: preview/pr-${{ github.event.number }}
           api_key: ${{ secrets.NEON_API_KEY }}
       - run: echo "Neon branch ${{ steps.branch.outputs.branch_id }} ready for PR ${{ github.event.number }}"

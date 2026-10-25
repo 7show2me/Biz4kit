@@ -16,20 +16,17 @@ Run the tests with `pnpm test:infra`. They need no AWS account.
 
 ## 1. Bootstrap (once per account)
 
+**Done on 2026-10-25** for account `438585988393`: state bucket `biz4kit-tfstate-438585988393`, ECR `biz4kit-api`, GitHub OIDC and the two deploy roles. The bootstrap state is in that bucket under `bootstrap.tfstate`. To change it later:
+
 ```sh
 cd infra/bootstrap
-terraform init
-terraform apply                     # profile "biz4kit"
+terraform init -backend-config="bucket=biz4kit-tfstate-438585988393" \
+  -backend-config="key=bootstrap.tfstate" -backend-config="region=ap-south-1" \
+  -backend-config="use_lockfile=true" -backend-config="encrypt=true" -backend-config="profile=biz4kit"
+terraform apply
 ```
 
-Move the bootstrap state into the bucket it just created. Add `backend "s3" {}` inside the `terraform {}` block of `bootstrap/main.tf`, then run:
-
-```sh
-terraform init -migrate-state \
-  -backend-config="bucket=$(terraform output -raw state_bucket)" \
-  -backend-config="key=bootstrap.tfstate" \
-  -backend-config="region=ap-south-1" -backend-config="use_lockfile=true" -backend-config="encrypt=true"
-```
+On a new account, comment out `backend "s3" {}` in `bootstrap/main.tf` for the first apply (the bucket does not exist yet), then put it back and run the init above with `-migrate-state`.
 
 Push a first image so the services have something to run. The tag is the commit SHA, the same one CI uses:
 

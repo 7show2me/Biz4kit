@@ -5,6 +5,10 @@
 terraform {
   required_version = ">= 1.10"
 
+  # State lives in the bucket this stack creates (README step 1). Configure with
+  # -backend-config: bucket, key=bootstrap.tfstate, region, use_lockfile, encrypt.
+  backend "s3" {}
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"

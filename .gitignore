@@ -65,3 +65,9 @@ crash.log
 
 # Python
 __pycache__/
+
+# Vercel CLI link and pulled env (vercel link)
+.vercel
+.env*
+!**/.env.schema
+!**/.env.example

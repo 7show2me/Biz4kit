@@ -14,10 +14,10 @@
     "db:studio": "drizzle-kit studio",
     "db:migrate": "drizzle-kit migrate",
     "db:app-role": "tsx scripts/app-role.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.2.0",
     "drizzle-orm": "catalog:",
     "pg": "^8.23.1",
     "zod": "catalog:"

@@ -17,7 +17,7 @@ Written 2026-10-23, after the final design check (`reports/final-design-check-20
 | `apps/native` | Expo scaffold. Not Phase 1 screens. The fumadocs scaffold was deleted (D108). |
 | `packages/api` | `publicProcedure`, `protectedProcedure`; router has only `healthCheck`, `privateData`. |
 | `packages/auth` | Better Auth email + password, Drizzle adapter, Polar plugin with placeholder product id. |
-| `packages/db` | Drizzle on `neon-http`; only the auth tables; no migrations. |
+| `packages/db` | Drizzle on node-postgres (pooled Neon URL); full Phase 1 schema with forced RLS, `withWorkspace` / `withUser` / `takeNumber`, migrations and a dev seed (WBS 1.2, 2026-10-25). |
 | `infra/` | **Updated 2026-10-24 (BIZ-2):** `bootstrap/` (S3 state bucket with lock files, ECR, GitHub OIDC deploy roles) and one stack per environment (ECS Fargate API + worker, API Gateway HTTP API → VPC Link → Cloud Map, no load balancer or NAT, Secrets Manager, files bucket). `terraform test` with a mocked provider. Not applied yet; see `infra/README.md`. |
 | CI | **Updated 2026-10-24 (BIZ-2):** `.github/workflows/ci.yml` (ultracite, typecheck, Vitest, Terraform tests, image build, gitleaks, audit), `preview-db.yml` (Neon branch per PR), `deploy.yml` (staging on `main`, production on `v*` tags). `test` task in `turbo.json`; Vitest in `apps/server`. Playwright not yet. |
 | Git | `apps/`, `packages/`, `design/app/`, root config are **untracked**; `infra/.terraform/` not ignored. |

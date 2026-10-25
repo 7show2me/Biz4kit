@@ -4,7 +4,7 @@ import { eq, sql } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { withUser, withWorkspace } from "./index";
-import { customer, member, workspace } from "./schema";
+import { customer, invoice, lead, member, payment, workspace } from "./schema";
 import { fakePhone, fillWorkspace } from "./test/fixtures";
 import { PG, appDb, hasDb, makeWorkspace, pgCode } from "./test/helpers";
 
@@ -33,12 +33,16 @@ describe.skipIf(!hasDb)("tenant isolation (RLS)", () => {
   let a = "";
   let b = "";
   let bCustomerId = "";
+  let bInvoiceId = "";
 
   beforeAll(async () => {
     a = await makeWorkspace(db, "Studio A");
     b = await makeWorkspace(db, "Studio B");
     await fillWorkspace(db, a);
-    ({ customerId: bCustomerId } = await fillWorkspace(db, b));
+    ({ customerId: bCustomerId, invoiceId: bInvoiceId } = await fillWorkspace(
+      db,
+      b
+    ));
   });
 
   describe("database setup", () => {
@@ -187,6 +191,31 @@ describe.skipIf(!hasDb)("tenant isolation (RLS)", () => {
         )
       );
       expect(code).toBe(PG.insufficientPrivilege);
+    });
+
+    it("cannot link its own record to another workspace's record", async () => {
+      const payForB = await pgCode(() =>
+        withWorkspace(db, a, (tx) =>
+          tx
+            .insert(payment)
+            .values({ invoiceId: bInvoiceId, amountPaise: 100n })
+        )
+      );
+      expect(payForB).toBe(PG.foreignKeyViolation);
+      const leadForB = await pgCode(() =>
+        withWorkspace(db, a, (tx) =>
+          tx
+            .insert(lead)
+            .values({ customerId: bCustomerId, type: "quoted", source: "web" })
+        )
+      );
+      expect(leadForB).toBe(PG.foreignKeyViolation);
+      const invoiceForB = await pgCode(() =>
+        withWorkspace(db, a, (tx) =>
+          tx.insert(invoice).values({ kind: "bill", customerId: bCustomerId })
+        )
+      );
+      expect(invoiceForB).toBe(PG.foreignKeyViolation);
     });
 
     it("cannot delete another workspace's row", async () => {

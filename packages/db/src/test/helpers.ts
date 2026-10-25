@@ -47,6 +47,7 @@ export async function pgCode(run: () => Promise<unknown>): Promise<string> {
 export const PG = {
   insufficientPrivilege: "42501",
   uniqueViolation: "23505",
+  foreignKeyViolation: "23503",
   checkViolation: "23514",
   invalidEnum: "22P02",
   raised: "P0001",

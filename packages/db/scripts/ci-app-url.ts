@@ -18,9 +18,10 @@ const password = randomBytes(32).toString("base64url");
 const client = new Client({ connectionString: ownerUrl });
 await client.connect();
 try {
+  // Only login and password: changing SUPERUSER, even to off, needs a superuser.
   // DDL takes no parameters; the password is base64url only.
   await client.query(
-    `alter role ${APP_ROLE} with login password '${password}' nosuperuser nobypassrls nocreatedb nocreaterole noinherit`
+    `alter role ${APP_ROLE} with login password '${password}'`
   );
 } finally {
   await client.end();

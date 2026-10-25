@@ -70,10 +70,12 @@ const setUp = async (target: (typeof TARGETS)[number]) => {
       "select 1 from pg_roles where rolname = $1",
       [APP_ROLE]
     );
-    const verb = rowCount ? "alter" : "create";
-    // DDL takes no parameters; the password is base64url only.
+    // DDL takes no parameters; the password is base64url only. ALTER sets only
+    // login and password: changing SUPERUSER, even to off, needs a superuser.
     await client.query(
-      `${verb} role ${APP_ROLE} with login password '${password}' nosuperuser nobypassrls nocreatedb nocreaterole noinherit`
+      rowCount
+        ? `alter role ${APP_ROLE} with login password '${password}'`
+        : `create role ${APP_ROLE} with login password '${password}' nosuperuser nobypassrls nocreatedb nocreaterole noinherit`
     );
   } finally {
     await client.end();

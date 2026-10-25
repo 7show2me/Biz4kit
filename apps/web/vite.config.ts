@@ -6,7 +6,7 @@ import viteReact from "@vitejs/plugin-react";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   server: {
     port: 3001,
   },
@@ -27,8 +27,9 @@ export default defineConfig({
       authToken: process.env.SENTRY_AUTH_TOKEN,
     }),
   ],
-  // These deployments run the standalone build artifact.
+  // Builds bundle every dependency: deployments run the standalone artifact.
+  // Dev keeps them external, or Vite inlines CommonJS React and fails (D112).
   ssr: {
-    noExternal: true,
+    noExternal: command === "build" ? true : undefined,
   },
-});
+}));

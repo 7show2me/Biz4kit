@@ -24,7 +24,7 @@ If work depends on a business fact that is not stated in `prep/` or `docs/decisi
 
 - Backend runs in Docker (API + workers) on ECS Fargate behind API Gateway, no load balancer, Mumbai (D28, D38, D42). Terraform state in S3 with locking (D39). Web app on Vercel (D22). Queue: Upstash Redis free + BullMQ (D33). Files: S3 Mumbai (D31).
 - TanStack Start web, Hono + oRPC API (D30). Monorepo: pnpm + Turborepo (D37).
-- Postgres is on Neon, AWS Singapore `aws-ap-southeast-1` (D4, D111; Mumbai not offered to our account), branches `prod`, `dev` and `test`; CI and PR previews use `test`, no branch per PR (D105, D114, D115), via Drizzle (D36).
+- Postgres is on Neon, AWS Singapore `aws-ap-southeast-1` (D4, D111; Mumbai not offered to our account), branches `prod`, `dev`, `test` (local tests) plus one per PR for CI and previews via the Neon GitHub integration (D105, D113, D117), via Drizzle (D36).
 - Email sender is the business name only, reply-to the owner, never "via Biz4Kit" (D35).
 - Brand (Biz4Kit chrome only, local only, D10-D19): `brand/theme.css` (colours, fonts, radius, shadows), `brand/logo/*.svg` (4B mark and lockup), `brand/design-system/` (brand book, tokens, usage rules), `brand/preview.html` (open in a browser). Customer-facing pages use the business's own theme.
 - Re-create the Linear board with `python scripts/linear_seed.py`. It is safe to re-run.

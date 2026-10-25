@@ -70,9 +70,9 @@ Then force a new deployment: `aws ecs update-service --cluster biz4kit-staging -
 
 The deploy roles trust only `repo:7show2me/Biz4kit:environment:<name>`. A workflow outside that environment cannot assume them.
 
-## 4. Neon (D4, D105, D111, D114)
+## 4. Neon (D4, D105, D111, D117)
 
-Project `biz4kit` (`fancy-leaf-05807484`), created 2026-10-25 in `aws-ap-southeast-1` (Singapore): Neon does not offer Mumbai to our account (D111). Long-lived branches: `prod` (the default branch, renamed from `main`), `dev` created from it, and `test` created from `dev` (D113). The staging environment uses `dev`. There is no branch per pull request (D114): CI runs the database tests on `test` through the repository secrets `TEST_DATABASE_URL` (app role) and `TEST_DATABASE_MIGRATION_URL` (owner), and PR previews use `test` too (D115). CI does not reset `test`; reset it by hand with `pnpm db:test:reset` when it drifts, for example after an abandoned PR's migration (D116).
+Project `biz4kit` (`fancy-leaf-05807484`), created 2026-10-25 in `aws-ap-southeast-1` (Singapore): Neon does not offer Mumbai to our account (D111). Long-lived branches: `prod` (the default branch, renamed from `main`), `dev` created from it, and `test` created from `dev` for local test runs (D113). The staging environment uses `dev`. Every pull request gets `preview/pr-<n>` (D105, D117), reset to a fresh copy of `dev` on each push, migrated, tested and deleted on close (`.github/workflows/database.yml`). GitHub gets `NEON_API_KEY` and `NEON_PROJECT_ID` from the Neon GitHub integration (Neon console → Integrations → GitHub). The free plan allows 10 branches per project, so about 7 PRs can be open at once.
 
 ```sh
 neonctl branches rename main prod --project-id <id>

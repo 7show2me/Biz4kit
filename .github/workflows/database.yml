@@ -1,0 +1,60 @@
+# A Neon branch per pull request (D105, D117), reset to a fresh copy of dev on
+# every push and deleted when the PR closes. Migrations run on it, then the RLS
+# cross-tenant suite and the data rules (packages/db). NEON_API_KEY and
+# NEON_PROJECT_ID come from the Neon GitHub integration. Dev holds generated
+# demo data only, never real customers.
+name: Database
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: database-${{ github.event.number }}
+  cancel-in-progress: ${{ github.event.action != 'closed' }}
+
+env:
+  BRANCH: preview/pr-${{ github.event.number }}
+  NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+  NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+
+jobs:
+  rls:
+    name: Migrations and RLS tests
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Fresh PR branch from dev
+        run: |
+          neon() { npx -y neonctl@8.8.0 --project-id "$NEON_PROJECT_ID" "$@"; }
+          if neon branches get "$BRANCH" > /dev/null 2>&1; then
+            neon branches reset "$BRANCH" --parent
+          else
+            neon branches create --name "$BRANCH" --parent dev
+          fi
+          url=$(neon connection-string "$BRANCH" --pooled --role-name neondb_owner --database-name neondb)
+          echo "::add-mask::$url"
+          echo "DATABASE_MIGRATION_URL=$url" >> "$GITHUB_ENV"
+      # As the branch owner. drizzle.config.ts also loads DATABASE_URL.
+      - name: Apply migrations
+        run: DATABASE_URL="$DATABASE_MIGRATION_URL" pnpm --filter @Biz4kit/db db:migrate:deploy
+      - name: App role URL for the tests
+        run: pnpm --filter @Biz4kit/db exec tsx scripts/ci-app-url.ts
+      - name: RLS cross-tenant suite and data rules
+        run: pnpm --filter @Biz4kit/db test
+
+  delete:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - run: npx -y neonctl@8.8.0 --project-id "$NEON_PROJECT_ID" branches delete "$BRANCH"

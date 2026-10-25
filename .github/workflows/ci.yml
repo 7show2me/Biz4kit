@@ -1,6 +1,6 @@
 # Required checks on every pull request (Workflow doc: Required checks).
-# Lighthouse, axe, the RLS cross-tenant suite and the migration dry-run join
-# this file with the packages that bring them (1.2, 1.5).
+# Lighthouse and axe join this file with 1.5. The RLS cross-tenant suite and
+# the migrations run in database.yml, on each PR's Neon branch (1.2).
 name: CI
 
 on:
@@ -33,7 +33,8 @@ jobs:
       - name: Lint and format (ultracite)
         run: pnpm check
       - run: pnpm check-types
-      - run: pnpm test
+      # packages/db runs in database.yml, on the PR's own Neon branch (D117).
+      - run: pnpm test --filter=!@Biz4kit/db
 
   infra:
     name: Terraform

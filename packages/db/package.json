@@ -12,17 +12,23 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate:deploy": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:app-role": "tsx scripts/app-role.ts",
+    "test": "vitest run",
+    "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.1.0",
     "drizzle-orm": "catalog:",
+    "pg": "^8.23.1",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@Biz4kit/config": "workspace:*",
+    "@types/pg": "^8.23.1",
     "drizzle-kit": "1.0.0-rc.4",
+    "tsx": "catalog:",
     "typescript": "^6.0.3",
-    "varlock": "catalog:"
+    "varlock": "catalog:",
+    "vitest": "catalog:"
   }
 }

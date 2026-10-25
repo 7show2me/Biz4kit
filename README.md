@@ -28,7 +28,8 @@ You need: Node 24, pnpm, and the Vercel and Neon CLIs logged in (`vercel login`,
 ```bash
 pnpm install          # also installs the lefthook pre-commit hook
 pnpm env:pull         # Vercel Development env -> apps/server, apps/web, packages/db .env.local
-pnpm db:migrate       # apply migrations to Neon dev
+pnpm db:migrate       # apply migrations to Neon dev (as the owner role)
+pnpm --filter @Biz4kit/db db:seed   # sample salon from the prototype, generated contacts
 pnpm dev:server       # API on http://localhost:3000 (GET /health)
 pnpm dev:worker       # BullMQ worker on the shared Upstash queue
 pnpm dev:web          # web app on http://localhost:3001
@@ -38,12 +39,26 @@ pnpm dev:web          # web app on http://localhost:3001
 
 Local and the deployed dev environment share the same database and queue (D112): a worker on your machine can take jobs queued by dev, and the other way round.
 
+### Database roles and tenancy
+
+Every workspace table has row-level security, **forced**, on `app.workspace_id`. Two roles:
+
+| Env key | Role | Used for |
+| --- | --- | --- |
+| `DATABASE_URL` | `biz4kit_app` (no BYPASSRLS, owns no table) | the API, worker, seed |
+| `DATABASE_MIGRATION_URL` | `neondb_owner` | `drizzle-kit` only |
+
+Query workspace data only through `withWorkspace(db, workspaceId, fn)` from `@Biz4kit/db`: it opens a transaction and sets the workspace, so a missing `where workspace_id = …` still leaks nothing. Without it, queries see no rows. `withUser(db, userId, fn)` shows only that user's memberships and workspaces, to pick one after sign-in.
+
+`pnpm --filter @Biz4kit/db db:app-role` creates the app role on the Neon `dev` and `test` branches (or rotates its password) and saves the four URLs to Vercel Development. Run `pnpm env:pull` afterwards.
+
 ### Tests and the `test` branch
 
-Tests that touch the database use the Neon `test` branch (`TEST_DATABASE_URL`), never `dev` (D113). Reset it from `dev` before a run:
+Tests that touch the database use the Neon `test` branch (`TEST_DATABASE_URL` as the app role, `TEST_DATABASE_MIGRATION_URL` as the owner), never `dev` (D113). The run applies migrations first. Without those keys the database tests are skipped locally, with a warning; in CI they fail instead. CI does not use this branch: each PR gets its own Neon branch (D117, `.github/workflows/database.yml`). Reset `test` from `dev` before a local run:
 
 ```bash
 pnpm db:test:reset
+pnpm --filter @Biz4kit/db test   # tenant isolation and data rules
 ```
 
 ### Image test (Docker)

@@ -114,3 +114,5 @@ Newest at the bottom. One row per decision; never edit an old row. A later decis
 | D106 | 2026-10-24 | — | Chart library for the web app (dashboard paid-per-day chart) | **shadcn chart** (Recharts underneath), coloured from the brand chart tokens. | Product owner | 1.5, 3.6 |
 | D107 | 2026-10-24 | — | `@shadcn/lint` (design-system lint for Tailwind classes, enforces D52) | **On, as errors**: CI fails on raw colours, arbitrary values or inline styles. | Product owner | 1.1, 1.5 |
 | D108 | 2026-10-24 | — | `apps/fumadocs` docs site from the scaffold (not in the WBS) | **Deleted.** | Product owner | 1.1 |
+| D109 | 2026-10-25 | BIZ-87 | API hosting for PR previews | **A Vercel function in each preview deployment** runs the Hono API against that PR's Neon branch (D105). No BullMQ workers in previews. Staging and production stay on ECS Fargate (D28). | Product owner (accepted the recommended answer) | 1.1 |
+| D110 | 2026-10-25 | BIZ-88 | How long to keep API and worker logs | **14 days** in CloudWatch, staging and production. | Product owner | 1.1 |

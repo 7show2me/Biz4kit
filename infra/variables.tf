@@ -36,9 +36,9 @@ variable "web_origin" {
 }
 
 variable "log_retention_days" {
-  # TODO(BIZ-88): no default until the retention period is decided.
-  description = "Days CloudWatch keeps API and worker logs. Open question BIZ-88."
+  description = "Days CloudWatch keeps API and worker logs (D110)."
   type        = number
+  default     = 14
 
   validation {
     condition     = contains([1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653], var.log_retention_days)

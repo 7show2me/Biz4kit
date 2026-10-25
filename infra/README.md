@@ -10,10 +10,9 @@ Terraform for AWS Mumbai (`ap-south-1`): the API and BullMQ workers on ECS Farga
 
 Run the tests with `pnpm test:infra`. They need no AWS account.
 
-## Open questions that block apply
+## Not built yet
 
-- **BIZ-88**: log retention. `log_retention_days` has no default until it is answered.
-- **BIZ-87**: where the API runs for PR previews. Not built yet.
+- PR previews run the API as a Vercel function against the PR's Neon branch (D109). Not built yet.
 
 ## 1. Bootstrap (once per account)
 
@@ -46,7 +45,7 @@ docker push <ecr_repository_url>:$(git rev-parse HEAD)
 cd infra
 terraform init -backend-config=backend/staging.hcl -backend-config="bucket=biz4kit-tfstate-<account>"
 terraform apply -var environment=staging -var aws_profile=biz4kit \
-  -var image_tag=<sha> -var web_origin=https://<staging web origin> -var log_retention_days=<BIZ-88> \
+  -var image_tag=<sha> -var web_origin=https://<staging web origin> \
   -var sentry_dsn=<Sentry project DSN>
 ```
 

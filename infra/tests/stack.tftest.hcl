@@ -53,11 +53,10 @@ mock_provider "aws" {
 }
 
 variables {
-  environment        = "staging"
-  image_tag          = "test"
-  web_origin         = "https://staging.example.test"
-  log_retention_days = 30
-  sentry_dsn         = "https://key@o1.ingest.sentry.io/1"
+  environment = "staging"
+  image_tag   = "test"
+  web_origin  = "https://staging.example.test"
+  sentry_dsn  = "https://key@o1.ingest.sentry.io/1"
 }
 
 run "api_runs_on_fargate_without_a_load_balancer" {
@@ -208,8 +207,8 @@ run "logs_keep_the_agreed_retention" {
   command = apply
 
   assert {
-    condition     = aws_cloudwatch_log_group.api.retention_in_days == 30 && aws_cloudwatch_log_group.worker.retention_in_days == 30
-    error_message = "Log groups use log_retention_days."
+    condition     = aws_cloudwatch_log_group.api.retention_in_days == 14 && aws_cloudwatch_log_group.worker.retention_in_days == 14
+    error_message = "Logs are kept 14 days (D110)."
   }
 }
 

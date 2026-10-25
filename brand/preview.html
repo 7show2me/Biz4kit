@@ -1,117 +1,394 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Biz4Kit Brand Preview</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
-<link rel="stylesheet" href="theme.css">
-<style>
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--background); color: var(--foreground); font: 15px/22px var(--font-sans); }
-  main { max-width: 1040px; margin: 0 auto; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px)); }
-  h1 { font: 600 24px/30px var(--font-sans); margin: 0 0 4px; }
-  h2 { font: 600 17px/24px var(--font-sans); margin: 40px 0 12px; }
-  p.lead { color: var(--muted-foreground); margin: 0; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
-  .card { min-width: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); overflow: hidden; }
-  .stage { display: flex; align-items: center; justify-content: center; min-height: 180px; padding: 24px; }
-  .stage img { display: block; max-width: 100%; height: auto; }
-  .stage.light { background: var(--background); }
-  .stage.dark { background: #0a0e1e; }
-  .stage.indigo { background: #03035e; }
-  .stage.photo { background: linear-gradient(135deg, #5f78f7, #d946ef 55%, #f59e0b); }
-  .meta { padding: 12px 16px; border-top: 1px solid var(--border); }
-  .meta b { display: block; font: 500 13px/18px var(--font-mono); }
-  .meta span { color: var(--muted-foreground); font-size: 13px; line-height: 18px; }
-  .tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
-  table { border-collapse: collapse; width: 100%; font-size: 13px; }
-  th, td { text-align: left; padding: 8px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-  th { background: var(--muted); font-weight: 500; }
-  td.num { font: 500 13px/18px var(--font-mono); }
-  .pass { color: var(--foreground); } .pass::before { content: "✓ "; color: var(--chart-1); }
-  .swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
-  .sw { min-width: 0; border: 1px solid var(--border); border-radius: var(--radius-sm, 16px); overflow: hidden; background: var(--card); }
-  .sw i { display: block; height: 56px; }
-  .sw span { display: block; padding: 6px 10px; font: 500 12px/16px var(--font-mono); overflow-wrap: anywhere; }
-  .btns { display: flex; flex-wrap: wrap; gap: 12px; padding: 20px; }
-  .btn { font: 500 14px/20px var(--font-sans); padding: 10px 18px; border-radius: 18px; border: 0; }
-  .btn.p { background: var(--primary); color: var(--primary-foreground); }
-  .btn.d { background: var(--destructive); color: var(--destructive-foreground); }
-  .btn:focus-visible, .focus { outline: 2px solid var(--ring); outline-offset: 2px; }
-  .darkbox { padding: 4px; border-radius: var(--radius); background: var(--background); color: var(--foreground); border: 1px solid var(--border); }
-</style>
-</head>
-<body>
-<main>
-  <h1>Biz4Kit brand</h1>
-  <p class="lead">Logo files from <code>brand/logo/</code>, each shown at its own size on the ground it is made for. The theme comes from <code>brand/theme.css</code>.</p>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Biz4Kit Brand Preview</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap"
+    />
+    <link rel="stylesheet" href="theme.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        font: 15px/22px var(--font-sans);
+      }
+      main {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px
+          max(16px, env(safe-area-inset-left, 0px));
+      }
+      h1 {
+        font: 600 24px/30px var(--font-sans);
+        margin: 0 0 4px;
+      }
+      h2 {
+        font: 600 17px/24px var(--font-sans);
+        margin: 40px 0 12px;
+      }
+      p.lead {
+        color: var(--muted-foreground);
+        margin: 0;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+        gap: 16px;
+      }
+      .card {
+        min-width: 0;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+        overflow: hidden;
+      }
+      .stage {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 180px;
+        padding: 24px;
+      }
+      .stage img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+      .stage.light {
+        background: var(--background);
+      }
+      .stage.dark {
+        background: #0a0e1e;
+      }
+      .stage.indigo {
+        background: #03035e;
+      }
+      .stage.photo {
+        background: linear-gradient(135deg, #5f78f7, #d946ef 55%, #f59e0b);
+      }
+      .meta {
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+      }
+      .meta b {
+        display: block;
+        font: 500 13px/18px var(--font-mono);
+      }
+      .meta span {
+        color: var(--muted-foreground);
+        font-size: 13px;
+        line-height: 18px;
+      }
+      .tablewrap {
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 13px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 14px;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      th {
+        background: var(--muted);
+        font-weight: 500;
+      }
+      td.num {
+        font: 500 13px/18px var(--font-mono);
+      }
+      .pass {
+        color: var(--foreground);
+      }
+      .pass::before {
+        content: "✓ ";
+        color: var(--chart-1);
+      }
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+      }
+      .sw {
+        min-width: 0;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm, 16px);
+        overflow: hidden;
+        background: var(--card);
+      }
+      .sw i {
+        display: block;
+        height: 56px;
+      }
+      .sw span {
+        display: block;
+        padding: 6px 10px;
+        font: 500 12px/16px var(--font-mono);
+        overflow-wrap: anywhere;
+      }
+      .btns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 20px;
+      }
+      .btn {
+        font: 500 14px/20px var(--font-sans);
+        padding: 10px 18px;
+        border-radius: 18px;
+        border: 0;
+      }
+      .btn.p {
+        background: var(--primary);
+        color: var(--primary-foreground);
+      }
+      .btn.d {
+        background: var(--destructive);
+        color: var(--destructive-foreground);
+      }
+      .btn:focus-visible,
+      .focus {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+      }
+      .darkbox {
+        padding: 4px;
+        border-radius: var(--radius);
+        background: var(--background);
+        color: var(--foreground);
+        border: 1px solid var(--border);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Biz4Kit brand</h1>
+      <p class="lead">
+        Logo files from <code>brand/logo/</code>, each shown at its own size on the ground it is
+        made for. The theme comes from <code>brand/theme.css</code>.
+      </p>
 
-  <h2>Lockup: mark and name</h2>
-  <div class="grid">
-    <div class="card"><div class="stage light"><img src="logo/biz4kit-lockup.svg" width="444" height="116" alt="Biz4Kit logo with name, indigo"></div>
-      <div class="meta"><b>biz4kit-lockup.svg</b><span>444 × 116. Light grounds, transparent.</span></div></div>
-    <div class="card"><div class="stage dark"><img src="logo/biz4kit-lockup-dark.svg" width="464" height="136" alt="Biz4Kit logo with name on a dark bordered tile"></div>
-      <div class="meta"><b>biz4kit-lockup-dark.svg</b><span>464 × 136. Own dark tile with a border, so it also shows on a light page.</span></div></div>
-    <div class="card"><div class="stage indigo"><img src="logo/biz4kit-lockup-white.svg" width="444" height="116" alt="Biz4Kit logo with name, white"></div>
-      <div class="meta"><b>biz4kit-lockup-white.svg</b><span>444 × 116. Photos and the primary fill, transparent.</span></div></div>
-  </div>
+      <h2>Lockup: mark and name</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="stage light">
+            <img
+              src="logo/biz4kit-lockup.svg"
+              width="444"
+              height="116"
+              alt="Biz4Kit logo with name, indigo"
+            />
+          </div>
+          <div class="meta">
+            <b>biz4kit-lockup.svg</b><span>444 × 116. Light grounds, transparent.</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="stage dark">
+            <img
+              src="logo/biz4kit-lockup-dark.svg"
+              width="464"
+              height="136"
+              alt="Biz4Kit logo with name on a dark bordered tile"
+            />
+          </div>
+          <div class="meta">
+            <b>biz4kit-lockup-dark.svg</b
+            ><span>464 × 136. Own dark tile with a border, so it also shows on a light page.</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="stage indigo">
+            <img
+              src="logo/biz4kit-lockup-white.svg"
+              width="444"
+              height="116"
+              alt="Biz4Kit logo with name, white"
+            />
+          </div>
+          <div class="meta">
+            <b>biz4kit-lockup-white.svg</b
+            ><span>444 × 116. Photos and the primary fill, transparent.</span>
+          </div>
+        </div>
+      </div>
 
-  <h2>Mark alone</h2>
-  <div class="grid">
-    <div class="card"><div class="stage light"><img src="logo/biz4kit-logo.svg" width="200" height="116" alt="Biz4Kit 4B mark, indigo"></div>
-      <div class="meta"><b>biz4kit-logo.svg</b><span>200 × 116. Sidebar, small spaces on light.</span></div></div>
-    <div class="card"><div class="stage dark"><img src="logo/biz4kit-logo-dark.svg" width="220" height="136" alt="Biz4Kit 4B mark on a dark bordered tile"></div>
-      <div class="meta"><b>biz4kit-logo-dark.svg</b><span>220 × 136. Own dark tile with a border.</span></div></div>
-    <div class="card"><div class="stage photo"><img src="logo/biz4kit-logo-white.svg" width="200" height="116" alt="Biz4Kit 4B mark, white"></div>
-      <div class="meta"><b>biz4kit-logo-white.svg</b><span>200 × 116. On photos, transparent.</span></div></div>
-    <div class="card"><div class="stage light"><img src="logo/biz4kit-app-icon.svg" width="160" height="160" alt="Biz4Kit app icon"></div>
-      <div class="meta"><b>biz4kit-app-icon.svg</b><span>160 × 160. Favicon, PWA, Expo, avatar.</span></div></div>
-  </div>
+      <h2>Mark alone</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="stage light">
+            <img
+              src="logo/biz4kit-logo.svg"
+              width="200"
+              height="116"
+              alt="Biz4Kit 4B mark, indigo"
+            />
+          </div>
+          <div class="meta">
+            <b>biz4kit-logo.svg</b><span>200 × 116. Sidebar, small spaces on light.</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="stage dark">
+            <img
+              src="logo/biz4kit-logo-dark.svg"
+              width="220"
+              height="136"
+              alt="Biz4Kit 4B mark on a dark bordered tile"
+            />
+          </div>
+          <div class="meta">
+            <b>biz4kit-logo-dark.svg</b><span>220 × 136. Own dark tile with a border.</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="stage photo">
+            <img
+              src="logo/biz4kit-logo-white.svg"
+              width="200"
+              height="116"
+              alt="Biz4Kit 4B mark, white"
+            />
+          </div>
+          <div class="meta">
+            <b>biz4kit-logo-white.svg</b><span>200 × 116. On photos, transparent.</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="stage light">
+            <img src="logo/biz4kit-app-icon.svg" width="160" height="160" alt="Biz4Kit app icon" />
+          </div>
+          <div class="meta">
+            <b>biz4kit-app-icon.svg</b><span>160 × 160. Favicon, PWA, Expo, avatar.</span>
+          </div>
+        </div>
+      </div>
 
-  <h2>Small sizes</h2>
-  <div class="card"><div class="stage light" style="gap:32px; flex-wrap:wrap">
-    <img src="logo/biz4kit-logo.svg" style="height:48px; width:auto" alt="">
-    <img src="logo/biz4kit-logo.svg" style="height:32px; width:auto" alt="">
-    <img src="logo/biz4kit-logo.svg" style="height:24px; width:auto" alt="">
-    <img src="logo/biz4kit-logo.svg" style="height:16px; width:auto" alt="">
-    <img src="logo/biz4kit-app-icon.svg" style="width:64px; height:64px" alt="">
-    <img src="logo/biz4kit-app-icon.svg" style="width:32px; height:32px" alt="">
-    <img src="logo/biz4kit-app-icon.svg" style="width:16px; height:16px" alt="">
-  </div><div class="meta"><span>Mark at 48, 32, 24 and 16px tall; app icon at 64, 32 and 16px.</span></div></div>
+      <h2>Small sizes</h2>
+      <div class="card">
+        <div class="stage light" style="gap: 32px; flex-wrap: wrap">
+          <img src="logo/biz4kit-logo.svg" style="height: 48px; width: auto" alt="" />
+          <img src="logo/biz4kit-logo.svg" style="height: 32px; width: auto" alt="" />
+          <img src="logo/biz4kit-logo.svg" style="height: 24px; width: auto" alt="" />
+          <img src="logo/biz4kit-logo.svg" style="height: 16px; width: auto" alt="" />
+          <img src="logo/biz4kit-app-icon.svg" style="width: 64px; height: 64px" alt="" />
+          <img src="logo/biz4kit-app-icon.svg" style="width: 32px; height: 32px" alt="" />
+          <img src="logo/biz4kit-app-icon.svg" style="width: 16px; height: 16px" alt="" />
+        </div>
+        <div class="meta">
+          <span>Mark at 48, 32, 24 and 16px tall; app icon at 64, 32 and 16px.</span>
+        </div>
+      </div>
 
-  <h2>Contrast (checked)</h2>
-  <div class="tablewrap"><table>
-    <thead><tr><th>Pair</th><th>Light</th><th>Dark</th><th>Needs</th></tr></thead>
-    <tbody>
-      <tr><td>foreground on background</td><td class="num">19.7</td><td class="num">20.1</td><td>4.5 <span class="pass">pass</span></td></tr>
-      <tr><td>primary-foreground on primary</td><td class="num">17.8</td><td class="num">10.6</td><td>4.5 <span class="pass">pass</span></td></tr>
-      <tr><td>muted-foreground on background</td><td class="num">6.2</td><td class="num">7.3</td><td>4.5 <span class="pass">pass</span></td></tr>
-      <tr><td>destructive as text on background</td><td class="num">4.6</td><td class="num">6.5 <small>(was 2.1)</small></td><td>4.5 <span class="pass">pass</span></td></tr>
-      <tr><td>destructive-foreground on destructive</td><td class="num">4.7</td><td class="num">6.4</td><td>4.5 <span class="pass">pass</span></td></tr>
-      <tr><td>ring (focus) on background</td><td class="num">3.7</td><td class="num">5.4 <small>(was 1.7)</small></td><td>3.0 <span class="pass">pass</span></td></tr>
-      <tr><td>sidebar-ring on sidebar</td><td class="num">10.1</td><td class="num">5.0 <small>(was 1.6)</small></td><td>3.0 <span class="pass">pass</span></td></tr>
-      <tr><td>border on background (decorative only)</td><td class="num">1.3</td><td class="num">1.2</td><td>not a control edge</td></tr>
-    </tbody>
-  </table></div>
+      <h2>Contrast (checked)</h2>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Pair</th>
+              <th>Light</th>
+              <th>Dark</th>
+              <th>Needs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>foreground on background</td>
+              <td class="num">19.7</td>
+              <td class="num">20.1</td>
+              <td>4.5 <span class="pass">pass</span></td>
+            </tr>
+            <tr>
+              <td>primary-foreground on primary</td>
+              <td class="num">17.8</td>
+              <td class="num">10.6</td>
+              <td>4.5 <span class="pass">pass</span></td>
+            </tr>
+            <tr>
+              <td>muted-foreground on background</td>
+              <td class="num">6.2</td>
+              <td class="num">7.3</td>
+              <td>4.5 <span class="pass">pass</span></td>
+            </tr>
+            <tr>
+              <td>destructive as text on background</td>
+              <td class="num">4.6</td>
+              <td class="num">6.5 <small>(was 2.1)</small></td>
+              <td>4.5 <span class="pass">pass</span></td>
+            </tr>
+            <tr>
+              <td>destructive-foreground on destructive</td>
+              <td class="num">4.7</td>
+              <td class="num">6.4</td>
+              <td>4.5 <span class="pass">pass</span></td>
+            </tr>
+            <tr>
+              <td>ring (focus) on background</td>
+              <td class="num">3.7</td>
+              <td class="num">5.4 <small>(was 1.7)</small></td>
+              <td>3.0 <span class="pass">pass</span></td>
+            </tr>
+            <tr>
+              <td>sidebar-ring on sidebar</td>
+              <td class="num">10.1</td>
+              <td class="num">5.0 <small>(was 1.6)</small></td>
+              <td>3.0 <span class="pass">pass</span></td>
+            </tr>
+            <tr>
+              <td>border on background (decorative only)</td>
+              <td class="num">1.3</td>
+              <td class="num">1.2</td>
+              <td>not a control edge</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-  <h2>Fixed controls, both themes</h2>
-  <div class="grid">
-    <div class="card"><div class="btns"><button class="btn p">Send invoice</button><button class="btn d">Void invoice</button><button class="btn p focus">Focus ring</button></div><div class="meta"><span>Light</span></div></div>
-    <div class="darkbox dark"><div class="card" style="border:0"><div class="btns"><button class="btn p">Send invoice</button><button class="btn d">Void invoice</button><button class="btn p focus">Focus ring</button></div><div class="meta"><span>Dark</span></div></div></div>
-  </div>
+      <h2>Fixed controls, both themes</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="btns">
+            <button class="btn p">Send invoice</button><button class="btn d">Void invoice</button
+            ><button class="btn p focus">Focus ring</button>
+          </div>
+          <div class="meta"><span>Light</span></div>
+        </div>
+        <div class="darkbox dark">
+          <div class="card" style="border: 0">
+            <div class="btns">
+              <button class="btn p">Send invoice</button><button class="btn d">Void invoice</button
+              ><button class="btn p focus">Focus ring</button>
+            </div>
+            <div class="meta"><span>Dark</span></div>
+          </div>
+        </div>
+      </div>
 
-  <h2>Palette</h2>
-  <div class="swatches">
-    <div class="sw"><i style="background:var(--primary)"></i><span>primary</span></div>
-    <div class="sw"><i style="background:var(--chart-1)"></i><span>chart-1</span></div>
-    <div class="sw"><i style="background:var(--secondary)"></i><span>secondary</span></div>
-    <div class="sw"><i style="background:var(--accent)"></i><span>accent</span></div>
-    <div class="sw"><i style="background:var(--muted)"></i><span>muted</span></div>
-    <div class="sw"><i style="background:var(--destructive)"></i><span>destructive</span></div>
-    <div class="sw"><i style="background:var(--chart-2)"></i><span>chart-2</span></div>
-    <div class="sw"><i style="background:var(--chart-3)"></i><span>chart-3</span></div>
-  </div>
-</main>
-</body>
+      <h2>Palette</h2>
+      <div class="swatches">
+        <div class="sw"><i style="background: var(--primary)"></i><span>primary</span></div>
+        <div class="sw"><i style="background: var(--chart-1)"></i><span>chart-1</span></div>
+        <div class="sw"><i style="background: var(--secondary)"></i><span>secondary</span></div>
+        <div class="sw"><i style="background: var(--accent)"></i><span>accent</span></div>
+        <div class="sw"><i style="background: var(--muted)"></i><span>muted</span></div>
+        <div class="sw"><i style="background: var(--destructive)"></i><span>destructive</span></div>
+        <div class="sw"><i style="background: var(--chart-2)"></i><span>chart-2</span></div>
+        <div class="sw"><i style="background: var(--chart-3)"></i><span>chart-3</span></div>
+      </div>
+    </main>
+  </body>
 </html>

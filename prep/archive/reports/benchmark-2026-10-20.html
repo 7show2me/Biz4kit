@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Biz4Kit · Quick 4 benchmark and flow check · 20 Oct 2026</title>
+    <link rel="stylesheet" href="../brand/theme.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400..700&family=Fraunces:opsz,wght@9..144,500..800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        font:
+          14px/1.5 "DM Sans",
+          system-ui,
+          sans-serif;
+      }
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 32px 24px 64px;
+      }
+      h1,
+      h2 {
+        font-family: "Fraunces", serif;
+        margin: 0;
+      }
+      h1 {
+        font-size: 30px;
+      }
+      h2 {
+        font-size: 22px;
+        margin: 36px 0 12px;
+      }
+      h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      .muted {
+        color: var(--muted-foreground);
+      }
+      .mono {
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+      }
+      .grid4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      @media (max-width: 900px) {
+        .grid4,
+        .grid2 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 560px) {
+        .grid4,
+        .grid2 {
+          grid-template-columns: 1fr;
+        }
+      }
+      .score {
+        font-family: "Fraunces", serif;
+        font-size: 40px;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .of {
+        font-size: 16px;
+        color: var(--muted-foreground);
+      }
+      .bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 4px 0;
+        font-size: 12px;
+      }
+      .bar span:first-child {
+        width: 72px;
+        color: var(--muted-foreground);
+      }
+      .track {
+        flex: 1;
+        height: 6px;
+        background: var(--muted);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .fill {
+        height: 100%;
+        background: var(--chart-1);
+      }
+      .taps {
+        display: flex;
+        gap: 8px;
+        margin: 12px 0;
+      }
+      .taps div {
+        flex: 1;
+        background: var(--muted);
+        border-radius: 6px;
+        padding: 8px;
+        text-align: center;
+      }
+      .taps b {
+        display: block;
+        font-family: "DM Mono", monospace;
+        font-size: 18px;
+      }
+      .gap {
+        background: color-mix(in oklch, var(--destructive) 10%, transparent);
+        color: var(--destructive);
+        border-radius: 6px;
+        padding: 8px 10px;
+        font-size: 13px;
+        margin: 8px 0;
+      }
+      ol,
+      ul {
+        margin: 6px 0 0;
+        padding-left: 18px;
+      }
+      li {
+        margin: 3px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th {
+        text-align: left;
+        font-weight: 600;
+        color: var(--muted-foreground);
+        background: var(--muted);
+        padding: 8px;
+      }
+      td {
+        padding: 8px;
+        border-top: 1px solid var(--border);
+        vertical-align: top;
+      }
+      .pill {
+        display: inline-block;
+        padding: 1px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .hi {
+        background: color-mix(in oklch, var(--destructive) 14%, transparent);
+        color: var(--destructive);
+      }
+      .md {
+        background: var(--secondary);
+        color: var(--secondary-foreground);
+      }
+      .tag {
+        display: inline-block;
+        font-size: 11px;
+        padding: 0 6px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        color: var(--muted-foreground);
+      }
+      .flow {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+      }
+      .flow .n {
+        padding: 6px 10px;
+        border-radius: 6px;
+        background: var(--secondary);
+        color: var(--secondary-foreground);
+        font-weight: 600;
+      }
+      .flow .n.bad {
+        background: color-mix(in oklch, var(--destructive) 14%, transparent);
+        color: var(--destructive);
+      }
+      .flow .a {
+        color: var(--muted-foreground);
+      }
+      .rec {
+        color: var(--success, var(--chart-1));
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <p class="mono muted">
+        reports/benchmark-2026-10-20.html · source: design/screens.html,
+        docs/decisions.md (D56–D69), docs/flow.html, docs/status-flow.html,
+        prep/Design inputs.md
+      </p>
+      <h1>Quick 4: how fast is Biz4Kit, and where does the flow break?</h1>
+      <p class="muted">
+        Benchmark of the Phase 1 prototype against apps Indian small businesses
+        use today. Competitor tap counts are estimates from product knowledge,
+        not measured.
+      </p>
+
+      <h2>Scorecard</h2>
+      <div class="grid4">
+        <div class="card">
+          <h3>Quick Catalog</h3>
+          <p><span class="score">3</span><span class="of"> / 5</span></p>
+          <div class="taps">
+            <div><b>2 → ✕</b>Biz4Kit</div>
+            <div><b>2</b>WhatsApp Biz</div>
+          </div>
+          <div class="bar">
+            <span>Speed</span>
+            <div class="track"><div class="fill" style="width: 40%"></div></div>
+            2
+          </div>
+          <div class="bar">
+            <span>Clarity</span>
+            <div class="track"><div class="fill" style="width: 60%"></div></div>
+            3
+          </div>
+          <div class="bar">
+            <span>Phone</span>
+            <div class="track"><div class="fill" style="width: 60%"></div></div>
+            3
+          </div>
+          <div class="bar">
+            <span>India fit</span>
+            <div class="track"><div class="fill" style="width: 80%"></div></div>
+            4
+          </div>
+          <div class="gap">
+            "Share price list" on Catalog goes nowhere. Sharing works only once,
+            on the onboarding Done screen.
+          </div>
+          <ol>
+            <li>
+              Wire Share price list to the share sheet (WhatsApp first, link,
+              QR, PDF)
+            </li>
+            <li>Share one item from the row menu</li>
+            <li>Quick-add item: name + price; rest under "More"</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>Quick Reply</h3>
+          <p><span class="score">2.5</span><span class="of"> / 5</span></p>
+          <div class="taps">
+            <div><b>5–6</b>Biz4Kit</div>
+            <div><b>2–3</b>WhatsApp Biz</div>
+          </div>
+          <div class="bar">
+            <span>Speed</span>
+            <div class="track"><div class="fill" style="width: 60%"></div></div>
+            3
+          </div>
+          <div class="bar">
+            <span>Clarity</span>
+            <div class="track"><div class="fill" style="width: 40%"></div></div>
+            2
+          </div>
+          <div class="bar">
+            <span>Phone</span>
+            <div class="track"><div class="fill" style="width: 60%"></div></div>
+            3
+          </div>
+          <div class="bar">
+            <span>India fit</span>
+            <div class="track"><div class="fill" style="width: 60%"></div></div>
+            3
+          </div>
+          <div class="gap">
+            No saved-replies picker for everyday answers (timings, address, "got
+            your request"). The price reply sheet has two primary buttons.
+          </div>
+          <ol>
+            <li>One button: "Share and create PI-"</li>
+            <li>Ready-message chips on Lead and Leads (1 tap copy)</li>
+            <li>
+              Inline Reply on the Leads list opens the reply sheet directly
+            </li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>Quick Invoice</h3>
+          <p><span class="score">2.5</span><span class="of"> / 5</span></p>
+          <div class="taps">
+            <div><b>6 / ✕</b>Biz4Kit</div>
+            <div><b>4–6</b>Swipe, Razorpay link</div>
+          </div>
+          <div class="bar">
+            <span>Speed</span>
+            <div class="track"><div class="fill" style="width: 40%"></div></div>
+            2
+          </div>
+          <div class="bar">
+            <span>Clarity</span>
+            <div class="track"><div class="fill" style="width: 60%"></div></div>
+            3
+          </div>
+          <div class="bar">
+            <span>Phone</span>
+            <div class="track"><div class="fill" style="width: 60%"></div></div>
+            3
+          </div>
+          <div class="bar">
+            <span>India fit</span>
+            <div class="track"><div class="fill" style="width: 90%"></div></div>
+            4.5
+          </div>
+          <div class="gap">
+            Every "New invoice" button (Today, Invoices, Customer) is dead. A
+            walk-in, or any business with Jobs off (the lite default, D63),
+            cannot invoice.
+          </div>
+          <ol>
+            <li>
+              Phone-first composer: customer by phone, recent items, live total,
+              one "Request payment" button
+            </li>
+            <li>"Invoice again" from a customer or past invoice</li>
+            <li>Owner records + approves own payment in one sheet</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>Quick Cashflow</h3>
+          <p><span class="score">2</span><span class="of"> / 5</span></p>
+          <div class="taps">
+            <div><b>2+ & maths</b>Biz4Kit</div>
+            <div><b>0</b>Khatabook, Vyapar</div>
+          </div>
+          <div class="bar">
+            <span>Speed</span>
+            <div class="track"><div class="fill" style="width: 40%"></div></div>
+            2
+          </div>
+          <div class="bar">
+            <span>Clarity</span>
+            <div class="track"><div class="fill" style="width: 40%"></div></div>
+            2
+          </div>
+          <div class="bar">
+            <span>Phone</span>
+            <div class="track"><div class="fill" style="width: 40%"></div></div>
+            2
+          </div>
+          <div class="bar">
+            <span>India fit</span>
+            <div class="track"><div class="fill" style="width: 60%"></div></div>
+            3
+          </div>
+          <div class="gap">
+            Money in only: no expenses, no cash-in-hand. No "collect this week"
+            figure. Due shows ₹19,293 on Today but ₹34,530 on Invoices.
+          </div>
+          <ol>
+            <li>Top card: "This week ₹X · Overdue ₹Y" → list by amount</li>
+            <li>One data source for every Due / To approve number</li>
+            <li>On phone, To collect before the chart</li>
+          </ol>
+        </div>
+      </div>
+      <p class="muted" style="margin-top: 12px">
+        Strongest everywhere: India fit. UPI deep link and QR, a GST-correct
+        PDF, ₹ in Indian format, proof-and-approve. Weakest: the two "Quick"
+        jobs that are not wired, Invoice (walk-in) and Catalog (share).
+      </p>
+
+      <h2>Where the flow breaks</h2>
+      <div class="card">
+        <div class="flow">
+          <span class="n">Lead</span><span class="a">→</span>
+          <span class="n">Reply = PI-</span><span class="a">→</span>
+          <span class="n bad">Advance / balance?</span><span class="a">→</span>
+          <span class="n">Proof upload</span><span class="a">→</span>
+          <span class="n bad">Approval (limit, 1-person)</span
+          ><span class="a">→</span> <span class="n bad">INV- number</span
+          ><span class="a">→</span>
+          <span class="n bad">Lead "Paid"?</span>
+        </div>
+        <p class="muted" style="margin: 10px 0 0">
+          Red steps contradict each other across docs or are undecided. The
+          decisions agree on the model (lead → PI- → approval → INV-), but the
+          prototype doesn't follow it.
+        </p>
+      </div>
+
+      <h2>Top logic issues</h2>
+      <table class="card" style="padding: 0">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Area</th>
+            <th>Issue</th>
+            <th>Where</th>
+            <th>Fix</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pill hi">High</span></td>
+            <td>Invoice</td>
+            <td>
+              Meera's <b>unpaid</b> invoice already carries
+              <span class="mono">INV-2627-0042</span> (pay page, email, PDF,
+              message 12). D60: INV- only on payment approval.
+            </td>
+            <td class="mono">screens.html:1459, 2812</td>
+            <td>Show PI- until approved; add an "after approval" state</td>
+          </tr>
+          <tr>
+            <td><span class="pill hi">High</span></td>
+            <td>Invoice</td>
+            <td>
+              PI- and INV- look like one shared counter (PI-0041, INV-0042,
+              PI-0043…), and PI-0042 becomes INV-0042. D60 says separate
+              gap-free series.
+            </td>
+            <td class="mono">screens.html:2811, 2925</td>
+            <td>Own counter for INV- in samples</td>
+          </tr>
+          <tr>
+            <td><span class="pill hi">High</span></td>
+            <td>Payment</td>
+            <td>
+              Two advance models: a separate advance PI + balance PI (flow.html)
+              vs one PI "Part paid" (status-flow.html). INV- per approval or at
+              full payment?
+            </td>
+            <td class="mono">flow.html:665, 772, 947, 1115</td>
+            <td>Owner question 1</td>
+          </tr>
+          <tr>
+            <td><span class="pill hi">High</span></td>
+            <td>Invoice</td>
+            <td>
+              Wholesaler / manufacturer (D56) get a "tax invoice on dispatch"
+              after the reply was already paid, so two tax invoices for one
+              sale.
+            </td>
+            <td class="mono">flow.html:1017, 1027</td>
+            <td>Annotate D56 after question 1</td>
+          </tr>
+          <tr>
+            <td><span class="pill hi">High</span></td>
+            <td>Approval</td>
+            <td>
+              Manager limit "Up to ₹5,000", yet the Manager can approve Meera's
+              ₹9,440. "Up to" (≤) vs D57 "below" (&lt;).
+            </td>
+            <td class="mono">screens.html:3567, 3219</td>
+            <td>Disable above limit: "Owner must approve"</td>
+          </tr>
+          <tr>
+            <td><span class="pill hi">High</span></td>
+            <td>Payment</td>
+            <td>
+              Kavya's ₹5,000 counts as paid while its proof still waits for
+              approval.
+            </td>
+            <td class="mono">screens.html:2815, 3220</td>
+            <td>Paid stays ₹0 until approved</td>
+          </tr>
+          <tr>
+            <td><span class="pill hi">High</span></td>
+            <td>Lead</td>
+            <td>
+              Kavya's lead is "Paid" while her invoice is part paid. Asha's lead
+              is "Rejected" but she paid today.
+            </td>
+            <td class="mono">screens.html:2215, 2218</td>
+            <td>Owner question 3; fix samples</td>
+          </tr>
+          <tr>
+            <td><span class="pill md">Med</span></td>
+            <td>Reply</td>
+            <td>
+              Anita's reply: lines ₹25,500, "CGST + SGST 18%" ₹3,410 (13.4%). At
+              18% it is ₹4,590. ₹28,910 repeats on 4 screens.
+            </td>
+            <td class="mono">screens.html:2400–2407</td>
+            <td>Recompute the sample</td>
+          </tr>
+          <tr>
+            <td><span class="pill md">Med</span></td>
+            <td>Cashflow</td>
+            <td>
+              Due ₹19,293 (Today) vs ₹34,530 (Invoices). To approve ₹14,440
+              (stat) vs ₹9,440 (ageing). An unpaid proforma counts as money
+              owed.
+            </td>
+            <td class="mono">screens.html:1940, 2088, 2844</td>
+            <td>Derive every figure from INVS; question 6</td>
+          </tr>
+          <tr>
+            <td><span class="pill md">Med</span></td>
+            <td>Board</td>
+            <td>
+              "Waiting for approval", PI part paid / overdue, booking "To
+              confirm" and job done-not-invoiced have no column; "Proforma due"
+              fits two columns.
+            </td>
+            <td class="mono">D65; screens.html:2159</td>
+            <td>One column per status</td>
+          </tr>
+          <tr>
+            <td><span class="pill md">Med</span></td>
+            <td>Approval</td>
+            <td>
+              No screens for: proof rejected (re-upload), void, expired
+              proforma, balance invoice from a done job.
+            </td>
+            <td class="mono">screens.html:954–961</td>
+            <td>Add states</td>
+          </tr>
+          <tr>
+            <td><span class="pill md">Med</span></td>
+            <td>Docs</td>
+            <td>
+              D64 says reminders are shared by hand in Phase 1; D67 says the app
+              sends email. Design inputs.md:175 still says the number is
+              assigned at first share.
+            </td>
+            <td class="mono">decisions.md D64; DI:175</td>
+            <td>Add "refined by" notes</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="muted">
+        Why the built-in Check missed these: it tests rendering, links and
+        colours, not totals, number series or the same record across screens.
+        Adding those checks would catch most of the rows above.
+      </p>
+
+      <h2>
+        Questions for you
+        <span
+          class="muted"
+          style="font-size: 14px; font-family: &quot;DM Sans&quot;"
+          >(these decide the flow; I won't guess them)</span
+        >
+      </h2>
+      <div class="grid2">
+        <div class="card">
+          <h3>1 · Advance and balance</h3>
+          <p>
+            A: one PI, part paid, INV- at full payment · B: advance PI → its own
+            INV-, then a balance PI → INV- · C: advance receipt, one INV- at
+            service
+          </p>
+          <p class="rec">
+            Recommended: B (matches flow.html). CA to confirm GST.
+          </p>
+        </div>
+        <div class="card">
+          <h3>2 · Post-service invoice before payment</h3>
+          <p>A: PI- until approved, like replies · B: INV- at first share</p>
+          <p class="rec">Recommended: A (one rule). CA to confirm.</p>
+        </div>
+        <div class="card">
+          <h3>3 · When is a lead "Paid"?</h3>
+          <p>
+            A: first payment approved · B: every invoice on it fully paid · C:
+            reply PI paid only
+          </p>
+          <p class="rec">Recommended: B</p>
+        </div>
+        <div class="card">
+          <h3>4 · Payment after Reject / Snooze / expiry</h3>
+          <p>
+            A: block, the pay page says "no longer valid" · B: accept, approval
+            shows a warning
+          </p>
+          <p class="rec">
+            Recommended: B for Snoozed, A for Rejected or expired
+          </p>
+        </div>
+        <div class="card">
+          <h3>5 · Manager limit, one-person shop</h3>
+          <p>
+            Limit "below" (&lt;) or "up to" (≤)? When the owner is the only
+            approver, may they approve their own upload (logged)?
+          </p>
+          <p class="rec">Recommended: &lt;, and yes (logged)</p>
+        </div>
+        <div class="card">
+          <h3>6 · Is an unpaid proforma money owed?</h3>
+          <p>
+            A: yes, it can go Overdue with reminders 13/14 · B: no, it becomes
+            "Expired" after pay-by and gets a follow-up
+          </p>
+          <p class="rec">Recommended: B</p>
+        </div>
+        <div class="card">
+          <h3>7 · Overpay / paid against an old PI version</h3>
+          <p>
+            Refuse approval above the balance, or approve and refund outside the
+            app? Apply to latest version or hold for owner?
+          </p>
+          <p class="rec">
+            Recommended: refuse above balance; apply to latest, note it
+          </p>
+        </div>
+        <div class="card">
+          <h3>8 · Scope: Quick Cashflow &amp; Quick Catalog</h3>
+          <p>
+            D63 names leads + Quick Invoice + Quick Reply. Are Catalog and
+            Cashflow now core too? Does Cashflow include money out (expenses /
+            cashbook) in Phase 1?
+          </p>
+          <p class="rec">Needs your call: money out is a scope change</p>
+        </div>
+      </div>
+
+      <h2>Suggested order</h2>
+      <div class="card">
+        <ol>
+          <li>
+            <b>Now, no decisions needed:</b> fix sample data (GST, Due totals,
+            Kavya, Asha, reminders), manager limit button, single primary button
+            on the reply sheet, wire Share price list.
+          </li>
+          <li>
+            <b>After questions 1–3 and 6:</b> numbering (PI-/INV-),
+            advance/balance states, board mapping, lead Paid.
+          </li>
+          <li>
+            <b>Then the missing Quick screens:</b> New invoice composer,
+            ready-message picker, "To collect this week" card.
+          </li>
+        </ol>
+      </div>
+    </div>
+  </body>
+</html>

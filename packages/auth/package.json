@@ -1,0 +1,27 @@
+{
+  "name": "@Biz4kit/auth",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check-types": "tsc -b"
+  },
+  "dependencies": {
+    "@Biz4kit/db": "workspace:*",
+    "@better-auth/core": "1.7.7",
+    "@better-auth/drizzle-adapter": "1.7.7",
+    "@better-auth/expo": "catalog:",
+    "@polar-sh/better-auth": "catalog:",
+    "@polar-sh/sdk": "^0.47.0",
+    "better-auth": "catalog:",
+    "drizzle-orm": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@Biz4kit/config": "workspace:*",
+    "typescript": "^6.0.3"
+  }
+}

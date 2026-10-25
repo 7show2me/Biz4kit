@@ -1,0 +1,30 @@
+name: Biz4kit
+
+# Image test only (D112): runs the same API and worker image Fargate runs,
+# against the cloud dev services (Neon dev, Upstash). Daily development runs
+# with `pnpm dev`, not Docker. Values come from `vercel env pull` (README).
+services:
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    image: biz4kit-api:local
+    init: true
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: apps/server/.env.local
+        required: true
+    restart: "no"
+
+  worker:
+    image: biz4kit-api:local
+    command: ["node", "--enable-source-maps", "dist/worker.mjs"]
+    init: true
+    env_file:
+      - path: apps/server/.env.local
+        required: true
+    depends_on:
+      server:
+        condition: service_started
+    restart: "no"

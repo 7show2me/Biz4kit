@@ -1,0 +1,26 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+/* Biz4Kit chrome tokens (D10-D19, D52): colours, fonts, radius, shadows and the
+   density scale. Values live in brand/; edit them there, never here. */
+@import "../../../../brand/theme.css";
+@import "../../../../brand/tailwind.css";
+@source "../../../../apps/**/*.{ts,tsx}";
+@source "../**/*.{ts,tsx}";
+
+/* shadcn components use rounded-lg for cards and dialogs: the brand card radius (D54). */
+@theme inline {
+  --radius-lg: var(--radius);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  html {
+    @apply font-sans;
+  }
+}

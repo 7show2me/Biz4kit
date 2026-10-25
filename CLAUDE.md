@@ -1,16 +1,18 @@
 # Biz4Kit
 
-White-label workspace for small businesses (catalog, quotes, invoices, payments). Planning documents live in `Prep/`. Read the `.md` versions; the `.docx` and `.pdf` files are copies.
+White-label workspace for small businesses (catalog, quick replies (proforma invoices), invoices, payments). Planning documents live in `prep/` as Markdown, rewritten on 2026-10-24 to match `docs/decisions.md`. The earlier versions and their `.docx` / `.pdf` copies are in `prep/archive/2026-10-24/`.
 
-- `Prep/Outline.md`: product
-- `Prep/WBS.md`: work packages
-- `Prep/Workflow & final verification.md`: build rules, TDD, PII, security, go / no-go
-- `Prep/Architecture & contracts.md`, `Prep/Design inputs.md`, `Prep/Legal & compliance.md`, `Prep/Business plan.md`, `Prep/Market fit & sales.md`
-- `docs/decisions.md`: answered business questions. These override `Prep/` where they differ.
+- `prep/Outline.md`: product
+- `prep/WBS.md`: work packages
+- `prep/Workflow & final verification.md`: build rules, TDD, PII, security, go / no-go
+- `prep/Architecture & contracts.md`, `prep/Design inputs.md`, `prep/Legal & compliance.md`, `prep/Business plan.md`, `prep/Market fit & sales.md`
+- `docs/decisions.md`: answered business questions. These override `prep/` where they differ.
+- `design/app/`: the locked functional prototype and build spec (D94); `design/screens-v2.html` is its frozen look. `docs/implementation-notes.md`: prototype → product notes.
+- `docs/flow.html`: how Lead → Reply (proforma) → Booking → Job → Invoice → Paid fit together, who approves what, and how it changes by business type (open in a browser).
 
 ## Never assume a business fact
 
-If work depends on a business fact that is not stated in `Prep/` or `docs/decisions.md`, **do not guess and do not put in a placeholder value.** This covers prices, plan limits, GST / tax, legal or consent wording, verticals, vendors, message wording, approvals, retention and refunds. Use the `biz-linear-question` skill: it opens a Linear question for a person, pings Slack, and you continue only once it is answered. Figures that `Prep/` calls "assumptions" count as open questions.
+If work depends on a business fact that is not stated in `prep/` or `docs/decisions.md`, **do not guess and do not put in a placeholder value.** This covers prices, plan limits, GST / tax, legal or consent wording, verticals, vendors, message wording, approvals, retention and refunds. Use the `biz-linear-question` skill: it opens a Linear question for a person, pings Slack, and you continue only once it is answered. Figures that `prep/` calls "assumptions" count as open questions.
 
 ## Where things go
 
@@ -20,8 +22,10 @@ If work depends on a business fact that is not stated in `Prep/` or `docs/decisi
 
 ## Stack decisions (see docs/decisions.md)
 
-- Backend runs in Docker (API + workers) on an AWS container service, Mumbai (D28). Web app on Vercel (D22). Redis: Upstash free (D29).
-- Postgres is on Neon, AWS Mumbai.
+- Backend runs in Docker (API + workers) on ECS Fargate behind API Gateway, no load balancer, Mumbai (D28, D38, D42). Terraform state in S3 with locking (D39). Web app on Vercel (D22). Queue: Upstash Redis free + BullMQ (D33). Files: S3 Mumbai (D31).
+- TanStack Start web, Hono + oRPC API (D30). Monorepo: pnpm + Turborepo (D37).
+- Postgres is on Neon, AWS Singapore `aws-ap-southeast-1` (D4, D111; Mumbai not offered to our account), branches `prod` and `dev` plus one per PR (D105), via Drizzle (D36).
+- Email sender is the business name only, reply-to the owner, never "via Biz4Kit" (D35).
 - Brand (Biz4Kit chrome only, local only, D10-D19): `brand/theme.css` (colours, fonts, radius, shadows), `brand/logo/*.svg` (4B mark and lockup), `brand/design-system/` (brand book, tokens, usage rules), `brand/preview.html` (open in a browser). Customer-facing pages use the business's own theme.
 - Re-create the Linear board with `python scripts/linear_seed.py`. It is safe to re-run.
 

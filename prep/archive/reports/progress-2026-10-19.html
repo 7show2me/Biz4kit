@@ -1,0 +1,187 @@
+<!doctype html><meta charset="utf-8" /><title>Biz4Kit progress</title
+><style>
+  body {
+    font:
+      15px/1.5 system-ui,
+      sans-serif;
+    max-width: 760px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    color: #1a1a2e;
+  }
+  h2 {
+    margin-top: 1.6rem;
+    font-size: 1.05rem;
+  }
+  li {
+    margin: 0.2rem 0;
+  }
+</style>
+<h1>Biz4Kit progress report, 2026-10-19</h1>
+<h2>Window: 2026-10-16 to 2026-10-19 | Build day 1 (day 1 = 2026-10-19)</h2>
+<ul></ul>
+<h2>Done / answered in window</h2>
+<ul>
+  <li>BIZ-84 Q: Dark theme: focus ring and destructive text contrast [Done]</li>
+  <li>BIZ-85 Q: Status colours for Paid, Due and Overdue [Answered]</li>
+  <li>BIZ-80 Q: Web frontend host: Vercel or Fly [Answered]</li>
+  <li>BIZ-79 Q: Production Redis for BullMQ [Answered]</li>
+  <li>BIZ-83 Q: Build day 1 date [Answered]</li>
+  <li>BIZ-82 Q: Engineers, designer and verifiers to invite [Answered]</li>
+  <li>BIZ-81 Q: CA and lawyer: names and emails [Answered]</li>
+</ul>
+<h2>Decisions recorded</h2>
+<ul>
+  <li>
+    D1 Which two pilot verticals? (Outline: salons + IndiaMART; Market fit: salons + agencies):
+    **Salons + design / IT agencies.** Starter kits for all six verticals still ship.
+  </li>
+  <li>
+    D2 Who triages business questions?: **Saurabh Jadhav** (Linear admin, 7show2me@gmail.com)
+    answers or reassigns.
+  </li>
+  <li>
+    D3 Where does the backend run?: **Backend (API + BullMQ workers) runs in Docker**, deployed to
+    **Fly.io Mumbai (bom)**. Local dev uses docker compose.
+  </li>
+  <li>
+    D4 Which Postgres?: **Neon**, AWS Mumbai region (`aws-ap-south-1`): prod + staging branches, one
+    branch per PR preview; point-in-time restore replaces the night
+  </li>
+  <li>
+    D5 Name: lock Biz4Kit or run the three-name test?: **Biz4Kit. File the trademark now**; the
+    three-name test is dropped.
+  </li>
+  <li>
+    D6 Does the company (entity, PAN, GST, bank) exist?: **Not yet.** Everything is still to be
+    filed (urgent from day 1).
+  </li>
+  <li>D7 Are a CA and lawyer engaged?: **Neither yet.** Engage both on day 1.</li>
+  <li>
+    D8 Pilot support channel?: **Founder&#x27;s phone** is the support line for the pilot; no
+    separate WhatsApp Business number.
+  </li>
+  <li>
+    D9 Slack channel for question pings?: **#business-questions** in the PowerPlus Slack workspace.
+  </li>
+  <li>
+    D10 Biz4Kit brand palette and fonts (Prep proposed teal + amber, Inter): **Indigo /
+    electric-blue shadcn theme supplied by the owner** (`brand/theme.css`), replacing the Prep
+    proposal. Fonts: Anek Latin (display),
+  </li>
+  <li>
+    D11 Logo shape (replaces the four-tile kit in D10): **Coin mark**: a disc with a
+    &quot;paid&quot; tick cut out and a notch holding a small brand-blue coin, beside the Biz4Kit
+    wordmark (blue 4). Files in
+  </li>
+  <li>
+    D12 Logo (replaces the coin mark in D11): **B4 monogram**: B in Playfair Display Black + 4 in
+    Bricolage Grotesque ExtraBold (condensed) with a cut gap, beside the Biz4Kit wordmark in
+  </li>
+  <li>
+    D13 Logo (replaces the B4 monogram in D12): **Elegant B4 monogram**: B in Bodoni Moda (600, opsz
+    40) + 4 in Cormorant Garamond Italic (600, lining) with a cut gap, beside &quot;Biz4Kit&quot; in
+  </li>
+  <li>
+    D14 Logo (replaces D13): **Bold one-ink rupee B4**: B in Bodoni Moda Black (900, opsz 11) with
+    the two bars of the ₹ sign across its top, plus a Playfair Display Bla
+  </li>
+  <li>
+    D15 Logo (replaces D14): **4B mark, no wordmark**: a 4 then a B in Playfair Display Black,
+    upright and the same height, joined by one hairline dash at the 4&#x27;s crossb
+  </li>
+  <li>
+    D16 4B dash weight and height (refines D15): Dash is **bold (6.5 units on a 100-unit letter,
+    trimmed from 9 at the owner&#x27;s request) and runs through the upper third** (centre at 33%
+    fro
+  </li>
+  <li>
+    D17 Logo with the name; dark file looked empty: Added **lockups: the 4B mark +
+    &quot;Biz4Kit&quot; in Playfair Display Black (serif, upright)** for sign-in, onboarding, site,
+    emails, documents; the
+  </li>
+  <li>
+    D18 Dark-theme contrast (focus ring 1.7:1, destructive text 2.1:1): **Adjust both** (owner:
+    &quot;fix that contrast issue&quot;). Dark `--ring` and `--sidebar-ring` = electric blue
+    `oklch(0.6199 0.1907 271.3978)` (5.4:
+  </li>
+  <li>
+    D19 Where the design system lives: **Local only.** The published claude.ai design-system
+    artifact was deleted at the owner&#x27;s request; D10&#x27;s link is dead. The system is `brand/
+  </li>
+  <li>
+    D20 Typography (replaces the Anek Latin / IBM Plex / JetBrains set in D10): **Fraunces** (serif:
+    headings and display, 24px+), **DM Sans** (sans: all UI text), **DM Mono** (mono: every amount
+    and identifier). Amounts
+  </li>
+  <li>
+    D21 Design-system page: uniform grids, colour as a table, small card corners: Colour tokens are
+    a table (light swatch, dark swatch, token, both values, usage) with every row 76px tall and no
+    clipping from 1100px to 192
+  </li>
+  <li>
+    D22 Web frontend host: Vercel or Fly?: **Vercel** for the Next.js web app. Backend (API +
+    workers) stays on Fly Mumbai (D3).
+  </li>
+  <li>
+    D23 CA and lawyer: names and emails: **Not now.** They will be added at the end of Phase 2.
+    (Supersedes D7&#x27;s &quot;engage both on day 1&quot; for Linear invites.)
+  </li>
+  <li>
+    D24 Engineers, designer and verifiers to invite: **One-person project.** No other engineers,
+    designer or verifiers will be invited.
+  </li>
+  <li>D25 Build day 1 date: **Monday 2026-10-19 (today).**</li>
+  <li>
+    D26 Status colours for Paid, Due, Overdue: **Option 1: add green and amber tokens** (light +
+    dark, contrast-checked to 4.5:1). Paid is green, Due amber, Overdue red, each with a word
+  </li>
+  <li>
+    D27 Verification with one person (refines D24): **One agent, one human.** The agent does the
+    work as assignee; the human is the verifier. The answers in D23 to D26 override `Prep/` where t
+  </li>
+  <li>
+    D28 Backend host (replaces Fly in D3): **Backend (API + BullMQ workers) runs in Docker on an AWS
+    container service in Mumbai (ap-south-1)**, next to Neon (D4). Service (App Runner
+  </li>
+  <li>
+    D29 Production Redis for BullMQ (Fly Redis ruled out by D28): **Upstash Redis, free plan**
+    (native Redis TCP endpoint, not REST). Watch the monthly command cap; move to a paid plan if the
+    queue exceeds
+  </li>
+</ul>
+<h2>Commits</h2>
+<ul>
+  <li>
+    e812443 Add planning docs, decision log, brand system and Linear seed script (Saurabh Jadhav,
+    2026-10-19)
+  </li>
+</ul>
+<h2>In progress</h2>
+<ul>
+  <li>Nothing started.</li>
+</ul>
+<h2>Waiting on a person (Needs answer)</h2>
+<ul>
+  <li>None.</li>
+</ul>
+<h2>Planned for today (WBS)</h2>
+<ul>
+  <li>0.1 † Build workflow set-up</li>
+  <li>1.1 Repo, CI/CD, environments</li>
+  <li>1.2 Data model &amp; tenancy</li>
+  <li>1.3 Auth (Better Auth)</li>
+  <li>B0.1 Vendor and account set-up</li>
+  <li>B0.2 Retainers</li>
+  <li>B0.3 Company, PAN, GST, bank</li>
+  <li>B1.4 Hiring</li>
+  <li>S0.1 Sales playbook adopted</li>
+</ul>
+<h2>Due</h2>
+<ul>
+  <li>No issue has a due date in Linear.</li>
+</ul>
+<h2>Open overall</h2>
+<ul>
+  <li>84 open issues</li>
+</ul>

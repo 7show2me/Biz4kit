@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Upload Prep/WBS.md to Linear: team BIZ, workflow states, projects, labels,
+"""Upload prep/WBS.md to Linear: team BIZ, workflow states, projects, labels,
 one issue per WBS row with blocks relations, and the first open business questions.
 
 Safe to re-run: existing states, projects, labels, issues (matched by the WBS id at
@@ -16,13 +16,13 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-WBS = ROOT / "Prep" / "WBS.md"
+WBS = ROOT / "prep" / "WBS.md"
 ASK = ROOT / ".claude" / "skills" / "biz-linear-question" / "ask.py"
 
-TEAM = {"name": "Biz4Kit", "key": "BIZ", "description": "Biz4Kit build: Dev, Business and Sales & success (Prep/WBS.md)"}
+TEAM = {"name": "Biz4Kit", "key": "BIZ", "description": "Biz4Kit build: Dev, Business and Sales & success (prep/WBS.md)"}
 
 # Added on top of Linear's defaults (Backlog, Todo, In Progress, In Review, Done, Canceled, Duplicate).
-# Statuses follow Prep/Workflow & final verification.md, plus two for biz-linear-question.
+# Statuses follow prep/Workflow & final verification.md, plus two for biz-linear-question.
 STATES = [
     ("Ready to verify", "started", "#4EA7FC"),
     ("Verifying", "started", "#BB87FC"),
@@ -41,12 +41,12 @@ PROJECTS = {
     "questions": ("Business Questions", "Questions AI agents must not answer themselves (biz-linear-question skill)."),
 }
 
-AREAS = ["auth", "catalog", "quote", "invoice", "payments", "messages", "portal", "admin", "infra"]
+AREAS = ["auth", "catalog", "invoice", "payments", "messages", "portal", "admin", "infra"]
 Q_AREAS = ["product", "pricing", "gst", "legal", "sales", "vendor", "people"]
 
 AREA_OF = {
     "0.1": "infra", "1.1": "infra", "1.2": "infra", "1.3": "auth", "1.4": "admin", "1.5": "portal",
-    "1.6": "messages", "1.7": "infra", "2.1": "catalog", "2.2": "catalog", "2.3": "quote", "2.4": "quote",
+    "1.6": "messages", "1.7": "infra", "2.1": "catalog", "2.2": "catalog", "2.3": "invoice", "2.4": "invoice",  # D60: no Quote; a reply is a proforma invoice
     "2.5": "invoice", "2.6": "payments", "2.7": "messages", "2.8": "infra", "2.9": "messages",
     "3.1": "portal", "3.2": "portal", "3.3": "portal", "3.4": "portal", "3.5": "auth", "3.6": "admin",
     "3.7": "admin", "3.8": "admin", "3.9": "portal", "3.11": "portal", "4.1": "infra", "4.2": "catalog",
@@ -62,11 +62,14 @@ URGENT = {"B0.2", "B0.3"}  # D6, D7: no company, CA or lawyer yet
 # Decisions in docs/decisions.md that change WBS text. Each entry replaces a field.
 AMEND = {
     "1.1": {
-        "done": "Monorepo (web, mobile, api); backend (API + BullMQ workers) as Docker images, docker compose for local dev "
-                "(api, worker, Redis), deployed to Fly.io Mumbai (bom); Neon Postgres in AWS Mumbai with prod + staging "
-                "branches and a Neon branch per PR preview; point-in-time restore; preview deploys; error tracking",
-        "verify": "Deploy a hello-world to prod; restore a Neon branch to an earlier point in time",
-        "note": "D3, D4",
+        "done": "Monorepo (pnpm + Turborepo, D37: web, native, server); backend (API + BullMQ workers) as Docker images in ECR, "
+                "docker compose for local dev; deployed to ECS Fargate in Mumbai (ap-south-1) behind API Gateway HTTP API -> "
+                "VPC Link -> Cloud Map, no load balancer (D28, D38, D42); Terraform state in S3 with locking (D39); web app on "
+                "Vercel (D22); Upstash Redis for BullMQ (D33); Neon Postgres in AWS Mumbai with prod + staging branches and a "
+                "Neon branch per PR preview; point-in-time restore (D4); preview deploys; error tracking",
+        "verify": "Deploy a hello-world API to ECS Fargate behind API Gateway and the web app to Vercel; restore a Neon branch "
+                  "to an earlier point in time",
+        "note": "D3, D4, D22, D28, D33, D37, D38, D39, D42",
     },
     "B0.2": {"note": "D7: neither a CA nor a lawyer is engaged yet. Day-1 priority"},
     "B0.3": {"note": "D6: entity, PAN, GST and bank account are all still to be filed. Day-1 priority"},
@@ -87,21 +90,21 @@ AMEND = {
     },
 }
 
-# Cross-team aliases. Prep/WBS.md row 4.4 says "Sales 2.3", but its "Cross-team dependencies"
+# Cross-team aliases. prep/WBS.md row 4.4 says "Sales 2.3", but its "Cross-team dependencies"
 # note says "Dev 4.4 needs Sales S1.1 (the Founding 20)"; the note is the stated intent.
 DEP_ALIAS = {"S2.3@4.4": "S1.1"}
 
 SEED_QUESTIONS = [
     dict(title="Production Redis for BullMQ", area="vendor", blocks=["1.1"],
          question="Which managed Redis should the BullMQ workers use in production?",
-         context="D3 puts the backend in Docker on Fly.io Mumbai; BullMQ (Prep/Outline.md:106) needs Redis. Local dev uses Redis in docker compose.",
+         context="D3 puts the backend in Docker on Fly.io Mumbai; BullMQ (prep/Outline.md:106) needs Redis. Local dev uses Redis in docker compose.",
          options=["Upstash Redis through Fly (fly redis create): billed on the Fly invoice, close to the app",
                   "Upstash direct: own account and dashboard, same engine",
                   "Self-run Redis on a Fly machine: cheapest, we own persistence and upgrades"],
          recommend="Upstash through Fly, for one bill and no servers to run"),
     dict(title="Web frontend host: Vercel or Fly", area="vendor", blocks=["1.1"],
          question="Should the Next.js web app (catalog, portal, workspace) deploy to Vercel, or to Fly alongside the backend?",
-         context="Prep/Outline.md:106 says Vercel / Fly.io. D3 places the backend on Fly Mumbai. Both CLIs are logged in.",
+         context="prep/Outline.md:106 says Vercel / Fly.io. D3 places the backend on Fly Mumbai. Both CLIs are logged in.",
          options=["Vercel: best Next.js support and per-PR previews; edge CDN; data still in Neon Mumbai",
                   "Fly: one platform and one bill, app next to the API in Mumbai; previews need our own setup"],
          recommend="Vercel for the web app, Fly for API + workers"),
@@ -112,12 +115,12 @@ SEED_QUESTIONS = [
          recommend="Invite both to Linear so B0.5 / B1.1 reviews are tracked"),
     dict(title="Engineers, designer and verifiers to invite", area="people", blocks=["0.1"],
          question="Who are the two engineer-reviewers and the designer, so they can be invited to Linear as assignees and verifiers?",
-         context="Prep/WBS.md Dev team: two engineers as reviewers of record and one designer. Workflow doc: the assignee and the verifier must be different people.",
+         context="prep/WBS.md Dev team: two engineers as reviewers of record and one designer. Workflow doc: the assignee and the verifier must be different people.",
          options=["Reply with names + emails", "Saurabh verifies everything for now (breaks the two-person rule)"],
          recommend="Invite at least one more engineer before day 1 so every PR has a second person"),
     dict(title="Build day 1 date", area="product", blocks=["0.1"],
          question="Which calendar date is day 1 of the 10-day Phase 1 build?",
-         context="Prep/WBS.md plans in day numbers. Linear cycles (one per day) and due dates need a real start date.",
+         context="prep/WBS.md plans in day numbers. Linear cycles (one per day) and due dates need a real start date.",
          options=["A specific date (reply with it)", "Start as soon as the CA / lawyer are engaged"],
          recommend="Pick a Monday so the day-10 go / no-go lands on a weekday"),
 ]
@@ -158,7 +161,8 @@ def parse_wbs():
             section = None
         if not section or not line.startswith("| "):
             continue
-        cells = [c.strip() for c in line.strip().strip("|").split(" | ")]
+        # Linear shows the current wording only: drop D41 "~~old~~" struck text, keep the (Dxx) note.
+        cells = [re.sub(r"~~.*?~~\s*", "", c).strip() for c in line.strip().strip("|").split(" | ")]
         if len(cells) < 7 or cells[0] in ("WBS",) or cells[0].startswith("---") or cells[0].startswith("**"):
             continue
         wbs_id, amended = cells[0].replace("†", "").strip(), "†" in cells[0]
@@ -240,7 +244,7 @@ def description(row, deps):
         lines.append("_Row marked † in the WBS: amended after the Workflow, Architecture and Market fit reviews._")
     if amend.get("note"):
         lines.append(f"_Changed by decision {amend['note']} in `docs/decisions.md`._")
-    lines += ["", "Source: `Prep/WBS.md`. Business facts not stated in Prep or docs/decisions.md must be asked (biz-linear-question), not assumed."]
+    lines += ["", "Source: `prep/WBS.md`. Business facts not stated in Prep or docs/decisions.md must be asked (biz-linear-question), not assumed."]
     return "\n".join(lines)
 
 

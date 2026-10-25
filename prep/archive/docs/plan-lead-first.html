@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lead-first model: the plan</title>
+    <!-- Local page (D19). A two-minute read of the proposed model before anything is recorded or built.
+     "Owner said" = your words from chat on 19 Oct 2026. "My proposal" = a gap I filled; not a fact until you say so.
+     Colours and fonts from brand/theme.css. No scripts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400..700&family=Fraunces:opsz,wght@9..144,500..800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --background: oklch(0.9924 0.0028 308.4292);
+        --foreground: oklch(0.1288 0.0219 314.0129);
+        --card: oklch(1 0 0);
+        --primary: oklch(0.2236 0.1469 265.8205);
+        --primary-foreground: oklch(1 0 0);
+        --secondary: oklch(0.9387 0.0262 264.4409);
+        --secondary-foreground: oklch(0.4691 0.2225 262.4817);
+        --muted: oklch(0.9518 0.0057 308.3939);
+        --muted-foreground: oklch(0.4882 0.0203 308.0008);
+        --border: oklch(0.916 0.012 313.2115);
+        --destructive: oklch(0.5858 0.222 17.5846);
+        --destructive-foreground: oklch(1 0 0);
+        --success: #15803d;
+        --success-soft: #f0fdf4;
+        --warning: #b45309;
+        --warning-soft: #fffbeb;
+        --info: #1d4ed8;
+        --info-soft: #eff6ff;
+        --violet: #6d28d9;
+        --violet-soft: #f5f3ff;
+        --teal: #0f766e;
+        --teal-soft: #f0fdfa;
+        --font-serif: "Fraunces", Georgia, serif;
+        --font-sans: "DM Sans", system-ui, sans-serif;
+        --font-mono: "DM Mono", Menlo, monospace;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: oklch(0.1063 0.0172 259.538);
+          --foreground: oklch(0.9924 0.0028 308.4292);
+          --card: oklch(0.145 0.0211 263.1799);
+          --primary: oklch(0.382 0.1967 265.289);
+          --secondary: oklch(0.2108 0.0426 270.3694);
+          --secondary-foreground: oklch(0.9924 0.0028 308.4292);
+          --muted: oklch(0.1797 0.0376 272.6396);
+          --muted-foreground: oklch(0.6878 0.0218 285.8125);
+          --border: oklch(0.2445 0.0736 280.5871);
+          --destructive: oklch(0.68 0.2 20);
+          --destructive-foreground: oklch(0.1288 0.0219 314.0129);
+          --success: #4ade80;
+          --success-soft: #052e16;
+          --warning: #fbbf24;
+          --warning-soft: #2d1a04;
+          --info: #60a5fa;
+          --info-soft: #0b1a3a;
+          --violet: #a78bfa;
+          --violet-soft: #1e1033;
+          --teal: #2dd4bf;
+          --teal-soft: #042f2e;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        font: 15px/1.5 var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+      }
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 32px 16px 64px;
+      }
+      h1 {
+        font: 800 clamp(26px, 4vw, 36px)/1.1 var(--font-serif);
+        margin: 0 0 6px;
+      }
+      h2 {
+        font: 700 21px/1.2 var(--font-serif);
+        margin: 36px 0 10px;
+      }
+      p {
+        margin: 0 0 8px;
+      }
+      .muted {
+        color: var(--muted-foreground);
+      }
+      .small {
+        font-size: 13px;
+      }
+      .label {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted-foreground);
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 16px;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        height: 20px;
+        padding: 0 7px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        vertical-align: middle;
+      }
+      .b-said {
+        background: var(--success-soft);
+        color: var(--success);
+      }
+      .b-prop {
+        background: var(--warning-soft);
+        color: var(--warning);
+        border: 1px dashed var(--warning);
+      }
+      .b-q {
+        background: var(--destructive);
+        color: var(--destructive-foreground);
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        height: 20px;
+        padding: 0 7px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        margin: 2px 4px 2px 0;
+        white-space: nowrap;
+      }
+      .ok {
+        background: var(--success-soft);
+        color: var(--success);
+      }
+      .warn {
+        background: var(--warning-soft);
+        color: var(--warning);
+      }
+      .bad {
+        background: var(--destructive);
+        color: var(--destructive-foreground);
+      }
+      .info {
+        background: var(--info-soft);
+        color: var(--info);
+      }
+      .vio {
+        background: var(--violet-soft);
+        color: var(--violet);
+      }
+      .mute {
+        background: var(--muted);
+        color: var(--muted-foreground);
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        height: 20px;
+        padding: 0 6px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-size: 12px;
+      }
+      /* flow */
+      .flow {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        gap: 6px;
+        margin: 10px 0;
+      }
+      .step {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 8px 10px;
+        flex: 1 1 140px;
+        min-width: 130px;
+        position: relative;
+      }
+      .step b {
+        display: block;
+        font-size: 14px;
+      }
+      .step span {
+        display: block;
+        font-size: 12.5px;
+        color: var(--muted-foreground);
+      }
+      .step.who {
+        background: var(--muted);
+        border-style: dashed;
+      }
+      .step.money {
+        outline: 2px solid var(--success);
+        outline-offset: -2px;
+      }
+      .rupee {
+        position: absolute;
+        top: -10px;
+        right: 8px;
+        background: var(--success);
+        color: #fff;
+        font: 700 11px var(--font-mono);
+        height: 18px;
+        padding: 0 6px;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .arrow {
+        align-self: center;
+        color: var(--muted-foreground);
+        font-size: 18px;
+      }
+      .lane {
+        margin-bottom: 14px;
+      }
+      .lane .label {
+        margin-bottom: 2px;
+      }
+      /* before / after */
+      .ba {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+      .ba .card h3 {
+        font: 600 14px var(--font-sans);
+        margin: 0 0 6px;
+      }
+      .ba ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+      .ba li {
+        margin: 3px 0;
+      }
+      .before {
+        opacity: 0.75;
+      }
+      .before li {
+        text-decoration: line-through;
+        text-decoration-color: var(--destructive);
+      }
+      /* lists */
+      .dl {
+        display: grid;
+        gap: 6px;
+      }
+      .dl > div {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        gap: 10px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+      }
+      .dl .n {
+        font: 700 13px var(--font-mono);
+        color: var(--secondary-foreground);
+      }
+      .two {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+      .two ul {
+        margin: 6px 0 0;
+        padding-left: 18px;
+      }
+      .two li {
+        margin: 3px 0;
+      }
+      .q {
+        border-left: 4px solid var(--destructive);
+      }
+      @media (max-width: 600px) {
+        .step {
+          min-width: 110px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="label">Biz4Kit · plan · local page · 20 Oct 2026</p>
+      <h1>Lead first, invoice as the reply</h1>
+      <p class="muted">
+        What you described on 19 Oct, drawn out so you can check it before I
+        record anything or change any screen. Approved 20 Oct 2026: decisions D59–D66 recorded, screens and docs/flow.html updated.
+      </p>
+      <p class="small">
+        <span class="badge b-said">Owner said</span> your words &nbsp;
+        <span class="badge b-said">Decided</span> a gap I filled, change it
+        if wrong &nbsp; <span class="badge b-q">Question</span> needs your
+        answer
+      </p>
+
+      <h2>1. The model in one picture</h2>
+      <p class="muted small">
+        Biz4Kit is a brand kit, not a CRM. The core is three things:
+        <b>track the lead · quick reply · quick invoice</b>.
+        <span class="badge b-said">Owner said</span>
+      </p>
+
+      <div class="lane">
+        <div class="label">Quoted lead · the customer asked for a price</div>
+        <div class="flow">
+          <div class="step">
+            <b>Lead</b
+            ><span>“Request a quote” on your page, or typed in by staff.</span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="step who">
+            <b>You review it</b
+            ><span
+              ><strong>Accept</strong> · <strong>Edit</strong> (items, qty, brief) · <strong>Reject</strong></span
+            >
+          </div>
+          <div class="arrow">→</div>
+          <div class="step money">
+            <b>Reply = proforma</b
+            ><span
+              >You price it; the reply is an invoice <code>PI-</code>, sent by
+              Email or SMS. Reject sends the rejected email.</span
+            ><span class="rupee">₹ pay to confirm</span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <b>Customer pays</b
+            ><span
+              >Paying is the acceptance. UPI / QR / bank, then “I have
+              paid”.</span
+            >
+          </div>
+          <div class="arrow">→</div>
+          <div class="step who">
+            <b>Owner approves</b><span>The proof. Only path to Paid.</span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <b>Tax invoice <code>INV-</code></b
+            ><span>Numbered now, gap-free. Receipt to the customer.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lane">
+        <div class="label">
+          Booked lead · the customer booked a slot for a bookable package
+        </div>
+        <div class="flow">
+          <div class="step">
+            <b>Lead</b
+            ><span>“Book” on your page: package, slot, name, phone.</span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="step who">
+            <b>You assign staff</b><span>And confirm by Email or SMS.</span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <b>Service</b
+            ><span>The job happens (checklist, photos: extra).</span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="step money">
+            <b>Invoice after</b
+            ><span>Or at booking when the package sets an advance.</span
+            ><span class="rupee">₹</span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="step who">
+            <b>Owner approves</b><span>Paid. Receipt.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lane">
+        <div class="label">Overdue payments · new section under Money</div>
+        <div class="flow">
+          <div class="step">
+            <b>Past the pay-by date</b
+            ><span>The invoice turns Overdue by itself.</span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="step who">
+            <b>One-tap Remind</b
+            ><span
+              >Email or SMS. Gentle at +3 days (message 13), firmer at +7 and
+              +14 (message 14).</span
+            >
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <b>List</b
+            ><span
+              >Customer · invoice · days overdue · amount · last reminder.</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <h2>2. What changes</h2>
+      <div class="ba">
+        <div class="card before">
+          <h3>Before (what <code>prep/</code> says)</h3>
+          <ul>
+            <li>
+              Quote is its own record; the customer taps Accept on a quote page
+            </li>
+            <li>Invoice is created from the job, after the work</li>
+            <li>Lead statuses: New · Contacted · Quoted · Snoozed</li>
+            <li>
+              Board: Lead · Quoted · Booked · In service · Invoiced · Paid
+            </li>
+            <li>Sidebar Sales: Leads · Quotes · Customers</li>
+            <li>Overdue is a filter on the invoices list</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>After</h3>
+          <ul>
+            <li>
+              No Quote record. The priced reply <b>is</b> the invoice, linked to
+              the lead <span class="badge b-said">Owner said</span>
+            </li>
+            <li>
+              Proforma <code>PI-</code> until paid, then tax invoice
+              <code>INV-</code> <span class="badge b-said">Decided</span>
+            </li>
+            <li>
+              Lead type as a chip: <span class="chip">Quoted</span>
+              <span class="chip">Booked</span>; statuses
+              <span class="pill info">New</span
+              ><span class="pill mute">Contacted</span
+              ><span class="pill vio">Replied</span
+              ><span class="pill warn">Snoozed</span
+              ><span class="pill bad">Rejected</span
+              ><span class="pill ok">Paid</span>
+              <span class="badge b-said">Decided</span>
+            </li>
+            <li>
+              Board: New · Replied · Booked · In service · Invoiced · Paid
+              <span class="badge b-said">Decided</span>
+            </li>
+            <li>
+              Sidebar Sales: Leads · Customers. Money: Invoices ·
+              <b>Overdue</b> · Approvals
+            </li>
+            <li>
+              Board, Customers, Jobs are extras you switch on
+              <span class="badge b-said">Owner said</span> “CRM is extra”
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>3. Decisions this would record</h2>
+      <div class="dl">
+        <div>
+          <span class="n">D59</span
+          ><span
+            >A Lead is anything a customer requested; two types, quoted and
+            booked. <span class="badge b-said">Owner said</span></span
+          >
+        </div>
+        <div>
+          <span class="n">D60</span
+          ><span
+            >No Quote record. The reply is an invoice linked to the lead.
+            <span class="badge b-said">Owner said</span> Proforma
+            <code>PI-</code> until paid, then <code>INV-</code>.
+            <span class="badge b-said">Decided</span></span
+          >
+        </div>
+        <div>
+          <span class="n">D61</span
+          ><span
+            >You Accept / Edit / Reject a quoted lead and reply by Email or SMS;
+            the customer accepts by paying.
+            <span class="badge b-said">Owner said</span> Reply and rejection
+            wording: drafts for you to approve.
+            <span class="badge b-said">Decided</span></span
+          >
+        </div>
+        <div>
+          <span class="n">D62</span
+          ><span
+            >Booked lead: assign staff, confirm by Email or SMS, invoice after
+            the service (or at booking with an advance).
+            <span class="badge b-said">Owner said</span></span
+          >
+        </div>
+        <div>
+          <span class="n">D63</span
+          ><span
+            >Brand kit, not CRM: core = track leads, quick invoice, quick reply;
+            Board, Customers, Jobs are extras.
+            <span class="badge b-said">Owner said</span></span
+          >
+        </div>
+        <div>
+          <span class="n">D64</span
+          ><span
+            >Overdue payments page with one-tap Remind.
+            <span class="badge b-said">Owner said</span> (the page design is
+            mine)</span
+          >
+        </div>
+        <div>
+          <span class="n">D65</span
+          ><span
+            >Board columns New · Replied · Booked · In service · Invoiced ·
+            Paid. Replaces D58.
+            <span class="badge b-said">Decided</span></span
+          >
+        </div>
+        <div>
+          <span class="n">D66</span
+          ><span
+            >Lead statuses New · Contacted · Replied · Snoozed · Rejected ·
+            Paid; Quoted / Booked is the type.
+            <span class="badge b-said">Decided</span></span
+          >
+        </div>
+      </div>
+
+      <h2>4. Screens that change</h2>
+      <div class="two">
+        <div class="card">
+          <b>Changed</b>
+          <ul>
+            <li>
+              <b>Leads list:</b> tabs All · Quoted · Booked · Replied · Snoozed;
+              a Type column; row action Reply or Confirm
+            </li>
+            <li>
+              <b>Lead detail:</b> three views (Quoted, Booked, Replied); Accept
+              opens “Price and reply”, Edit opens “Edit request”, Reject opens
+              “Reject and reply”; Confirm opens “Confirm and reply”
+            </li>
+            <li>
+              <b>Invoice editor:</b> Proforma and Tax invoice views; “From: Lead
+              Meera Kulkarni”
+            </li>
+            <li>
+              <b
+                >Board, dashboard card, sign-in headline, customer timeline, My
+                orders:</b
+              >
+              words and sample data
+            </li>
+          </ul>
+        </div>
+        <div class="card">
+          <b>New and removed</b>
+          <ul>
+            <li>
+              <b>New:</b> Overdue payments page (Money) with the Remind dialog
+            </li>
+            <li>
+              <b>Removed:</b> Quotes list, Quote editor, Share-quote sheet, the
+              customer’s Quote page (they get the pay page instead)
+            </li>
+            <li>
+              <b>Unchanged:</b> catalog, bookings, jobs, approvals, settings,
+              pay page, invoice email and PDF
+            </li>
+          </ul>
+          <p class="small muted" style="margin-top: 8px">
+            37 screens → 35. The built-in Check keeps running on every step.
+          </p>
+        </div>
+      </div>
+
+      <h2>
+        5. Three questions for you <span class="badge b-q">Question</span>
+      </h2>
+      <div class="dl">
+        <div class="q">
+          <span class="n">Q1</span
+          ><span
+            ><b>Numbering.</b> Do <code>PI-</code> and <code>INV-</code> run as
+            two separate series (my proposal: yes, the tax series is the one the
+            CA checks), or does the proforma keep its number when it becomes the
+            tax invoice?</span
+          >
+        </div>
+        <div class="q">
+          <span class="n">Q2</span
+          ><span
+            ><b>Channels.</b> You said Email or SMS for the reply. Is WhatsApp
+            also a quick-reply channel (it already exists in the share sheet),
+            or Email and SMS only?</span
+          >
+        </div>
+        <div class="q">
+          <span class="n">Q3</span
+          ><span
+            ><b>Advance.</b> The samples use a 30 % advance on accept. Keep that
+            as the default a business can change, or no advance by
+            default?</span
+          >
+        </div>
+      </div>
+
+      <p class="small muted" style="margin-top: 28px">
+        Done 20 Oct 2026: recorded D59–D66, rewrote
+        <code>docs/flow.html</code> to this model, then change the screens in
+        the order above, checking after each step.
+      </p>
+    </main>
+  </body>
+</html>

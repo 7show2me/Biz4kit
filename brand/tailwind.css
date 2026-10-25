@@ -1,0 +1,141 @@
+/* Biz4Kit project tokens as Tailwind v4 utilities. Load order: tailwindcss, then theme.css,
+   then this file. Values live in theme.css; this file only names them. Use these utilities,
+   never raw px / hex / arbitrary values (D52). Keep the words "at-import" out of comments:
+   the Tailwind browser build used by design/screens-v2.html fails on them. */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  /* colour */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-soft: var(--info-soft);
+  --color-violet: var(--violet);
+  --color-violet-foreground: var(--violet-foreground);
+  --color-violet-soft: var(--violet-soft);
+  --color-teal: var(--teal);
+  --color-teal-foreground: var(--teal-foreground);
+  --color-teal-soft: var(--teal-soft);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-blue: var(--brand-blue);
+  /* customer pages: fixed neutrals + the four generated business slots */
+  --color-customer-page: var(--customer-page);
+  --color-customer-surface: var(--customer-surface);
+  --color-customer-text: var(--customer-text);
+  --color-customer-muted: var(--customer-muted);
+  --color-customer-border: var(--customer-border);
+  --color-biz: var(--biz);
+  --color-biz-foreground: var(--biz-foreground);
+  --color-biz-soft: var(--biz-soft);
+  --color-biz-accent: var(--biz-accent);
+
+  /* type families */
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-customer: var(--font-customer);
+
+  /* type scale: text-display-lg, text-heading, text-title, text-body, text-body-sm,
+     text-caption, text-label, text-money, text-money-lg, text-code */
+  --text-display-lg: var(--type-display-lg);
+  --text-display-lg--line-height: var(--type-display-lg-leading);
+  --text-heading: var(--type-heading);
+  --text-heading--line-height: var(--type-heading-leading);
+  --text-title: var(--type-title);
+  --text-title--line-height: var(--type-title-leading);
+  --text-body: var(--type-body);
+  --text-body--line-height: var(--type-body-leading);
+  --text-body-sm: var(--type-body-sm);
+  --text-body-sm--line-height: var(--type-body-sm-leading);
+  --text-caption: var(--type-caption);
+  --text-caption--line-height: var(--type-caption-leading);
+  --text-label: var(--type-label);
+  --text-label--line-height: var(--type-label-leading);
+  --text-money: var(--type-money);
+  --text-money--line-height: var(--type-money-leading);
+  --text-money-lg: var(--type-money-lg);
+  --text-money-lg--line-height: var(--type-money-lg-leading);
+  --text-code: var(--type-code);
+  --text-code--line-height: var(--type-code-leading);
+
+  /* sizes: h-control-md, size-icon, w-sidebar, h-row, p-card, m-inset ... */
+  --spacing-control-xs: var(--size-control-xs);
+  --spacing-control-sm: var(--size-control-sm);
+  --spacing-control-md: var(--size-control-md);
+  --spacing-control-lg: var(--size-control-lg);
+  --spacing-touch: var(--size-touch);
+  --spacing-row: var(--size-row);
+  --spacing-row-sm: var(--size-row-sm);
+  --spacing-nav-item: var(--size-nav-item);
+  --spacing-header: var(--size-header);
+  --spacing-sidebar: var(--size-sidebar);
+  --spacing-aside: var(--size-aside);
+  --spacing-icon: var(--size-icon);
+  --spacing-icon-sm: var(--size-icon-sm);
+  --spacing-inset: var(--space-inset);
+  --spacing-page: var(--space-page);
+  --spacing-card: var(--space-card);
+  --spacing-card-sm: var(--space-card-sm);
+
+  /* radius (small, D54): rounded-xs (pills, chips), rounded-control (buttons), rounded-sm (inputs), rounded-md (menus),
+     rounded-card (cards, dialogs, panel), rounded-xl (sheets), rounded-pill */
+  --radius-xs: var(--radius-xs);
+  --radius-control: var(--radius-control);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-card: var(--radius);
+  --radius-xl: var(--radius-xl);
+  --radius-pill: var(--radius-pill);
+
+  /* layouts: media variants tab: / web: and container variants @tab: / @web: (600px, 1024px).
+     Plain values: Tailwind needs literal breakpoints; keep them equal to --screen-tab / --screen-web. */
+  --breakpoint-tab: 600px;
+  --breakpoint-web: 1024px;
+  --container-tab: 600px;
+  --container-web: 1024px;
+
+  /* elevation: shadow-sm (cards), shadow-md (popovers), shadow-lg (dialogs), shadow-xl (⌘K) */
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+}

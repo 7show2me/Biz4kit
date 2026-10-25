@@ -1,0 +1,4 @@
+{
+  "extends": "@Biz4kit/config/tsconfig.base.json",
+  "include": ["src/**/*.ts"]
+}

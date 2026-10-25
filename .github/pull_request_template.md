@@ -1,18 +1,19 @@
 ## Linear
+
 BIZ-
 
 ## What changed
 
-
 ## How to verify
+
 <!-- Copy the WBS "Human verifies" text for this package, then add click-through steps. -->
 
-
 ## Screenshots or short recording
+
 <!-- Phone viewport. Generated demo data only, no real PII. -->
 
-
 ## Checklist
+
 - [ ] First commit is the failing test from the acceptance criteria
 - [ ] Tests added (list them):
 - [ ] No existing test weakened or deleted (if one changed, say why and who approved)
@@ -23,4 +24,3 @@ BIZ-
 - [ ] Brand and UI follow `brand/theme.css` and the design system (if UI changed)
 
 ## Rollback note
-

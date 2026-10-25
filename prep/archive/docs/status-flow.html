@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Every status in Biz4Kit</title>
+    <!-- Local reading page (D19). Status families as they are in design/screens.html (now prep/archive/design/screens-v1.html) on 20 Oct 2026
+     (D55 colours, D65 board, D66 lead statuses). The Booking row is decided (D68, D69). Checked against D70–D81 and
+     design/screens-v2.html on 22 Oct 2026. No scripts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400..700&family=Fraunces:opsz,wght@9..144,500..800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --background: oklch(0.9924 0.0028 308.4292);
+        --foreground: oklch(0.1288 0.0219 314.0129);
+        --card: oklch(1 0 0);
+        --primary: oklch(0.2236 0.1469 265.8205);
+        --muted: oklch(0.9518 0.0057 308.3939);
+        --muted-foreground: oklch(0.4882 0.0203 308.0008);
+        --accent: oklch(0.9356 0.0312 279.862);
+        --border: oklch(0.916 0.012 313.2115);
+        --bad: #b91c1c;
+        --bad-soft: #fef2f2;
+        --ok: #15803d;
+        --ok-soft: #f0fdf4;
+        --warn: #b45309;
+        --warn-soft: #fffbeb;
+        --info: #1d4ed8;
+        --info-soft: #eff6ff;
+        --violet: #6d28d9;
+        --violet-soft: #f5f3ff;
+        --teal: #0f766e;
+        --teal-soft: #f0fdfa;
+        --mute: #52525b;
+        --mute-soft: #f4f4f5;
+        --font-serif: "Fraunces", Georgia, serif;
+        --font-sans: "DM Sans", system-ui, sans-serif;
+        --font-mono: "DM Mono", ui-monospace, Menlo, monospace;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: oklch(0.1063 0.0172 259.538);
+          --foreground: oklch(0.9924 0.0028 308.4292);
+          --card: oklch(0.145 0.0211 263.1799);
+          --muted: oklch(0.1797 0.0376 272.6396);
+          --muted-foreground: oklch(0.6878 0.0218 285.8125);
+          --accent: oklch(0.2553 0.0657 274.6654);
+          --border: oklch(0.2445 0.0736 280.5871);
+          --bad: #f87171;
+          --bad-soft: #3a0d0d;
+          --ok: #4ade80;
+          --ok-soft: #052e16;
+          --warn: #fbbf24;
+          --warn-soft: #2d1a04;
+          --info: #60a5fa;
+          --info-soft: #0b1a3a;
+          --violet: #a78bfa;
+          --violet-soft: #1e1033;
+          --teal: #2dd4bf;
+          --teal-soft: #042f2e;
+          --mute: #a1a1aa;
+          --mute-soft: #27272a;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        font: 15px/1.5 var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+      }
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 32px 16px 64px;
+      }
+      h1 {
+        font: 700 34px/1.1 var(--font-serif);
+        margin: 0 0 6px;
+      }
+      h2 {
+        font: 600 20px/1.2 var(--font-serif);
+        margin: 36px 0 12px;
+      }
+      p {
+        margin: 0 0 8px;
+      }
+      .lead {
+        color: var(--muted-foreground);
+      }
+      .fam {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+      }
+      .fam.open {
+        border: 2px solid var(--teal);
+      }
+      .fam header {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .fam header b {
+        font-size: 17px;
+      }
+      .fam header span {
+        color: var(--muted-foreground);
+        font-size: 13px;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 6px 0;
+      }
+      .step {
+        display: flex;
+        align-items: flex-start;
+      }
+      .step + .step::before {
+        content: "→";
+        color: var(--muted-foreground);
+        margin: 4px 8px 0;
+      }
+      .pill {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+      .why {
+        display: block;
+        max-width: 150px;
+        margin-top: 4px;
+        color: var(--muted-foreground);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+      .ok {
+        background: var(--ok-soft);
+        color: var(--ok);
+      }
+      .warn {
+        background: var(--warn-soft);
+        color: var(--warn);
+      }
+      .bad {
+        background: var(--bad-soft);
+        color: var(--bad);
+      }
+      .info {
+        background: var(--info-soft);
+        color: var(--info);
+      }
+      .violet {
+        background: var(--violet-soft);
+        color: var(--violet);
+      }
+      .teal {
+        background: var(--teal-soft);
+        color: var(--teal);
+      }
+      .mute {
+        background: var(--mute-soft);
+        color: var(--mute);
+      }
+      .side {
+        margin-left: 24px;
+        padding-left: 24px;
+        border-left: 1px dashed var(--border);
+      }
+      .hues {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 8px;
+      }
+      .hue {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+      .hue .pill {
+        margin-bottom: 6px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        font-size: 14px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 12px;
+        border-top: 1px solid var(--border);
+        vertical-align: top;
+      }
+      th {
+        background: var(--muted);
+        border-top: 0;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--muted-foreground);
+      }
+      tr.pick td {
+        background: var(--accent);
+      }
+      .tag {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 1px 7px;
+        border-radius: 999px;
+        background: var(--warn-soft);
+        color: var(--warn);
+        vertical-align: middle;
+      }
+      code {
+        font: 13px var(--font-mono);
+      }
+      @media (max-width: 600px) {
+        .side {
+          margin-left: 0;
+          padding-left: 0;
+          border: 0;
+          width: 100%;
+        }
+        .why {
+          max-width: 120px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Every status in Biz4Kit</h1>
+      <p class="lead">
+        Seven record types. Each one moves left to right. Under each status:
+        what moves it there. One colour never repeats inside a row (D55).
+      </p>
+
+      <h2>What each colour means</h2>
+      <div class="hues">
+        <div class="hue">
+          <span class="pill info">Blue</span><br />New. Something just arrived
+          or is running now.
+        </div>
+        <div class="hue">
+          <span class="pill mute">Grey</span><br />Not yet. Nothing has
+          happened, or it is parked.
+        </div>
+        <div class="hue">
+          <span class="pill violet">Violet</span><br />Waiting on us. The
+          business must act or approve.
+        </div>
+        <div class="hue">
+          <span class="pill warn">Amber</span><br />Waiting on the customer. A
+          date or a payment is open.
+        </div>
+        <div class="hue">
+          <span class="pill teal">Teal</span><br />Half done or firm. Part
+          delivered, or a slot Agreed (D68).
+        </div>
+        <div class="hue">
+          <span class="pill ok">Green</span><br />Done. Money in or work
+          finished (D68).
+        </div>
+        <div class="hue">
+          <span class="pill bad">Red</span><br />Problem. Late, or the customer
+          said no.
+        </div>
+      </div>
+
+      <h2>The flows</h2>
+
+      <div class="fam">
+        <header>
+          <b>Lead</b
+          ><span
+            >anything a customer asked for · type chip Quoted or Booked (D59,
+            D66)</span
+          >
+        </header>
+        <div class="row">
+          <div class="step">
+            <div>
+              <span class="pill info">New</span
+              ><span class="why"
+                >Request arrives from the page, QR or staff</span
+              >
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill mute">Contacted</span
+              ><span class="why">Staff called or wrote, no reply yet</span>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill violet">Replied</span
+              ><span class="why"
+                >Proforma PI- shared, or booking confirmed</span
+              >
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill ok">Paid</span
+              ><span class="why">Every invoice on the lead paid (D72)</span>
+            </div>
+          </div>
+          <div class="side">
+            <div class="step">
+              <div>
+                <span class="pill warn">Snoozed</span
+                ><span class="why">Parked until a date</span>
+              </div>
+            </div>
+            <div class="step" style="margin-top: 8px">
+              <div>
+                <span class="pill bad">Rejected</span
+                ><span class="why">Business declined (message 18)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fam open">
+        <header>
+          <b>Booking</b
+          ><span
+            >a slot for a bookable package (D62) ·
+            <span
+              class="tag"
+              style="background: var(--teal-soft); color: var(--teal)"
+              >decided 20 Oct (D69)</span
+            ></span
+          >
+        </header>
+        <div class="row">
+          <div class="step">
+            <div>
+              <span class="pill mute">To confirm</span
+              ><span class="why"
+                >Slot held, advance or confirmation not yet in</span
+              >
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill teal">Agreed</span
+              ><span class="why">Business confirmed by email (message 10)</span>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill mute" style="opacity: 0.6">→ becomes a Job</span
+              ><span class="why">On the day it is tracked as a job</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fam">
+        <header><b>Job</b><span>the work on the day (WBS 3.3)</span></header>
+        <div class="row">
+          <div class="step">
+            <div>
+              <span class="pill mute">Open</span
+              ><span class="why">Assigned, not started</span>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill info">In progress</span
+              ><span class="why">Staff tapped Start</span>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill ok">Done</span
+              ><span class="why">Checklist complete, proof photo</span>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill violet">Invoiced</span
+              ><span class="why">Invoice raised after the service</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fam">
+        <header>
+          <b>Reply</b
+          ><span
+            >the proforma PI- to a quoted lead; not money owed (D60, D75)</span
+          >
+        </header>
+        <div class="row">
+          <div class="step">
+            <div>
+              <span class="pill info">Awaiting payment</span
+              ><span class="why">Shared, pay-by date open</span>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill violet">Waiting for approval</span
+              ><span class="why">Customer sent proof, owner to approve</span>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill ok">Paid</span
+              ><span class="why">Approved, INV- number given</span>
+            </div>
+          </div>
+          <div class="side">
+            <div class="step">
+              <div>
+                <span class="pill mute">Expired</span
+                ><span class="why"
+                  >Past pay-by date; follow-up message 6, cannot be paid (D73,
+                  D75)</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fam">
+        <header>
+          <b>Invoice</b
+          ><span
+            >a bill owed after the service; PI- until the payment is approved,
+            then tax invoice INV- (D60, D71). Advance and balance are two
+            invoices (D70)</span
+          >
+        </header>
+        <div class="row">
+          <div class="step">
+            <div>
+              <span class="pill mute">Draft</span
+              ><span class="why">Being written</span>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill warn">Due</span
+              ><span class="why">Shared, pay-by date open</span>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill violet">Waiting for approval</span
+              ><span class="why">Customer sent proof, owner to approve</span>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill ok">Paid</span
+              ><span class="why">Approved, INV- number given</span>
+            </div>
+          </div>
+          <div class="side">
+            <div class="step">
+              <div>
+                <span class="pill teal"><s>Part paid</s></span
+                ><span class="why"
+                  >Dropped: the balance is its own invoice (D70)</span
+                >
+              </div>
+            </div>
+            <div class="step" style="margin-top: 8px">
+              <div>
+                <span class="pill bad">Overdue</span
+                ><span class="why">Past pay-by date (reminders 13, 14)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fam">
+        <header>
+          <b>Payment</b><span>one proof or one record (WBS 2.5)</span>
+        </header>
+        <div class="row">
+          <div class="step">
+            <div>
+              <span class="pill violet">Waiting for approval</span
+              ><span class="why">Proof uploaded or cash recorded by staff</span>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill ok">Approved</span
+              ><span class="why"
+                >Owner, or a Manager strictly below the limit; a sole Owner may
+                self-approve, logged (D74). Never above the open balance
+                (D76)</span
+              >
+            </div>
+          </div>
+          <div class="side">
+            <div class="step">
+              <div>
+                <span class="pill bad">Rejected</span
+                ><span class="why">Refused with a note (message 16)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fam">
+        <header><b>Team member</b><span>Settings → Team</span></header>
+        <div class="row">
+          <div class="step">
+            <div>
+              <span class="pill warn">Invited</span
+              ><span class="why">Email sent, not yet joined</span>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <span class="pill ok">Active</span
+              ><span class="why">Signed in once</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2>Board columns (D65) and where each status lands</h2>
+      <div class="row" style="margin-bottom: 8px">
+        <div class="step">
+          <div>
+            <span class="pill info">New</span
+            ><span class="why">Lead New, Contacted</span>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <span class="pill violet">Replied</span
+            ><span class="why"
+              >Lead Replied; reply Awaiting payment or Expired (D75)</span
+            >
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <span class="pill teal">Booked</span
+            ><span class="why">Booking To confirm or Agreed (D69)</span>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <span class="pill info">In service</span
+            ><span class="why">Job In progress</span>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <span class="pill warn">Invoiced</span
+            ><span class="why"
+              >Invoice Due, Overdue, Waiting for approval (D70)</span
+            >
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <span class="pill ok">Paid</span
+            ><span class="why">Every invoice on the lead paid (D72)</span>
+          </div>
+        </div>
+      </div>
+
+      <h2>Booking words: decided (D69)</h2>
+      <p class="lead">
+        Only one pair is needed. The rule from the colour key: the firm slot is
+        "done" (green or teal), the held slot is "not yet" (grey) or "waiting on
+        the customer" (amber).
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Firm slot</th>
+            <th>Held slot</th>
+            <th>Reads as</th>
+            <th>Fits the rest</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pill ok">Confirmed</span></td>
+            <td><span class="pill warn">Tentative</span></td>
+            <td>Before. "Tentative" is a long word on a phone.</td>
+            <td>
+              Green repeats Paid in the board row; amber reads as a problem.
+            </td>
+          </tr>
+          <tr class="pick">
+            <td><span class="pill teal">Agreed</span></td>
+            <td><span class="pill mute">To confirm</span></td>
+            <td>
+              Plain Indian English. "Agreed" says both sides said yes to the
+              slot.
+            </td>
+            <td>
+              Teal matches the Booked board column. Grey says "not yet", not
+              "trouble".
+            </td>
+          </tr>
+          <tr>
+            <td><span class="pill teal">Booked</span></td>
+            <td><span class="pill mute">Not confirmed</span></td>
+            <td>Clear, but "Booked" is already the lead type chip.</td>
+            <td>Two "Booked" labels next to each other on a lead.</td>
+          </tr>
+          <tr>
+            <td><span class="pill ok">Confirmed</span></td>
+            <td><span class="pill mute">Hold</span></td>
+            <td>Short. "Hold" is hotel language.</td>
+            <td>Keeps green; only the held word changes.</td>
+          </tr>
+          <tr>
+            <td><span class="pill teal">Fixed</span></td>
+            <td><span class="pill warn">Waiting for customer</span></td>
+            <td>Says who we wait for.</td>
+            <td>
+              Long; amber means the same as Due on an invoice, which is right.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="lead" style="margin-top: 10px">
+        Highlighted row is the decision (20 Oct 2026, D68, word changed by D69).
+        Applied to the status map, board, bookings page and dashboard.
+      </p>
+    </main>
+  </body>
+</html>

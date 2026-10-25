@@ -1,0 +1,1417 @@
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>How a sale moves through Biz4Kit</title>
+    <!-- Local reading page (D19). Every fact carries a footnote to prep/ or docs/decisions.md.
+     Model: lead first, invoice as the reply (D59–D66, 20 Oct 2026; checked against D67–D81 and design/screens-v2.html, 22 Oct 2026; re-checked against D82–D102 and the locked prototype design/app/, D94, 24 Oct 2026). Colours and fonts from brand/theme.css. No scripts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400..700&family=Fraunces:opsz,wght@9..144,500..800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --background: oklch(0.9924 0.0028 308.4292);
+        --foreground: oklch(0.1288 0.0219 314.0129);
+        --card: oklch(1 0 0);
+        --primary: oklch(0.2236 0.1469 265.8205);
+        --primary-foreground: oklch(1 0 0);
+        --secondary: oklch(0.9387 0.0262 264.4409);
+        --secondary-foreground: oklch(0.4691 0.2225 262.4817);
+        --muted: oklch(0.9518 0.0057 308.3939);
+        --muted-foreground: oklch(0.4882 0.0203 308.0008);
+        --accent: oklch(0.9356 0.0312 279.862);
+        --border: oklch(0.916 0.012 313.2115);
+        --destructive: oklch(0.5858 0.222 17.5846);
+        --destructive-foreground: oklch(1 0 0);
+        --success: #15803d;
+        --success-soft: #f0fdf4;
+        --warning: #b45309;
+        --warning-soft: #fffbeb;
+        --info: #1d4ed8;
+        --info-soft: #eff6ff;
+        --violet: #6d28d9;
+        --violet-soft: #f5f3ff;
+        --teal: #0f766e;
+        --teal-soft: #f0fdfa;
+        --font-serif: "Fraunces", Georgia, "Times New Roman", serif;
+        --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+        --font-mono: "DM Mono", ui-monospace, Menlo, monospace;
+        --radius: 8px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: oklch(0.1063 0.0172 259.538);
+          --foreground: oklch(0.9924 0.0028 308.4292);
+          --card: oklch(0.145 0.0211 263.1799);
+          --primary: oklch(0.382 0.1967 265.289);
+          --secondary: oklch(0.2108 0.0426 270.3694);
+          --secondary-foreground: oklch(0.9924 0.0028 308.4292);
+          --muted: oklch(0.1797 0.0376 272.6396);
+          --muted-foreground: oklch(0.6878 0.0218 285.8125);
+          --accent: oklch(0.2553 0.0657 274.6654);
+          --border: oklch(0.2445 0.0736 280.5871);
+          --destructive: oklch(0.68 0.2 20);
+          --destructive-foreground: oklch(0.1288 0.0219 314.0129);
+          --success: #4ade80;
+          --success-soft: #052e16;
+          --warning: #fbbf24;
+          --warning-soft: #2d1a04;
+          --info: #60a5fa;
+          --info-soft: #0b1a3a;
+          --violet: #a78bfa;
+          --violet-soft: #1e1033;
+          --teal: #2dd4bf;
+          --teal-soft: #042f2e;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        font: 15px/1.5 var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+      }
+      main {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 32px 16px 64px;
+      }
+      h1 {
+        font: 800 clamp(28px, 4vw, 40px)/1.1 var(--font-serif);
+        margin: 0 0 8px;
+        letter-spacing: -0.01em;
+      }
+      h2 {
+        font: 700 24px/1.2 var(--font-serif);
+        margin: 48px 0 12px;
+      }
+      h3 {
+        font: 600 16px/1.3 var(--font-sans);
+        margin: 0 0 4px;
+      }
+      p {
+        margin: 0 0 10px;
+      }
+      .lead {
+        font-size: 17px;
+        color: var(--muted-foreground);
+        max-width: 70ch;
+      }
+      a {
+        color: var(--secondary-foreground);
+      }
+      sup a {
+        text-decoration: none;
+        font-size: 11px;
+        padding-left: 1px;
+      }
+      code,
+      .mono {
+        font-family: var(--font-mono);
+        font-size: 0.93em;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+      }
+      .grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      }
+      .muted {
+        color: var(--muted-foreground);
+      }
+      .small {
+        font-size: 13px;
+      }
+      .label {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted-foreground);
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        height: 20px;
+        padding: 0 7px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        vertical-align: middle;
+      }
+      .b-fact {
+        background: var(--muted);
+        color: var(--muted-foreground);
+      }
+      .b-dec {
+        background: var(--success-soft);
+        color: var(--success);
+      }
+      .b-p2 {
+        background: var(--secondary);
+        color: var(--secondary-foreground);
+      }
+      .b-open {
+        background: var(--destructive);
+        color: var(--destructive-foreground);
+      }
+      .b-draft {
+        background: var(--warning-soft);
+        color: var(--warning);
+        border: 1px dashed var(--warning);
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        height: 20px;
+        padding: 0 7px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        margin: 2px 4px 2px 0;
+      }
+      .ok {
+        background: var(--success-soft);
+        color: var(--success);
+      }
+      .warn {
+        background: var(--warning-soft);
+        color: var(--warning);
+      }
+      .bad {
+        background: var(--destructive);
+        color: var(--destructive-foreground);
+      }
+      .info {
+        background: var(--info-soft);
+        color: var(--info);
+      }
+      .vio {
+        background: var(--violet-soft);
+        color: var(--violet);
+      }
+      .teal {
+        background: var(--teal-soft);
+        color: var(--teal);
+      }
+      .mute {
+        background: var(--muted);
+        color: var(--muted-foreground);
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        height: 20px;
+        padding: 0 6px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-size: 12px;
+        margin-right: 4px;
+      }
+      .def .who {
+        margin-top: 8px;
+      }
+      .def .not {
+        margin-top: 6px;
+        font-size: 13px;
+        color: var(--muted-foreground);
+      }
+      .def .not s {
+        opacity: 0.8;
+      }
+      .doors {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+      .door {
+        border-left: 4px solid var(--primary);
+      }
+      .door.alt {
+        border-left-color: var(--teal);
+      }
+      .strip {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        margin: 12px 0 20px;
+      }
+      .strip > div {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 10px 12px;
+        position: relative;
+      }
+      .strip .n {
+        font: 700 13px var(--font-mono);
+        color: var(--secondary-foreground);
+      }
+      .strip .t {
+        font: 700 17px/1.2 var(--font-serif);
+        margin: 2px 0;
+      }
+      .rupee {
+        position: absolute;
+        top: -10px;
+        right: 10px;
+        background: var(--success);
+        color: #fff;
+        font: 700 12px var(--font-mono);
+        height: 20px;
+        padding: 0 7px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .lane {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin-bottom: 10px;
+      }
+      .lane h3 {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .steps {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        gap: 6px;
+        margin: 10px 0 8px;
+      }
+      .step {
+        background: var(--muted);
+        border-radius: 6px;
+        padding: 8px 10px;
+        min-width: 150px;
+        flex: 1 1 150px;
+      }
+      .step b {
+        display: block;
+        font-size: 14px;
+      }
+      .step span {
+        display: block;
+        font-size: 12.5px;
+        color: var(--muted-foreground);
+      }
+      .step.money {
+        outline: 2px solid var(--success);
+        outline-offset: -2px;
+      }
+      .step.sys {
+        border: 1px dashed var(--border);
+        background: transparent;
+      }
+      .arrow {
+        align-self: center;
+        color: var(--muted-foreground);
+        font-size: 18px;
+        padding: 0 2px;
+      }
+      .actors {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 14px;
+        font-size: 13px;
+      }
+      .actors b {
+        font-weight: 600;
+      }
+      .tbl-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 640px;
+        font-size: 14px;
+      }
+      th {
+        text-align: left;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted-foreground);
+        background: var(--muted);
+        padding: 10px 12px;
+        white-space: nowrap;
+      }
+      td {
+        padding: 10px 12px;
+        border-top: 1px solid var(--border);
+        vertical-align: top;
+      }
+      td:first-child {
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .phase {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+      .phase ul,
+      .conf ul,
+      .src ol {
+        margin: 6px 0 0;
+        padding-left: 18px;
+      }
+      .phase li,
+      .conf li {
+        margin: 4px 0;
+      }
+      .src {
+        font-size: 13px;
+        color: var(--muted-foreground);
+      }
+      .src li {
+        margin: 3px 0;
+      }
+      .src li:target {
+        color: var(--foreground);
+        background: var(--accent);
+        border-radius: 4px;
+        padding: 2px 4px;
+      }
+      .board {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+      .board > div {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 10px 12px;
+      }
+      .board b {
+        display: block;
+        font-size: 15px;
+      }
+      .board .small {
+        margin-top: 4px;
+      }
+      @media (max-width: 600px) {
+        h2 {
+          margin-top: 36px;
+        }
+        .step {
+          min-width: 120px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="label">
+        Biz4Kit · product model · local page · updated 24 Oct 2026
+      </p>
+      <h1>How a sale moves through Biz4Kit</h1>
+      <p class="lead">
+        A customer either <b>asks for a price</b> or <b>books a slot</b>. Both
+        are <b>Leads</b>. The business replies with a price, and that reply
+        <b>is</b> the invoice. Paying it is the acceptance. Biz4Kit is a brand
+        kit, not a CRM: the core is <b>track the lead</b> and four Quick jobs:
+        <b>Catalog · Reply · Invoice · Cashflow</b> (money in only, D77).<sup
+          ><a href="#s20">20</a>, <a href="#s23">23</a></sup
+        >
+      </p>
+      <p class="small">
+        <span class="badge b-fact">Fact</span> stated in <code>prep/</code>,
+        with a footnote &nbsp; <span class="badge b-dec">D59–D102</span> decided
+        20–22 Oct 2026, in <code>docs/decisions.md</code> &nbsp;
+        <span class="badge b-draft">Draft</span> wording for you to approve
+        &nbsp; <span class="badge b-p2">Phase 2</span> later &nbsp;
+        <span class="badge b-open">Docs disagree</span>
+      </p>
+
+      <h2>1. What is what</h2>
+      <p class="muted">
+        One word per concept, used the same way in the UI, messages, PDFs and
+        code.<sup><a href="#s3">3</a></sup> Status colours never repeat within
+        one record.<sup><a href="#s19">19</a></sup> The crossed-out words are
+        the ones we do not use.
+      </p>
+      <div class="grid">
+        <div class="card def">
+          <h3>Lead</h3>
+          <p>
+            Anything a customer requested. Two types:
+            <span class="chip">Quoted</span> asked for a price,
+            <span class="chip">Booked</span> booked a slot.<sup
+              ><a href="#s20">20</a></sup
+            >
+          </p>
+          <div>
+            <span class="pill info">New</span
+            ><span class="pill mute">Contacted</span
+            ><span class="pill vio">Replied</span
+            ><span class="pill warn">Snoozed</span
+            ><span class="pill bad">Rejected</span
+            ><span class="pill ok">Paid</span>
+          </div>
+          <p class="who small">
+            <b>Made by:</b> the customer (Request a quote, or Book) or Staff by
+            hand.<sup><a href="#s1">1</a></sup>
+          </p>
+          <p class="not">
+            Not: <s>enquiry</s> (allowed in customer copy), <s>prospect</s>,
+            <s>opportunity</s>, <s>quote</s> (there is no Quote record, D60)
+          </p>
+        </div>
+        <div class="card def">
+          <h3>Invoice</h3>
+          <p>
+            A numbered request for payment, linked to the lead. The reply to a
+            quoted lead is a <b>proforma</b> <code>PI-</code>: not a tax
+            invoice. When the payment is approved it becomes the
+            <b>tax invoice</b> <code>INV-</code> with the next gap-free number.
+            Edits before payment are versions of the same <code>PI-</code>.
+            Every invoice, including one after the service, stays
+            <code>PI-</code> until its payment is approved (D71). An advance and
+            its balance are two invoices, each <code>PI-</code> then
+            <code>INV-</code> (D70). An unpaid reply is not money owed: past its
+            pay-by date it turns Expired, never Overdue (D75).<sup
+              ><a href="#s3">3</a>, <a href="#s6">6</a>, <a href="#s20">20</a>,
+              <a href="#s23">23</a></sup
+            >
+          </p>
+          <div>
+            Bill: <span class="pill mute">Draft</span
+            ><span class="pill warn">Due</span
+            ><span class="pill teal">Part paid</span
+            ><span class="pill bad">Overdue</span
+            ><span class="pill ok">Paid</span
+            ><span class="pill vio">Waiting for approval</span>
+            (Part paid: some approved, some still due; Overdue wins after the
+            due date, D55)
+          </div>
+          <div>
+            Reply: <span class="pill info">Awaiting payment</span
+            ><span class="pill vio">Waiting for approval</span
+            ><span class="pill ok">Paid</span
+            ><span class="pill mute">Expired</span> (a reply has no Part paid: an
+            advance and its balance are two invoices, D70)
+          </div>
+          <p class="who small">
+            <b>Made by:</b> Staff, when they Accept a quoted lead, after a
+            booked lead's service, or from manual lines.<sup
+              ><a href="#s16">16</a></sup
+            >
+            A shared invoice is cancelled (void) only by the Owner and keeps its
+            number; a draft can be deleted by anyone who writes.<sup
+              ><a href="#s5">5</a></sup
+            >
+          </p>
+          <p class="not">
+            Not: <s>bill</s>, <s>receipt</s>, <s>estimate</s>, <s>quotation</s>
+          </p>
+          <p class="who small">
+            <b>Serial numbers and warranty</b> (an extra, D85, D86): model and
+            warranty or guarantee on the proforma; the serial on the tax invoice;
+            one row per unit once serials are entered; a warranty card per row
+            with a serial.
+          </p>
+          <p class="who small">
+            <b>Optional lines:</b> the customer ticks them on the pay page and
+            the amount updates as they tick (D102).
+          </p>
+        </div>
+        <div class="card def">
+          <h3>Booking</h3>
+          <p>
+            A reserved time with a staff member, from a booked lead or set after
+            a quoted lead is paid.<sup><a href="#s3">3</a></sup>
+          </p>
+          <div>
+            <span class="pill mute">To confirm</span
+            ><span class="pill teal">Agreed</span
+            ><span class="pill info">In progress</span
+            ><span class="pill ok">Completed</span
+            ><span class="pill bad">Cancelled</span
+            ><span class="pill warn">No-show</span> (Cancelled red, D100)
+          </div>
+          <p class="who small">
+            <b>Confirmed by:</b> the business, with a staff member assigned
+            (D62). A clash on member + time is refused. Slots fall inside the
+            business's opening hours: up to two ranges per weekday, starting
+            every 30 minutes and fitting the package length; a day with no range
+            is closed (D97, D99).<sup
+              ><a href="#s4">4</a></sup
+            >
+          </p>
+          <p class="not">
+            Not: <s>slot</s>, <s>reservation</s>; “appointment” allowed for
+            salons
+          </p>
+        </div>
+        <div class="card def">
+          <h3>Job <span class="badge b-fact">extra</span></h3>
+          <p>
+            The work done for a paid reply or an Agreed booking (D69), with a
+            checklist, before / after photos and materials used (D87). Marking it
+            Done makes the draft invoice at once (a bill, or the balance after an
+            advance); the next step is <b>Review and send</b> (D88). An extra the
+            owner switches on (D63).<sup
+              ><a href="#s3">3</a></sup
+            >
+          </p>
+          <div>
+            <span class="pill mute">Open</span
+            ><span class="pill info">In progress</span
+            ><span class="pill ok">Done</span
+            ><span class="pill vio">Invoiced</span>
+          </div>
+          <p class="not">Not: <s>service</s>, <s>task</s>, <s>order</s></p>
+        </div>
+        <div class="card def">
+          <h3>Payment and proof</h3>
+          <p>
+            A <b>payment request</b> is the UPI link, QR and bank details on the
+            invoice page. A <b>proof</b> is the screenshot or PDF uploaded.
+            <b>Approve</b> is an approver confirming it: the only path to Paid
+            in Phase 1.<sup><a href="#s3">3</a>, <a href="#s4">4</a></sup>
+          </p>
+          <div>
+            <span class="pill vio">Waiting for approval</span
+            ><span class="pill ok">Approved</span
+            ><span class="pill bad">Rejected</span>
+          </div>
+          <p class="who small">
+            <b>Uploaded by:</b> the customer on the pay page, or the Owner, a
+            Manager or Staff; the Accountant is read-only plus export (D91).
+            <b>Approved by:</b> Owner, or a Manager
+            strictly below the limit the Owner sets (D57, D74). When the Owner
+            is the only approver they may approve their own upload, logged as
+            self-approved (D74). Approval above the open balance is refused
+            (D76).
+          </p>
+          <p class="not">
+            Not: <s>screenshot</s>, <s>verify</s>, <s>payment link</s> (gateway,
+            Phase 2)
+          </p>
+        </div>
+        <div class="card def">
+          <h3>Customer <span class="badge b-fact">CRM is extra</span></h3>
+          <p>
+            The person or company the business sells to. Never has an account;
+            acts only through private links. One per phone number. The customer
+            list and timeline are extras (D63).<sup
+              ><a href="#s3">3</a>, <a href="#s4">4</a></sup
+            >
+          </p>
+          <p class="who small">
+            <b>Sees:</b> the invoice page and a private <b>My orders</b> page
+            listing every request, booking, invoice and receipt; a warranty
+            card for each item with a serial (D86).<sup
+              ><a href="#s2">2</a></sup
+            >
+            “Made with Biz4Kit” shows only on the catalog, request, booking and
+            My orders pages, never on the pay page, PDF or warranty card (D89).
+          </p>
+          <p class="not">
+            Not: <s>user</s>, <s>buyer</s>; “client” allowed for agencies and IT
+          </p>
+        </div>
+      </div>
+
+      <h2>2. Two doors in</h2>
+      <p class="muted">
+        The customer lands on the business’s own page from a QR code, a WhatsApp
+        link or an Instagram bio.<sup><a href="#s1">1</a></sup> Looking at the
+        catalog or the price list creates nothing. Two things create a lead:
+      </p>
+      <div class="doors">
+        <div class="card door">
+          <h3>Request a quote → <span class="chip">Quoted</span> lead</h3>
+          <p>
+            Basket of items or a free-text brief, photos, preferred date,
+            location, name and phone.<sup><a href="#s1">1</a></sup> The business
+            prices it and replies with a proforma; the customer pays to confirm.
+          </p>
+          <p class="small muted">
+            When the price depends on the job: bridal, catering, a wholesale
+            order, a website, a batch of parts. Also when the owner hides a
+            price (“ask for a quote”).
+          </p>
+        </div>
+        <div class="card door alt">
+          <h3>Book a package → <span class="chip">Booked</span> lead</h3>
+          <p>
+            Only for packages the owner marks bookable. The customer picks a
+            slot inside the business's opening hours (D97, D99); the business
+            assigns a staff member and confirms.<sup
+              ><a href="#s1">1</a></sup
+            >
+            The price is the package price.
+          </p>
+          <p class="small muted">
+            When the price is fixed and it is a time slot: a hair spa, a monthly
+            package, a trial session.
+          </p>
+        </div>
+      </div>
+      <p class="small muted" style="margin-top: 10px">
+        There is no checkout or cart. “Our customers ask or book; they don’t
+        check out.”<sup><a href="#s13">13</a></sup>
+      </p>
+
+      <h2>3. The journey, and where the money is collected</h2>
+      <div class="strip">
+        <div>
+          <div class="n">1</div>
+          <div class="t">Pre-sale</div>
+          <div class="small muted">Lead → review → reply</div>
+          <span class="rupee">₹ pay to confirm</span>
+        </div>
+        <div>
+          <div class="n">2</div>
+          <div class="t">Getting paid</div>
+          <div class="small muted">
+            Proforma → proof → approve → tax invoice
+          </div>
+        </div>
+        <div>
+          <div class="n">3</div>
+          <div class="t">After the sale</div>
+          <div class="small muted">Receipt, My orders, repeat</div>
+        </div>
+      </div>
+      <p class="small muted">
+        A quoted lead pays its proforma up front (the whole amount, or an
+        advance the business sets). A booked lead is invoiced after the service,
+        or at booking when the package sets an advance.<sup
+          ><a href="#s8">8</a>, <a href="#s20">20</a></sup
+        >
+      </p>
+
+      <div class="lane">
+        <h3>
+          <span class="mono">1</span> Pre-sale
+          <span class="small muted">· from the request to the reply</span>
+        </h3>
+        <div class="steps">
+          <div class="step">
+            <b>Lead</b
+            ><span
+              >Portal form or staff entry. Email to the assignee and an item in
+              the in-app inbox (D87). Assign, priority normal / high (D87),
+              snooze.<sup><a href="#s1">1</a></sup></span
+            >
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <b>You review it</b
+            ><span
+              ><b style="display: inline">Accept</b> prices it ·
+              <b style="display: inline">Edit</b> changes items, quantity, brief
+              · <b style="display: inline">Reject</b> declines it (D61).</span
+            >
+          </div>
+          <div class="arrow">→</div>
+          <div class="step money">
+            <b>Reply = proforma <code>PI-</code></b
+            ><span
+              >Email is sent by the app; SMS and WhatsApp are copy-paste (D67).
+              Lead becomes Replied.<sup><a href="#s11">11</a></sup></span
+            >
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <b>Booked lead instead</b
+            ><span
+              >Assign a staff member, Confirm by Email or SMS (message 10).
+              Invoice after the service (D62).</span
+            >
+          </div>
+        </div>
+        <div class="actors">
+          <span><b>Customer:</b> asks or books</span
+          ><span
+            ><b>Staff:</b> reviews, prices, replies; Ask customer (message 3);
+            follows up (message 6)</span
+          ><span
+            ><b>System:</b> Replied on share or on booking confirm (D72);
+            Contacted on Ask</span
+          ><span
+            ><b>Ends:</b> Rejected (message 18, wording approved D95), Snoozed;
+            an unpaid reply
+            past its pay-by date turns Expired and gets message 6 (D75)</span
+          >
+        </div>
+      </div>
+
+      <div class="lane">
+        <h3>
+          <span class="mono">2</span> Getting paid
+          <span class="small muted"
+            >· only an approval (Owner, or Manager below the limit) makes it
+            Paid (D74)</span
+          >
+        </h3>
+        <div class="steps">
+          <div class="step">
+            <b>Payment request</b
+            ><span
+              >The proforma page: amount, UPI deep link, QR, bank details; the
+              customer ticks any optional lines (D102).<sup
+                ><a href="#s2">2</a></sup
+              >
+              Phase 1 moves no money.</span
+            >
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <b>Proof uploaded</b
+            ><span
+              >Customer taps “I have paid”, or the Owner, a Manager or Staff
+              record it (not the Accountant, D91). Required for UPI / bank,
+              optional for cash.<sup><a href="#s7">7</a></sup></span
+            >
+          </div>
+          <div class="arrow">→</div>
+          <div class="step money">
+            <b>Approved</b
+            ><span
+              >Owner (or Manager below the limit, D74), in-app or from the
+              approve-from-email link (48 h, single use, D57, D87). Rejected needs
+              a note (message 16); re-upload as a new
+              payment. Never above the open balance; a payment against an older
+              <code>PI-</code> version goes to the latest (D76). Rejected or
+              expired replies cannot be paid; Snoozed shows a warning (D73).<sup
+                ><a href="#s7">7</a></sup
+              ></span
+            >
+          </div>
+          <div class="arrow">→</div>
+          <div class="step sys">
+            <b>Tax invoice <code>INV-</code></b
+            ><span
+              >Numbered now, gap-free. Lead becomes Paid when every invoice on
+              it is paid (D72). Receipt: message 15 and PDF.<sup
+                ><a href="#s6">6</a>, <a href="#s20">20</a></sup
+              ></span
+            >
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <b>Service, then the rest</b
+            ><span
+              >Booking or job (extras). Job done makes the draft invoice; staff
+              Review and send it (D88). A separate balance invoice after the work
+              when an advance was taken: <code>PI-</code>, then
+              <code>INV-</code> on approval (D70, D71).<sup
+                ><a href="#s8">8</a></sup
+              ></span
+            >
+          </div>
+        </div>
+        <div class="actors">
+          <span><b>Customer:</b> pays, uploads proof</span
+          ><span><b>Staff:</b> shares, records cash</span
+          ><span
+            ><b>Owner (or Manager strictly below the limit, D74):</b>
+            approves</span
+          ><span
+            ><b>System:</b> Overdue past the pay-by date for a bill owed after
+            the service; an unpaid reply turns Expired instead (D75). A bill
+            with some approved and some still due is Part paid (D55); an advance
+            and its balance are two invoices (D70)<sup
+              ><a href="#s5">5</a></sup
+            ></span
+          ><span><b>Ends:</b> Void (Owner only, no approved payment, number
+            kept)</span>
+        </div>
+      </div>
+
+      <div class="lane">
+        <h3>
+          <span class="mono">3</span> After the sale
+          <span class="small muted">· what stays with the customer</span>
+        </h3>
+        <div class="steps">
+          <div class="step">
+            <b>Receipt</b
+            ><span
+              >Downloadable on the invoice page after approval.<sup
+                ><a href="#s2">2</a></sup
+              ></span
+            >
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <b>My orders</b
+            ><span
+              >One private link per customer: every request, booking, invoice
+              and receipt.<sup><a href="#s2">2</a></sup></span
+            >
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <b>Timeline <span class="badge b-fact">extra</span></b
+            ><span
+              >Every lead, booking, invoice and message as events; tags; repeat
+              prompts.<sup><a href="#s18">18</a></sup></span
+            >
+          </div>
+          <div class="arrow">→</div>
+          <div class="step sys">
+            <b>Later <span class="badge b-p2">Phase 2</span></b
+            ><span
+              >Credit notes, gateway refunds, review collection.<sup
+                ><a href="#s16">16</a>, <a href="#s17">17</a></sup
+              ></span
+            >
+          </div>
+        </div>
+        <div class="actors">
+          <span
+            ><b>Customer:</b> opens My orders, asks for export or erasure
+            (DPDP)</span
+          ><span
+            ><b>Business:</b> handles any refund itself; Biz4Kit moves no
+            money<sup><a href="#s17">17</a></sup></span
+          >
+        </div>
+      </div>
+
+      <h2>4. Overdue payments <span class="badge b-dec">D64</span></h2>
+      <div class="card">
+        <p>
+          A bill owed after the service (post-service or balance invoice) turns
+          <span class="pill bad">Overdue</span> by itself the day after its
+          pay-by date.<sup><a href="#s5">5</a></sup> An unpaid reply
+          <code>PI-</code> is not money owed and never goes overdue: it turns
+          Expired and gets a follow-up (message 6) (D75). The
+          <b>Overdue</b> page under Payments (D80) lists every one with the
+          customer, days overdue, amount and the last reminder, and a one-tap
+          <b>Remind</b> by Email or SMS.
+        </p>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Ready message</th>
+                <th>Who sends it</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>+3 days</td>
+                <td>
+                  13, gentle: “a gentle reminder that invoice {invoice_no}
+                  ({amount}) from {business} is due. Pay here: {link}”<sup
+                    ><a href="#s11">11</a></sup
+                  >
+                </td>
+                <td>
+                  Email: the app sends it. SMS and WhatsApp: copy and paste
+                  (D67). <span class="badge b-p2">Phase 2</span> sends all three
+                  on schedule
+                </td>
+              </tr>
+              <tr>
+                <td>+7 and +14 days</td>
+                <td>
+                  14, overdue: “invoice {invoice_no} for {amount} is now {days}
+                  days overdue. Please pay at {link} or reply if there is an
+                  issue. — {business}”<sup><a href="#s11">11</a></sup>
+                </td>
+                <td>Same</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small muted" style="margin-top: 8px">
+          The Owner, Manager and Accountant see the page; only Owner and Manager
+          get the Remind button. The Overdue card on Today opens it. Every
+          Remind writes a Message row on the invoice, so the timeline shows what
+          was sent.<sup><a href="#s11">11</a></sup>
+        </p>
+      </div>
+
+      <h2>5. When approval is needed</h2>
+      <p class="muted">
+        Four gates. They are the same for every business type; only the Manager
+        amount limit is set per workspace.<sup
+          ><a href="#s7">7</a>, <a href="#s10">10</a></sup
+        >
+      </p>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Gate</th>
+              <th>Who</th>
+              <th>What is required</th>
+              <th>What it unlocks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Accept, Edit or Reject a request</td>
+              <td>The business (Staff, Manager, Owner)</td>
+              <td>
+                Accept: price every line, pay-by date, advance % if any (the
+                reply is then the advance proforma, each line at that %, D70);
+                lines may be marked optional for the customer to tick (D102).
+                Reject: a reason and the decline message (18, wording D95). D61.
+              </td>
+              <td>
+                Accept creates and shares the proforma; Lead → Replied. Reject →
+                Rejected.
+              </td>
+            </tr>
+            <tr>
+              <td>Confirm a booking</td>
+              <td>The business</td>
+              <td>
+                A staff member assigned; To confirm → Agreed (D69). Overlapping
+                bookings for one member are refused.<sup
+                  ><a href="#s5">5</a></sup
+                >
+                D62.
+              </td>
+              <td>The customer gets message 10; the service can start.</td>
+            </tr>
+            <tr>
+              <td>Approve a payment proof</td>
+              <td>
+                Owner. Manager only when the Owner turns on “Payment approvals
+                by Managers” and sets an amount limit (D57); then only strictly
+                below it (D74).
+              </td>
+              <td>
+                Proof file required for UPI and bank, optional for cash. The
+                approver cannot be the uploader when another approver exists; an
+                Owner who is the only approver may approve their own upload,
+                logged as self-approved (D74). Never above the open balance
+                (D76); not for a rejected or expired reply (D73). In-app, or the
+                approve-from-email link (single-use, 48 h, D57, D87).<sup
+                  ><a href="#s7">7</a></sup
+                >
+              </td>
+              <td>
+                Proforma → tax invoice <code>INV-</code>; Lead → Paid once every
+                invoice on it is paid (D72); receipt offered (message 15).
+                Reject with a note → message 16 to the uploader.
+              </td>
+            </tr>
+            <tr>
+              <td>Void an invoice</td>
+              <td>Owner only</td>
+              <td>
+                No approved payment on it. A draft (not yet shared) is simply
+                deleted by anyone who writes.<sup><a href="#s5">5</a></sup>
+              </td>
+              <td>Number kept; excluded from totals.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted" style="margin-top: 8px">
+        There is no customer-side Accept button any more: paying the proforma is
+        the acceptance (D60). Staff cannot see reports or the approval queue;
+        the Accountant is read-only with export: cannot record, approve or edit
+        (D91).<sup><a href="#s9">9</a></sup>
+      </p>
+
+      <h2>6. How it changes by business type</h2>
+      <p class="muted">
+        The flow and the gates are identical. A starter kit changes the labels,
+        the default units, whether HSN and MOQ fields show, and what follows a
+        paid reply (D56, read with “quote” as “quoted lead” and “accept” as
+        “pays”, D66; tax invoice on approval for every type, D90). Starter kits
+        for the five types after salon are drafted by Claude and approved by the
+        owner (D96) <span class="badge b-open">Open</span>.<sup
+          ><a href="#s10">10</a></sup
+        >
+        Pilot verticals are salons
+        and design / IT agencies.<sup><a href="#s22">22</a></sup>
+      </p>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>Words it uses</th>
+              <th>Units and fields</th>
+              <th>Advance</th>
+              <th>
+                After the reply is paid <span class="badge b-dec">D56</span>
+              </th>
+              <th>Approval</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Salon or spa</td>
+              <td>Services, appointment, package</td>
+              <td>per visit; per-stylist calendar</td>
+              <td>Business sets it (bridal)</td>
+              <td>
+                Booking → Job → invoice (the balance when an advance was taken).
+                Most sales start as a booked lead, no price reply.
+              </td>
+              <td>Same gates</td>
+            </tr>
+            <tr>
+              <td>Restaurant or café</td>
+              <td>Menu, dish, per plate, event date</td>
+              <td>per plate; veg / non-veg tags</td>
+              <td>Advance proforma on accept</td>
+              <td>Booking (event date) → Job → balance invoice</td>
+              <td>Same gates</td>
+            </tr>
+            <tr>
+              <td>IndiaMART wholesaler</td>
+              <td>Products, MOQ, rate, proforma, delivery terms</td>
+              <td>
+                kg / pc / m; HSN per item; MOQ and item photos (D87); quantity
+                tiers; serial numbers and warranty on by default (D85)
+              </td>
+              <td>Proforma is the norm</td>
+              <td>
+                No booking. Tax invoice <code>INV-</code> when the payment is
+                approved (D90, replaces “on dispatch” in D56); a Job is optional
+                for packing and dispatch.
+              </td>
+              <td>Same gates</td>
+            </tr>
+            <tr>
+              <td>Small manufacturer</td>
+              <td>Items, specification, lead time, dispatch</td>
+              <td>
+                kg / pcs / m; GST / HSN; serial numbers and warranty on by
+                default (D85)
+              </td>
+              <td>Business sets it</td>
+              <td>
+                Job (order → dispatch) → draft invoice on done (D88) → tax invoice
+                on approval (D90)
+              </td>
+              <td>Same gates</td>
+            </tr>
+            <tr>
+              <td>IT services</td>
+              <td>Proposal, scope, milestone, AMC, retainer</td>
+              <td>hr / day; hourly and fixed</td>
+              <td>Per milestone</td>
+              <td>
+                Job → partial invoices. “Milestone” is a label: one line or one
+                job per milestone.
+              </td>
+              <td>Same gates</td>
+            </tr>
+            <tr>
+              <td>Design agency</td>
+              <td>Proposal, deliverable, revision, retainer</td>
+              <td>per deliverable; Basic / Standard / Premium tiers</td>
+              <td>50 % proforma on accept</td>
+              <td>Job → balance invoice</td>
+              <td>Same gates</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted" style="margin-top: 8px">
+        Lite mode is the default: catalog, leads, invoice, payment. Board,
+        Customers and Jobs appear when the owner switches them on (D63).<sup
+          ><a href="#s21">21</a></sup
+        >
+        Delivery challans, e-way bills and stock are out of scope for Phase
+        1.<sup><a href="#s10">10</a></sup>
+      </p>
+
+      <h2>
+        7. The board <span class="badge b-fact">extra</span>
+        <span class="badge b-dec">D65</span>
+      </h2>
+      <div class="board">
+        <div>
+          <b>New</b>
+          <div class="small">
+            Lead: <span class="pill info">New</span
+            ><span class="pill mute">Contacted</span>
+          </div>
+        </div>
+        <div>
+          <b>Replied</b>
+          <div class="small">
+            Reply: <span class="pill info">Awaiting payment</span
+            ><span class="pill mute">Expired</span> (D75)
+          </div>
+        </div>
+        <div>
+          <b>Booked</b>
+          <div class="small">
+            Booking: <span class="pill mute">To confirm</span
+            ><span class="pill teal">Agreed</span> (D69)
+          </div>
+        </div>
+        <div>
+          <b>In service</b>
+          <div class="small">
+            Job: <span class="pill info">In progress</span>
+          </div>
+        </div>
+        <div>
+          <b>Invoiced</b>
+          <div class="small">
+            Bill: <span class="pill warn">Due</span
+            ><span class="pill teal">Part paid</span
+            ><span class="pill bad">Overdue</span
+            ><span class="pill vio">Waiting for approval</span> (D55)
+          </div>
+        </div>
+        <div>
+          <b>Paid</b>
+          <div class="small">
+            Every invoice on the lead <span class="pill ok">Paid</span> (D72)
+          </div>
+        </div>
+      </div>
+
+      <h2>8. Phase 1 and Phase 2</h2>
+      <div class="phase">
+        <div class="card">
+          <h3>Phase 1 <span class="small muted">(this build)</span></h3>
+          <ul>
+            <li>
+              Three channels: Email, SMS, WhatsApp. The app <b>sends email</b>;
+              SMS and WhatsApp are ready to copy and paste. Every one is logged
+              (D67).<sup><a href="#s11">11</a></sup>
+            </li>
+            <li>
+              Automatic anyway: Replied on share, Overdue past the pay-by date
+              (bills only; an unpaid reply turns Expired, D75), tax invoice and
+              Paid when approvals reach the total, draft invoice (bill or
+              balance) on job done (D88).<sup><a href="#s5">5</a></sup>
+            </li>
+            <li>
+              Email to the assignee for a new lead, to the approver when a proof
+              waits (with the approve-from-email link), copies to the customer
+              when an email is known.<sup
+                ><a href="#s12">12</a></sup
+              >
+              In-app notification inbox behind the bell, by role, with unread and
+              per-person mute (D87).
+            </li>
+            <li>
+              16 ready messages: 8 and 9 (“Quote accepted”) are retired; 4–7 and
+              18 wording approved (D93, D95).
+            </li>
+            <li>
+              Paid means the owner approved a proof, not that a bank confirmed
+              it.<sup><a href="#s17">17</a></sup>
+            </li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Phase 2 <span class="badge b-p2">later</span></h3>
+          <ul>
+            <li>
+              Messages sent automatically: reminders +3 / +7 / +14, booking
+              reminders; WhatsApp API.
+            </li>
+            <li>
+              Gateway links (Razorpay, Stripe, Polar) with webhook reconcile;
+              unmatched payments drop into the approval queue.<sup
+                ><a href="#s7">7</a></sup
+              >
+            </li>
+            <li>
+              OTP on My orders where the owner wants it.<sup
+                ><a href="#s2">2</a></sup
+              >
+            </li>
+            <li>
+              Recurring invoices, credit notes, instant receipts.<sup
+                ><a href="#s16">16</a></sup
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>
+        9. Where the docs disagree
+        <span class="badge b-open">Docs disagree</span>
+      </h2>
+      <div class="card conf">
+        <ul>
+          <li>
+            <b>Quote record.</b> <code>prep/</code> still describes a Quote
+            entity, a quote editor, a customer Accept button and lawyer-reviewed
+            accept wording. D60 and D61 replace all of that; inline notes are in
+            Design inputs.md (glossary, data model, state table, Flow 2). Legal
+            &amp; compliance.md 108–114 (accept wording) is now unused.<sup
+              ><a href="#s20">20</a></sup
+            >
+          </li>
+          <li>
+            <b>Invoice statuses.</b> Outline says Draft → Sent → Paid → Overdue;
+            Design inputs has Part paid and Void. This page uses Design inputs:
+            Part paid (teal, D55) for a bill with some approved and some due; a
+            reply has none, because an advance and its balance are two invoices
+            (D70).
+          </li>
+          <li>
+            <b>Board labels.</b> Outline lines 26 and 54 differ; both are
+            replaced by D65.
+          </li>
+          <li>
+            <b>Manager approval.</b> Two wordings in Design inputs; settled as
+            one setting, D57.
+          </li>
+          <li>
+            <b>Numbering example.</b> <code>INV-2026-001</code> in Outline
+            versus the financial-year form; the FY form is the rule, and
+            <code>PI-</code> is a separate series (D60).<sup
+              ><a href="#s6">6</a></sup
+            >
+          </li>
+        </ul>
+        <p class="small muted" style="margin-top: 8px">
+          <code>prep/</code> was rewritten on 24 Oct 2026 to follow the
+          decisions; the earlier versions (and the .docx / .pdf copies) are in
+          <code>prep/archive/2026-10-24/</code>. Line numbers in the sources
+          below refer to those archived versions.
+        </p>
+      </div>
+
+      <h2>10. Sources</h2>
+      <div class="src">
+        <ol>
+          <li id="s1">
+            prep/Design inputs.md 81–85: customer journey (Arrive, Browse,
+            Request a quote, Book); Outline.md 46–48.
+          </li>
+          <li id="s2">
+            prep/Design inputs.md 86–89: Pay, My orders, private links;
+            Outline.md 50.
+          </li>
+          <li id="s3">
+            prep/Design inputs.md 318–347: glossary, one word per concept, with
+            the D59–D61 inline notes.
+          </li>
+          <li id="s4">
+            prep/Design inputs.md 136–157: data model (Customer, Package, Lead,
+            Booking, Job, Invoice, Payment, Message); Quote row replaced by D60.
+          </li>
+          <li id="s5">
+            prep/Design inputs.md 161–168: state machines and transitions;
+            Architecture &amp; contracts.md 141–147.
+          </li>
+          <li id="s6">
+            prep/Design inputs.md 172: numbering
+            <code>{prefix}-{FY}-{seq}</code>, proforma <code>PI-</code> is not a
+            tax invoice, void keeps the number.
+          </li>
+          <li id="s7">
+            prep/Design inputs.md 77 and 177: approval rules; Outline.md 140;
+            Architecture &amp; contracts.md 81, 143.
+          </li>
+          <li id="s8">
+            prep/Design inputs.md 178: deposits, advance on accept, balance on
+            completion.
+          </li>
+          <li id="s9">
+            prep/Design inputs.md 34 and Outline.md 67: roles; WBS 3.5;
+            Architecture &amp; contracts.md 149.
+          </li>
+          <li id="s10">
+            prep/Design inputs.md 38–47: vertical sheets and what a starter kit
+            changes; 370, 376, 393 for stock, challans and e-way bills.
+          </li>
+          <li id="s11">
+            prep/Design inputs.md 230–260: ready messages 1–17 and the Phase 1
+            manual-share rule; message 18 (Request declined) is new in D61; 8
+            and 9 retired, 4–7 and 18 wording approved (D93, D95).
+          </li>
+          <li id="s12">
+            Outline.md 54 (board), 85 (hand-offs and emails); Design inputs.md
+            103 (board screen).
+          </li>
+          <li id="s13">
+            prep/Design inputs.md 375 and 395: competitor glossary, no checkout.
+          </li>
+          <li id="s14">
+            prep/Legal &amp; compliance.md 112–114: former accept wording,
+            replaced by D60 (paying is the acceptance).
+          </li>
+          <li id="s15">
+            Architecture &amp; contracts.md 63; WBS 3.3; Design inputs.md 153:
+            job done creates the draft invoice; confirmed by D88.
+          </li>
+          <li id="s16">
+            Outline.md 38 (invoice inputs, credit notes Phase 2); Design
+            inputs.md 384; WBS 6.3.
+          </li>
+          <li id="s17">
+            prep/Legal &amp; compliance.md 38 and 63: Phase 1 moves no money;
+            refunds are the business’s.
+          </li>
+          <li id="s18">
+            Outline.md 64; Design inputs.md 386: customer timeline and repeat
+            prompts.
+          </li>
+          <li id="s19">docs/decisions.md D55: status colours per record.</li>
+          <li id="s20">
+            docs/decisions.md D59–D67 (20 Oct 2026): lead types, no Quote
+            record, review and reply, booked lead, brand kit not CRM, overdue
+            page, board columns, lead statuses, channels (email sent, SMS and
+            WhatsApp copy-paste).
+          </li>
+          <li id="s23">
+            docs/decisions.md D68–D81 (20–22 Oct 2026): booking words To confirm
+            / Agreed, advance and balance as two invoices,
+            <code>PI-</code> until approval, the Paid rule, snoozed / rejected /
+            expired replies, Manager limit strictly below and self-approval,
+            unpaid <code>PI-</code> not owed, overpayment, four Quick jobs,
+            logo, sidebar sections Home · Sales · Schedule · Payments ·
+            Business. Checked against design/screens-v2.html.
+          </li>
+          <li id="s24">
+            docs/decisions.md D82–D102 (22–24 Oct 2026): sidebar, prototype,
+            serial numbers and warranty (D85, D86), approve-from-email link,
+            inbox, first-run checklist, photos, MOQ, materials, lead priority
+            (D87), draft invoice on job done (D88), footer (D89), tax invoice
+            on approval for every type (D90), Accountant read-only (D91), pilot
+            gate (D92), ready messages (D93, D95), screens locked (D94), starter
+            kits (D96), opening hours (D97, D99), Polar (D98), Cancelled red
+            (D100), “Request a quote” (D101), optional lines (D102). Checked
+            against design/app/.
+          </li>
+          <li id="s21">WBS 1.5 (lite mode); Market fit &amp; sales.md 20.</li>
+          <li id="s22">docs/decisions.md D1: pilot verticals.</li>
+        </ol>
+      </div>
+    </main>
+  </body>
+</html>

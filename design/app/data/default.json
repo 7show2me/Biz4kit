@@ -1,0 +1,2038 @@
+{
+ "meta": {
+  "version": 1,
+  "today": "2026-10-19",
+  "people": {
+   "owner": "M1",
+   "manager": "M2",
+   "staff": "M3",
+   "accountant": "M5",
+   "superadmin": null
+  }
+ },
+ "workspace": {
+  "id": "W1",
+  "name": "Glow Studio",
+  "slug": "glow",
+  "vertical": "Salon or spa",
+  "plan": "free",
+  "address": "Shop 4, College Road",
+  "city": "Nashik",
+  "pin": "422005",
+  "state": "Maharashtra",
+  "stateCode": "27",
+  "phone": "+91 98220 41567",
+  "email": null,
+  "gstin": "27AAKFG4821M1Z3",
+  "upi": "glowstudio@okaxis",
+  "bank": {
+   "name": "HDFC Bank",
+   "account": "50200012344521",
+   "ifsc": "HDFC0001234"
+  },
+  "brand": {
+   "primary": "#9f1239",
+   "accent": "#f59e0b"
+  },
+  "numbering": {
+   "PI": {
+    "prefix": "PI",
+    "next": 47
+   },
+   "INV": {
+    "prefix": "INV",
+    "next": 30
+   }
+  },
+  "replyValidDays": 15,
+  "billDueDays": 7,
+  "approvals": {
+   "managerEnabled": true,
+   "managerLimit": 5000
+  },
+  "modules": {
+   "board": true,
+   "customers": true,
+   "jobs": true,
+   "serials": false
+  },
+  "terms": "Proforma: not a tax invoice. Due by {due_date}; the tax invoice follows once {business} approves your payment. Questions: {phone}. [Draft terms and SAC codes: CA to confirm (Legal & compliance §7)]",
+  "hours": {
+   "mon": [
+    [
+     "10:00",
+     "20:00"
+    ]
+   ],
+   "tue": [
+    [
+     "10:00",
+     "20:00"
+    ]
+   ],
+   "wed": [
+    [
+     "10:00",
+     "20:00"
+    ]
+   ],
+   "thu": [
+    [
+     "10:00",
+     "20:00"
+    ]
+   ],
+   "fri": [
+    [
+     "10:00",
+     "20:00"
+    ]
+   ],
+   "sat": [
+    [
+     "10:00",
+     "20:00"
+    ]
+   ],
+   "sun": [
+    [
+     "10:00",
+     "20:00"
+    ]
+   ]
+  }
+ },
+ "members": [
+  {
+   "id": "M1",
+   "name": "Priya Rao",
+   "email": "priya@glowstudio.in",
+   "phone": null,
+   "role": "owner",
+   "status": "active",
+   "initials": "PR"
+  },
+  {
+   "id": "M2",
+   "name": "Imran Shaikh",
+   "email": "imran.glow@gmail.com",
+   "phone": null,
+   "role": "manager",
+   "status": "active",
+   "initials": "IS"
+  },
+  {
+   "id": "M3",
+   "name": "Rahul Kale",
+   "email": "rahul.k@gmail.com",
+   "phone": null,
+   "role": "staff",
+   "status": "active",
+   "initials": "RK"
+  },
+  {
+   "id": "M4",
+   "name": "Pooja Shinde",
+   "email": "pooja.s@gmail.com",
+   "phone": null,
+   "role": "staff",
+   "status": "active",
+   "initials": "PS"
+  },
+  {
+   "id": "M5",
+   "name": "",
+   "email": "ca.office@gmail.com",
+   "phone": null,
+   "role": "accountant",
+   "status": "invited",
+   "initials": "CA"
+  }
+ ],
+ "categories": [
+  "Hair",
+  "Makeup",
+  "Hands and feet"
+ ],
+ "items": [
+  {
+   "id": "T1",
+   "name": "Haircut and styling",
+   "category": "Hair",
+   "unit": "visit",
+   "price": 800,
+   "gst": 18,
+   "hsn": "",
+   "desc": "30 min · wash included",
+   "showPrice": true,
+   "active": true,
+   "sort": 1
+  },
+  {
+   "id": "T2",
+   "name": "Hair spa",
+   "category": "Hair",
+   "unit": "visit",
+   "price": 1500,
+   "gst": 18,
+   "hsn": "",
+   "desc": "60 min · head massage",
+   "showPrice": true,
+   "active": true,
+   "sort": 2
+  },
+  {
+   "id": "T3",
+   "name": "Global colour",
+   "category": "Hair",
+   "unit": "visit",
+   "price": 3500,
+   "gst": 18,
+   "hsn": "",
+   "desc": "2 h · ammonia-free",
+   "showPrice": true,
+   "active": true,
+   "sort": 3
+  },
+  {
+   "id": "T4",
+   "name": "Keratin treatment",
+   "category": "Hair",
+   "unit": "visit",
+   "price": 6500,
+   "gst": 18,
+   "hsn": "",
+   "desc": "3 h · lasts 4 months",
+   "showPrice": true,
+   "active": true,
+   "sort": 4
+  },
+  {
+   "id": "T5",
+   "name": "Party makeup",
+   "category": "Makeup",
+   "unit": "visit",
+   "price": 4500,
+   "gst": 18,
+   "hsn": "",
+   "desc": "90 min · lashes included",
+   "showPrice": true,
+   "active": true,
+   "sort": 5
+  },
+  {
+   "id": "T6",
+   "name": "Bridal makeup",
+   "category": "Makeup",
+   "unit": "visit",
+   "price": 18000,
+   "gst": 18,
+   "hsn": "",
+   "desc": "HD airbrush · trial included",
+   "showPrice": false,
+   "active": true,
+   "sort": 6
+  },
+  {
+   "id": "T7",
+   "name": "Manicure",
+   "category": "Hands and feet",
+   "unit": "visit",
+   "price": 700,
+   "gst": 18,
+   "hsn": "",
+   "desc": "40 min",
+   "showPrice": true,
+   "active": true,
+   "sort": 7
+  },
+  {
+   "id": "T8",
+   "name": "Pedicure",
+   "category": "Hands and feet",
+   "unit": "visit",
+   "price": 900,
+   "gst": 18,
+   "hsn": "",
+   "desc": "50 min",
+   "showPrice": true,
+   "active": true,
+   "sort": 8
+  }
+ ],
+ "packages": [
+  {
+   "id": "K1",
+   "name": "Bridal",
+   "tier": "Basic",
+   "items": [
+    {
+     "itemId": "T6",
+     "qty": 1
+    },
+    {
+     "itemId": null,
+     "name": "Hair styling",
+     "qty": 1
+    }
+   ],
+   "price": 18000,
+   "billing": "one_time",
+   "bookable": true,
+   "durationMin": 240,
+   "advancePct": null,
+   "desc": "",
+   "active": true,
+   "sort": 1
+  },
+  {
+   "id": "K2",
+   "name": "Bridal",
+   "tier": "Standard",
+   "items": [
+    {
+     "itemId": "T6",
+     "qty": 1
+    },
+    {
+     "itemId": null,
+     "name": "Hair styling",
+     "qty": 1
+    },
+    {
+     "itemId": null,
+     "name": "Pre-bridal facial",
+     "qty": 1
+    }
+   ],
+   "price": 24000,
+   "billing": "one_time",
+   "bookable": true,
+   "durationMin": 240,
+   "advancePct": null,
+   "desc": "",
+   "active": true,
+   "sort": 2
+  },
+  {
+   "id": "K3",
+   "name": "Bridal",
+   "tier": "Premium",
+   "items": [
+    {
+     "itemId": "T6",
+     "qty": 1
+    },
+    {
+     "itemId": null,
+     "name": "Hair styling",
+     "qty": 1
+    },
+    {
+     "itemId": null,
+     "name": "Pre-bridal facial",
+     "qty": 1
+    },
+    {
+     "itemId": null,
+     "name": "Mehendi",
+     "qty": 1
+    },
+    {
+     "itemId": null,
+     "name": "Draping assistance",
+     "qty": 1
+    }
+   ],
+   "price": 36000,
+   "billing": "one_time",
+   "bookable": true,
+   "durationMin": 240,
+   "advancePct": null,
+   "desc": "",
+   "active": true,
+   "sort": 3
+  },
+  {
+   "id": "K4",
+   "name": "Monthly hair care",
+   "tier": null,
+   "items": [
+    {
+     "itemId": "T1",
+     "qty": 1
+    },
+    {
+     "itemId": "T2",
+     "qty": 1
+    }
+   ],
+   "price": 2100,
+   "billing": "monthly",
+   "bookable": true,
+   "durationMin": 120,
+   "advancePct": null,
+   "desc": "",
+   "active": true,
+   "sort": 4
+  },
+  {
+   "id": "K5",
+   "name": "Party ready",
+   "tier": null,
+   "items": [
+    {
+     "itemId": "T5",
+     "qty": 1
+    },
+    {
+     "itemId": null,
+     "name": "Hair styling",
+     "qty": 1
+    }
+   ],
+   "price": 6500,
+   "billing": "one_time",
+   "bookable": true,
+   "durationMin": 120,
+   "advancePct": null,
+   "desc": "",
+   "active": true,
+   "sort": 5
+  }
+ ],
+ "customers": [
+  {
+   "id": "C1",
+   "name": "Anita Sharma",
+   "phone": "+91 98765 43210",
+   "email": "anita.s@gmail.com",
+   "company": null,
+   "gstin": null,
+   "address": "Nashik, Maharashtra",
+   "tags": [
+    "Bride"
+   ],
+   "token": "c-7Hq2aS4",
+   "notes": "",
+   "createdAt": "2026-10-14"
+  },
+  {
+   "id": "C2",
+   "name": "Meera Kulkarni",
+   "phone": "+91 90110 22334",
+   "email": "meera.kulkarni@gmail.com",
+   "company": null,
+   "gstin": "27AAPFM5521K1Z8",
+   "address": "Gangapur Road, Nashik 422013, Maharashtra",
+   "tags": [
+    "Regular"
+   ],
+   "token": "c-4Rt8mK1",
+   "notes": "",
+   "createdAt": "2026-10-17"
+  },
+  {
+   "id": "C3",
+   "name": "Kavya Joshi",
+   "phone": "+91 88050 66778",
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [
+    "Regular"
+   ],
+   "token": "c-6Jw3kV9",
+   "notes": "",
+   "createdAt": "2026-10-10"
+  },
+  {
+   "id": "C4",
+   "name": "Rohan Desai",
+   "phone": "+91 97300 11223",
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [],
+   "token": "c-7Nd3rD2",
+   "notes": "",
+   "createdAt": "2026-10-08"
+  },
+  {
+   "id": "C5",
+   "name": "Sneha Patil",
+   "phone": "+91 99700 44556",
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [],
+   "token": "c-3Hs9sP5",
+   "notes": "",
+   "createdAt": "2026-09-26"
+  },
+  {
+   "id": "C6",
+   "name": "Asha Nair",
+   "phone": "+91 94220 99887",
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [
+    "Regular"
+   ],
+   "token": "c-9Ab4nR6",
+   "notes": "",
+   "createdAt": "2026-10-13"
+  },
+  {
+   "id": "C7",
+   "name": "Kiran Rao",
+   "phone": "+91 99230 12345",
+   "email": "kiran.rao@gmail.com",
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [],
+   "token": "c-9Kd2kR8",
+   "notes": "",
+   "createdAt": "2026-10-19T13:48:00+05:30"
+  },
+  {
+   "id": "C8",
+   "name": "Divya M.",
+   "phone": "+91 98500 77112",
+   "email": "divya.m@gmail.com",
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [],
+   "token": "c-2Fq8xT1",
+   "notes": "",
+   "createdAt": "2026-10-19T13:00:00+05:30"
+  },
+  {
+   "id": "C9",
+   "name": "Farah Khan",
+   "phone": null,
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [],
+   "token": "c-5Fk1hZ3",
+   "notes": "",
+   "createdAt": "2026-10-17"
+  },
+  {
+   "id": "C10",
+   "name": "Neha Iyer",
+   "phone": null,
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [],
+   "token": "c-8Ni6yQ2",
+   "notes": "",
+   "createdAt": "2026-10-15"
+  },
+  {
+   "id": "C11",
+   "name": "Ritu Shah",
+   "phone": null,
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [],
+   "token": "c-1Rs7hW4",
+   "notes": "",
+   "createdAt": "2026-10-16"
+  },
+  {
+   "id": "C12",
+   "name": "Tanvi B.",
+   "phone": null,
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [],
+   "token": "c-4Tb2vM7",
+   "notes": "",
+   "createdAt": "2026-10-14"
+  },
+  {
+   "id": "C13",
+   "name": "Pallavi Rao",
+   "phone": null,
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [],
+   "token": "c-6Pr9lC1",
+   "notes": "",
+   "createdAt": "2026-10-13"
+  },
+  {
+   "id": "C14",
+   "name": "Swati Deshmukh",
+   "phone": null,
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [],
+   "token": "c-3Sd5wG8",
+   "notes": "",
+   "createdAt": "2026-10-19"
+  },
+  {
+   "id": "C15",
+   "name": "Leena Thomas",
+   "phone": null,
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [],
+   "token": "c-2Lt4mN6",
+   "notes": "",
+   "createdAt": "2026-10-15"
+  },
+  {
+   "id": "C16",
+   "name": "Megha Rao",
+   "phone": null,
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [],
+   "token": "c-8Mr1gF5",
+   "notes": "",
+   "createdAt": "2026-10-17"
+  },
+  {
+   "id": "C17",
+   "name": "Nisha Verma",
+   "phone": "+91 98901 22110",
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": null,
+   "tags": [],
+   "token": "c-5Nv3qH2",
+   "notes": "",
+   "createdAt": "2026-10-16"
+  },
+  {
+   "id": "C18",
+   "name": "Komal Jain",
+   "phone": null,
+   "email": null,
+   "company": null,
+   "gstin": null,
+   "address": "Nashik, Maharashtra",
+   "tags": [],
+   "token": "c-7Kj8pX3",
+   "notes": "",
+   "createdAt": "2026-10-17"
+  }
+ ],
+ "leads": [
+  {
+   "id": "L1",
+   "customerId": "C7",
+   "type": "quoted",
+   "source": "instagram",
+   "brief": "Party makeup for 3 people on Sat 24 Oct",
+   "lines": [
+    {
+     "name": "Party makeup",
+     "note": "HD, lashes included",
+     "qty": 3,
+     "rate": 4500
+    },
+    {
+     "name": "Hair styling",
+     "note": "Simple open styling",
+     "qty": 3,
+     "rate": 1500
+    }
+   ],
+   "preferredDate": "2026-10-24T15:00:00+05:30",
+   "packageId": null,
+   "assigneeId": null,
+   "status": "new",
+   "snoozedUntil": null,
+   "rejectReason": null,
+   "createdAt": "2026-10-19T13:48:00+05:30"
+  },
+  {
+   "id": "L2",
+   "customerId": "C8",
+   "type": "booked",
+   "source": "qr",
+   "brief": "Monthly hair care · Tue 20 Oct 10:30",
+   "lines": [],
+   "preferredDate": "2026-10-20T10:30:00+05:30",
+   "packageId": "K4",
+   "assigneeId": "M3",
+   "status": "new",
+   "snoozedUntil": null,
+   "rejectReason": null,
+   "createdAt": "2026-10-19T13:00:00+05:30"
+  },
+  {
+   "id": "L3",
+   "customerId": "C1",
+   "type": "quoted",
+   "source": "web",
+   "brief": "Bridal makeup, wedding on 14 Nov",
+   "lines": [
+    {
+     "name": "Bridal makeup",
+     "note": "",
+     "qty": 1,
+     "rate": 18000
+    },
+    {
+     "name": "Hair styling",
+     "note": "",
+     "qty": 1,
+     "rate": 3500
+    },
+    {
+     "name": "Pre-bridal facial",
+     "note": "",
+     "qty": 1,
+     "rate": 2500
+    },
+    {
+     "name": "Draping assistance",
+     "note": "",
+     "qty": 1,
+     "rate": 1500
+    }
+   ],
+   "preferredDate": "2026-11-14",
+   "packageId": null,
+   "assigneeId": "M1",
+   "status": "replied",
+   "snoozedUntil": null,
+   "rejectReason": null,
+   "createdAt": "2026-10-17"
+  },
+  {
+   "id": "L4",
+   "customerId": "C9",
+   "type": "quoted",
+   "source": "referral",
+   "brief": "Hair colour, advice on shade",
+   "lines": [],
+   "preferredDate": null,
+   "packageId": null,
+   "assigneeId": "M4",
+   "status": "contacted",
+   "snoozedUntil": null,
+   "rejectReason": null,
+   "createdAt": "2026-10-17"
+  },
+  {
+   "id": "L5",
+   "customerId": "C10",
+   "type": "booked",
+   "source": "web",
+   "brief": "Global colour · Mon 19 Oct 13:00",
+   "lines": [
+    {
+     "name": "Global colour",
+     "note": "",
+     "qty": 1,
+     "rate": 3500
+    }
+   ],
+   "preferredDate": "2026-10-19T13:00:00+05:30",
+   "packageId": null,
+   "assigneeId": "M3",
+   "status": "replied",
+   "snoozedUntil": null,
+   "rejectReason": null,
+   "createdAt": "2026-10-15"
+  },
+  {
+   "id": "L6",
+   "customerId": "C11",
+   "type": "quoted",
+   "source": "manual",
+   "brief": "Keratin + spa for two",
+   "lines": [],
+   "preferredDate": null,
+   "packageId": null,
+   "assigneeId": "M3",
+   "status": "replied",
+   "snoozedUntil": null,
+   "rejectReason": null,
+   "createdAt": "2026-10-16"
+  },
+  {
+   "id": "L7",
+   "customerId": "C3",
+   "type": "quoted",
+   "source": "web",
+   "brief": "Hair spa and keratin, short hair",
+   "lines": [],
+   "preferredDate": null,
+   "packageId": null,
+   "assigneeId": "M4",
+   "status": "replied",
+   "snoozedUntil": null,
+   "rejectReason": null,
+   "createdAt": "2026-10-10"
+  },
+  {
+   "id": "L8",
+   "customerId": "C6",
+   "type": "quoted",
+   "source": "web",
+   "brief": "Party makeup on Sat 17 Oct",
+   "lines": [],
+   "preferredDate": "2026-10-17",
+   "packageId": null,
+   "assigneeId": "M3",
+   "status": "paid",
+   "snoozedUntil": null,
+   "rejectReason": null,
+   "createdAt": "2026-10-13"
+  },
+  {
+   "id": "L9",
+   "customerId": "C12",
+   "type": "quoted",
+   "source": "web",
+   "brief": "Bridesmaid makeup",
+   "lines": [],
+   "preferredDate": null,
+   "packageId": null,
+   "assigneeId": "M1",
+   "status": "snoozed",
+   "snoozedUntil": null,
+   "rejectReason": null,
+   "createdAt": "2026-10-14"
+  },
+  {
+   "id": "L10",
+   "customerId": "C13",
+   "type": "quoted",
+   "source": "web",
+   "brief": "Keratin on Sun 18 Oct",
+   "lines": [],
+   "preferredDate": "2026-10-18",
+   "packageId": null,
+   "assigneeId": "M1",
+   "status": "rejected",
+   "snoozedUntil": null,
+   "rejectReason": null,
+   "createdAt": "2026-10-13"
+  },
+  {
+   "id": "L11",
+   "customerId": "C2",
+   "type": "booked",
+   "source": "manual",
+   "brief": "Keratin + spa",
+   "lines": [],
+   "preferredDate": null,
+   "packageId": null,
+   "assigneeId": "M4",
+   "status": "replied",
+   "snoozedUntil": null,
+   "rejectReason": null,
+   "createdAt": "2026-10-17"
+  }
+ ],
+ "invoices": [
+  {
+   "id": "I1",
+   "kind": "bill",
+   "piNumber": "PI-2627-0045",
+   "invNumber": null,
+   "leadId": "L11",
+   "customerId": "C2",
+   "bookingId": null,
+   "jobId": "J5",
+   "version": 1,
+   "history": [],
+   "lines": [
+    {
+     "itemId": "T4",
+     "name": "Keratin treatment",
+     "desc": "3 h · lasts 4 months",
+     "qty": 1,
+     "unit": "visit",
+     "rate": 6500,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    },
+    {
+     "itemId": "T2",
+     "name": "Hair spa",
+     "desc": "60 min · head massage",
+     "qty": 1,
+     "unit": "visit",
+     "rate": 1500,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    }
+   ],
+   "discount": 0,
+   "payBy": null,
+   "dueDate": "2026-10-28",
+   "sharedAt": "2026-10-19T12:05:00+05:30",
+   "cancelled": false,
+   "token": "i-4Rt8mP2",
+   "reminders": [],
+   "createdAt": "2026-10-19T12:05:00+05:30"
+  },
+  {
+   "id": "I2",
+   "kind": "reply",
+   "piNumber": "PI-2627-0046",
+   "invNumber": null,
+   "leadId": "L3",
+   "customerId": "C1",
+   "bookingId": null,
+   "jobId": null,
+   "version": 1,
+   "history": [],
+   "lines": [
+    {
+     "itemId": "T6",
+     "name": "Bridal makeup",
+     "desc": "",
+     "qty": 1,
+     "unit": "visit",
+     "rate": 18000,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    },
+    {
+     "itemId": null,
+     "name": "Hair styling",
+     "desc": "",
+     "qty": 1,
+     "unit": null,
+     "rate": 3500,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    },
+    {
+     "itemId": null,
+     "name": "Pre-bridal facial",
+     "desc": "",
+     "qty": 1,
+     "unit": null,
+     "rate": 2500,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    },
+    {
+     "itemId": null,
+     "name": "Draping assistance",
+     "desc": "",
+     "qty": 1,
+     "unit": null,
+     "rate": 1500,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    }
+   ],
+   "discount": 0,
+   "payBy": "2026-10-31",
+   "dueDate": null,
+   "sharedAt": "2026-10-18T20:55:00+05:30",
+   "cancelled": false,
+   "token": "i-7Hq2xK9",
+   "reminders": [],
+   "createdAt": "2026-10-18T20:55:00+05:30"
+  },
+  {
+   "id": "I3",
+   "kind": "bill",
+   "piNumber": "PI-2627-0044",
+   "invNumber": null,
+   "leadId": null,
+   "customerId": "C3",
+   "bookingId": null,
+   "jobId": null,
+   "version": 1,
+   "history": [],
+   "lines": [
+    {
+     "itemId": null,
+     "name": "Hair spa and keratin, short hair",
+     "desc": "",
+     "qty": 1,
+     "unit": null,
+     "rate": 6300,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    }
+   ],
+   "discount": 0,
+   "payBy": null,
+   "dueDate": "2026-10-23",
+   "sharedAt": "2026-10-16",
+   "cancelled": false,
+   "token": "i-6Jw3pE4",
+   "reminders": [],
+   "createdAt": "2026-10-16"
+  },
+  {
+   "id": "I4",
+   "kind": "bill",
+   "piNumber": "PI-2627-0043",
+   "invNumber": null,
+   "leadId": null,
+   "customerId": "C14",
+   "bookingId": null,
+   "jobId": null,
+   "version": 1,
+   "history": [],
+   "lines": [
+    {
+     "itemId": null,
+     "name": "Service",
+     "desc": "",
+     "qty": 1,
+     "unit": null,
+     "rate": 5000,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    }
+   ],
+   "discount": 0,
+   "payBy": null,
+   "dueDate": "2026-10-26",
+   "sharedAt": "2026-10-19",
+   "cancelled": false,
+   "token": "i-3Sd5tY7",
+   "reminders": [],
+   "createdAt": "2026-10-19"
+  },
+  {
+   "id": "I5",
+   "kind": "bill",
+   "piNumber": "PI-2627-0042",
+   "invNumber": null,
+   "leadId": null,
+   "customerId": "C15",
+   "bookingId": null,
+   "jobId": null,
+   "version": 1,
+   "history": [],
+   "lines": [
+    {
+     "itemId": "T3",
+     "name": "Global colour",
+     "desc": "2 h · ammonia-free",
+     "qty": 1,
+     "unit": "visit",
+     "rate": 3500,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    }
+   ],
+   "discount": 0,
+   "payBy": null,
+   "dueDate": "2026-10-22",
+   "sharedAt": "2026-10-15",
+   "cancelled": false,
+   "token": "i-2Lt4uB1",
+   "reminders": [],
+   "createdAt": "2026-10-15"
+  },
+  {
+   "id": "I6",
+   "kind": "reply",
+   "piNumber": null,
+   "invNumber": "INV-2627-0029",
+   "leadId": "L8",
+   "customerId": "C6",
+   "bookingId": null,
+   "jobId": null,
+   "version": 1,
+   "history": [],
+   "lines": [
+    {
+     "itemId": null,
+     "name": "Party makeup on Sat 17 Oct",
+     "desc": "",
+     "qty": 1,
+     "unit": null,
+     "rate": 1800,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    }
+   ],
+   "discount": 0,
+   "payBy": null,
+   "dueDate": null,
+   "sharedAt": "2026-10-19",
+   "cancelled": false,
+   "token": "i-9Ab4cD6",
+   "reminders": [],
+   "createdAt": "2026-10-19"
+  },
+  {
+   "id": "I7",
+   "kind": "bill",
+   "piNumber": null,
+   "invNumber": "INV-2627-0028",
+   "leadId": null,
+   "customerId": "C16",
+   "bookingId": null,
+   "jobId": null,
+   "version": 1,
+   "history": [],
+   "lines": [
+    {
+     "itemId": null,
+     "name": "Service",
+     "desc": "",
+     "qty": 1,
+     "unit": null,
+     "rate": 5500,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    }
+   ],
+   "discount": 0,
+   "payBy": null,
+   "dueDate": null,
+   "sharedAt": "2026-10-17",
+   "cancelled": false,
+   "token": "i-8Mr1kL3",
+   "reminders": [],
+   "createdAt": "2026-10-17"
+  },
+  {
+   "id": "I8",
+   "kind": "bill",
+   "piNumber": null,
+   "invNumber": "INV-2627-0027",
+   "leadId": null,
+   "customerId": "C17",
+   "bookingId": null,
+   "jobId": null,
+   "version": 1,
+   "history": [],
+   "lines": [
+    {
+     "itemId": "T1",
+     "name": "Haircut and styling",
+     "desc": "30 min · wash included",
+     "qty": 1,
+     "unit": "visit",
+     "rate": 800,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    },
+    {
+     "itemId": "T2",
+     "name": "Hair spa",
+     "desc": "60 min · head massage",
+     "qty": 1,
+     "unit": "visit",
+     "rate": 1500,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    }
+   ],
+   "discount": 0,
+   "payBy": null,
+   "dueDate": null,
+   "sharedAt": "2026-10-16",
+   "cancelled": false,
+   "token": "i-5Nv3wS9",
+   "reminders": [],
+   "createdAt": "2026-10-16"
+  },
+  {
+   "id": "I9",
+   "kind": "bill",
+   "piNumber": null,
+   "invNumber": "INV-2627-0026",
+   "leadId": null,
+   "customerId": "C3",
+   "bookingId": null,
+   "jobId": null,
+   "version": 1,
+   "history": [],
+   "lines": [
+    {
+     "itemId": null,
+     "name": "Service",
+     "desc": "",
+     "qty": 1,
+     "unit": null,
+     "rate": 2700,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    }
+   ],
+   "discount": 0,
+   "payBy": null,
+   "dueDate": null,
+   "sharedAt": "2026-10-12",
+   "cancelled": false,
+   "token": "i-6Jw3fA2",
+   "reminders": [],
+   "createdAt": "2026-10-12"
+  },
+  {
+   "id": "I10",
+   "kind": "reply",
+   "piNumber": "PI-2627-0037",
+   "invNumber": null,
+   "leadId": "L6",
+   "customerId": "C11",
+   "bookingId": null,
+   "jobId": null,
+   "version": 1,
+   "history": [],
+   "lines": [
+    {
+     "itemId": null,
+     "name": "Keratin + spa for two",
+     "desc": "",
+     "qty": 1,
+     "unit": null,
+     "rate": 5500,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    }
+   ],
+   "discount": 0,
+   "payBy": "2026-10-16",
+   "dueDate": null,
+   "sharedAt": "2026-10-16",
+   "cancelled": false,
+   "token": "i-1Rs7nV5",
+   "reminders": [],
+   "createdAt": "2026-10-16"
+  },
+  {
+   "id": "I11",
+   "kind": "bill",
+   "piNumber": "PI-2627-0035",
+   "invNumber": null,
+   "leadId": null,
+   "customerId": "C4",
+   "bookingId": null,
+   "jobId": null,
+   "version": 1,
+   "history": [],
+   "lines": [
+    {
+     "itemId": null,
+     "name": "Service",
+     "desc": "",
+     "qty": 1,
+     "unit": null,
+     "rate": 4000,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    }
+   ],
+   "discount": 0,
+   "payBy": null,
+   "dueDate": "2026-10-15",
+   "sharedAt": "2026-10-08",
+   "cancelled": false,
+   "token": "i-7Nd3qA8",
+   "reminders": [
+    {
+     "at": "2026-10-17",
+     "templateId": 13,
+     "channel": "email"
+    }
+   ],
+   "createdAt": "2026-10-08"
+  },
+  {
+   "id": "I12",
+   "kind": "bill",
+   "piNumber": "PI-2627-0031",
+   "invNumber": null,
+   "leadId": null,
+   "customerId": "C5",
+   "bookingId": null,
+   "jobId": null,
+   "version": 1,
+   "history": [],
+   "lines": [
+    {
+     "itemId": null,
+     "name": "Service",
+     "desc": "",
+     "qty": 1,
+     "unit": null,
+     "rate": 7000,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    }
+   ],
+   "discount": 0,
+   "payBy": null,
+   "dueDate": "2026-10-03",
+   "sharedAt": "2026-09-26",
+   "cancelled": false,
+   "token": "i-3Hs9wE2",
+   "reminders": [
+    {
+     "at": "2026-10-12",
+     "templateId": 14,
+     "channel": "whatsapp"
+    },
+    {
+     "at": "2026-10-16",
+     "templateId": 14,
+     "channel": "email"
+    }
+   ],
+   "createdAt": "2026-09-26"
+  },
+  {
+   "id": "I13",
+   "kind": "bill",
+   "piNumber": null,
+   "invNumber": null,
+   "leadId": null,
+   "customerId": "C18",
+   "bookingId": "B8",
+   "jobId": "J7",
+   "version": 1,
+   "history": [],
+   "lines": [
+    {
+     "itemId": null,
+     "name": "Monthly hair care · Haircut and styling, Hair spa",
+     "desc": "",
+     "qty": 1,
+     "unit": null,
+     "rate": 2100,
+     "gst": 18,
+     "optional": false,
+     "selected": true
+    }
+   ],
+   "discount": 0,
+   "payBy": null,
+   "dueDate": null,
+   "sharedAt": null,
+   "cancelled": false,
+   "token": "i-2Kp7rT5",
+   "reminders": [],
+   "createdAt": "2026-10-17"
+  }
+ ],
+ "payments": [
+  {
+   "id": "P1",
+   "invoiceId": "I1",
+   "amount": 9440,
+   "method": "upi",
+   "reference": "429318765012",
+   "proof": {
+    "name": "gpay-screenshot.jpg"
+   },
+   "uploadedBy": "M4",
+   "uploadedAt": "2026-10-19T12:40:00+05:30",
+   "status": "pending",
+   "decidedBy": null,
+   "decidedAt": null,
+   "note": "",
+   "selfApproved": false,
+   "version": 1
+  },
+  {
+   "id": "P2",
+   "invoiceId": "I3",
+   "amount": 7434,
+   "method": "bank",
+   "reference": "",
+   "proof": null,
+   "uploadedBy": "M3",
+   "uploadedAt": "2026-10-18",
+   "status": "pending",
+   "decidedBy": null,
+   "decidedAt": null,
+   "note": "",
+   "selfApproved": false,
+   "version": 1
+  },
+  {
+   "id": "P3",
+   "invoiceId": "I6",
+   "amount": 2124,
+   "method": null,
+   "reference": "",
+   "proof": null,
+   "uploadedBy": null,
+   "uploadedAt": null,
+   "status": "approved",
+   "decidedBy": "M1",
+   "decidedAt": "2026-10-19T13:48:00+05:30",
+   "note": "",
+   "selfApproved": false,
+   "version": 1
+  },
+  {
+   "id": "P4",
+   "invoiceId": "I7",
+   "amount": 6490,
+   "method": null,
+   "reference": "",
+   "proof": null,
+   "uploadedBy": null,
+   "uploadedAt": null,
+   "status": "approved",
+   "decidedBy": null,
+   "decidedAt": "2026-10-17",
+   "note": "",
+   "selfApproved": false,
+   "version": 1
+  },
+  {
+   "id": "P5",
+   "invoiceId": "I8",
+   "amount": 2714,
+   "method": null,
+   "reference": "",
+   "proof": null,
+   "uploadedBy": null,
+   "uploadedAt": null,
+   "status": "approved",
+   "decidedBy": null,
+   "decidedAt": "2026-10-16",
+   "note": "",
+   "selfApproved": false,
+   "version": 1
+  },
+  {
+   "id": "P6",
+   "invoiceId": "I9",
+   "amount": 3186,
+   "method": null,
+   "reference": "",
+   "proof": null,
+   "uploadedBy": null,
+   "uploadedAt": null,
+   "status": "approved",
+   "decidedBy": null,
+   "decidedAt": "2026-10-12",
+   "note": "",
+   "selfApproved": false,
+   "version": 1
+  },
+  {
+   "id": "P7",
+   "invoiceId": "I11",
+   "amount": 4720,
+   "method": null,
+   "reference": "",
+   "proof": null,
+   "uploadedBy": "M4",
+   "uploadedAt": "2026-10-19",
+   "status": "rejected",
+   "decidedBy": "M1",
+   "decidedAt": "2026-10-19",
+   "note": "Amount on screenshot is ₹4,270",
+   "selfApproved": false,
+   "version": 1
+  }
+ ],
+ "bookings": [
+  {
+   "id": "B1",
+   "customerId": "C1",
+   "leadId": null,
+   "packageId": null,
+   "memberId": "M3",
+   "start": "2026-10-19T10:00:00+05:30",
+   "end": "2026-10-19T13:00:00+05:30",
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "B2",
+   "customerId": "C3",
+   "leadId": null,
+   "packageId": null,
+   "memberId": "M4",
+   "start": "2026-10-19T11:30:00+05:30",
+   "end": "2026-10-19T13:00:00+05:30",
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "B3",
+   "customerId": "C10",
+   "leadId": "L5",
+   "packageId": null,
+   "memberId": "M3",
+   "start": "2026-10-19T13:00:00+05:30",
+   "end": "2026-10-19T15:00:00+05:30",
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "B4",
+   "customerId": "C5",
+   "leadId": null,
+   "packageId": null,
+   "memberId": "M4",
+   "start": "2026-10-19T15:00:00+05:30",
+   "end": "2026-10-19T18:00:00+05:30",
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "B5",
+   "customerId": "C17",
+   "leadId": null,
+   "packageId": null,
+   "memberId": "M1",
+   "start": "2026-10-19T16:30:00+05:30",
+   "end": "2026-10-19T17:00:00+05:30",
+   "status": "tentative",
+   "notes": ""
+  },
+  {
+   "id": "B6",
+   "customerId": "C6",
+   "leadId": null,
+   "packageId": null,
+   "memberId": "M3",
+   "start": "2026-10-19T17:00:00+05:30",
+   "end": "2026-10-19T18:30:00+05:30",
+   "status": "tentative",
+   "notes": ""
+  },
+  {
+   "id": "B7",
+   "customerId": "C8",
+   "leadId": "L2",
+   "packageId": "K4",
+   "memberId": "M3",
+   "start": "2026-10-20T10:30:00+05:30",
+   "end": "2026-10-20T12:30:00+05:30",
+   "status": "tentative",
+   "notes": "Prefer the same stylist as last time."
+  },
+  {
+   "id": "B8",
+   "customerId": "C18",
+   "leadId": null,
+   "packageId": "K4",
+   "memberId": "M3",
+   "start": "2026-10-17",
+   "end": null,
+   "status": "completed",
+   "notes": ""
+  }
+ ],
+ "jobs": [
+  {
+   "id": "J1",
+   "bookingId": "B1",
+   "leadId": null,
+   "customerId": "C1",
+   "assigneeId": "M3",
+   "title": "Bridal trial",
+   "checklist": [
+    {
+     "t": "Skin prep and primer",
+     "done": true
+    },
+    {
+     "t": "Base and contour",
+     "done": true
+    },
+    {
+     "t": "Eye look",
+     "done": false
+    },
+    {
+     "t": "Hair bun with flowers",
+     "done": false
+    },
+    {
+     "t": "Photos for approval",
+     "done": false
+    }
+   ],
+   "status": "in_progress",
+   "start": "2026-10-19T10:00:00+05:30",
+   "completedAt": null,
+   "invoiceId": null
+  },
+  {
+   "id": "J2",
+   "bookingId": "B2",
+   "leadId": null,
+   "customerId": "C3",
+   "assigneeId": "M4",
+   "title": "Hair spa",
+   "checklist": [
+    {
+     "t": "Step 1",
+     "done": false
+    },
+    {
+     "t": "Step 2",
+     "done": false
+    },
+    {
+     "t": "Step 3",
+     "done": false
+    }
+   ],
+   "status": "open",
+   "start": "2026-10-19T11:30:00+05:30",
+   "completedAt": null,
+   "invoiceId": null
+  },
+  {
+   "id": "J3",
+   "bookingId": "B3",
+   "leadId": "L5",
+   "customerId": "C10",
+   "assigneeId": "M3",
+   "title": "Global colour",
+   "checklist": [
+    {
+     "t": "Step 1",
+     "done": false
+    },
+    {
+     "t": "Step 2",
+     "done": false
+    },
+    {
+     "t": "Step 3",
+     "done": false
+    },
+    {
+     "t": "Step 4",
+     "done": false
+    }
+   ],
+   "status": "open",
+   "start": "2026-10-19T13:00:00+05:30",
+   "completedAt": null,
+   "invoiceId": null
+  },
+  {
+   "id": "J4",
+   "bookingId": "B4",
+   "leadId": null,
+   "customerId": "C5",
+   "assigneeId": "M4",
+   "title": "Keratin treatment",
+   "checklist": [
+    {
+     "t": "Step 1",
+     "done": false
+    },
+    {
+     "t": "Step 2",
+     "done": false
+    },
+    {
+     "t": "Step 3",
+     "done": false
+    },
+    {
+     "t": "Step 4",
+     "done": false
+    },
+    {
+     "t": "Step 5",
+     "done": false
+    },
+    {
+     "t": "Step 6",
+     "done": false
+    }
+   ],
+   "status": "open",
+   "start": "2026-10-19T15:00:00+05:30",
+   "completedAt": null,
+   "invoiceId": null
+  },
+  {
+   "id": "J5",
+   "bookingId": null,
+   "leadId": "L11",
+   "customerId": "C2",
+   "assigneeId": "M4",
+   "title": "Keratin + spa",
+   "checklist": [
+    {
+     "t": "Step 1",
+     "done": true
+    },
+    {
+     "t": "Step 2",
+     "done": true
+    },
+    {
+     "t": "Step 3",
+     "done": true
+    },
+    {
+     "t": "Step 4",
+     "done": true
+    },
+    {
+     "t": "Step 5",
+     "done": true
+    },
+    {
+     "t": "Step 6",
+     "done": true
+    }
+   ],
+   "status": "invoiced",
+   "start": "2026-10-17",
+   "completedAt": "2026-10-17",
+   "invoiceId": "I1"
+  },
+  {
+   "id": "J6",
+   "bookingId": null,
+   "leadId": "L8",
+   "customerId": "C6",
+   "assigneeId": "M3",
+   "title": "Party makeup",
+   "checklist": [
+    {
+     "t": "Step 1",
+     "done": true
+    },
+    {
+     "t": "Step 2",
+     "done": true
+    },
+    {
+     "t": "Step 3",
+     "done": true
+    }
+   ],
+   "status": "done",
+   "start": "2026-10-17",
+   "completedAt": "2026-10-17",
+   "invoiceId": null
+  },
+  {
+   "id": "J7",
+   "bookingId": "B8",
+   "leadId": null,
+   "customerId": "C18",
+   "assigneeId": "M3",
+   "title": "Monthly hair care",
+   "checklist": [],
+   "status": "done",
+   "start": "2026-10-17",
+   "completedAt": "2026-10-17",
+   "invoiceId": "I13"
+  }
+ ],
+ "templates": [
+  {
+   "id": 1,
+   "event": "price_list",
+   "name": "Price list",
+   "trigger": "Owner taps share on the catalog",
+   "audience": "Prospect",
+   "subject": "Our price list — {business}",
+   "body": "Hi {customer_first}, here is our current price list from {business}. Tap to browse and request a quote: {link} — {sender}, {business}"
+  },
+  {
+   "id": 2,
+   "event": "request_received",
+   "name": "Quote request received",
+   "trigger": "Portal form submitted",
+   "audience": "Customer",
+   "subject": "We received your request — {business}",
+   "body": "Thanks {customer_first}, {business} has your request. We will send a quote shortly. Questions? Reply here."
+  },
+  {
+   "id": 3,
+   "event": "need_details",
+   "name": "Need more details",
+   "trigger": "Staff taps \"ask customer\" on a lead",
+   "audience": "Customer",
+   "subject": "A quick question about your request",
+   "body": "Hi {customer_first}, to prepare your quote {business} needs a little more detail: {question}. Reply here when convenient."
+  },
+  {
+   "id": 4,
+   "event": "reply_shared",
+   "name": "Reply (proforma) shared",
+   "trigger": "Reply shared",
+   "audience": "Customer",
+   "subject": "Your price {doc_no} from {business}",
+   "body": "Hi {customer_first}, here is our price {doc_no} for your request: {link}. It is valid until {valid_until}; paying on the page confirms it. — {sender}"
+  },
+  {
+   "id": 5,
+   "event": "reply_revised",
+   "name": "Reply revised",
+   "trigger": "New version shared",
+   "audience": "Customer",
+   "subject": "Updated price {doc_no}",
+   "body": "Hi {customer_first}, {business} has updated {doc_no}. The same link shows the new version: {link}"
+  },
+  {
+   "id": 6,
+   "event": "reply_followup",
+   "name": "Reply follow-up, also when a reply expires",
+   "trigger": "Staff taps follow-up (+3 days default)",
+   "audience": "Customer",
+   "subject": "Following up on {doc_no}",
+   "body": "Hi {customer_first}, just checking whether {doc_no} works for you. Happy to adjust anything: {link} — {sender}, {business}"
+  },
+  {
+   "id": 7,
+   "event": "reply_expiring",
+   "name": "Reply expiring",
+   "trigger": "2 days before valid_until",
+   "audience": "Customer",
+   "subject": "{doc_no} is valid until {valid_until}",
+   "body": "Hi {customer_first}, {doc_no} from {business} is valid until {valid_until}. Pay on the page to keep this price: {link}"
+  },
+  {
+   "id": 10,
+   "event": "booking_confirmed",
+   "name": "Booking confirmed",
+   "trigger": "Booking confirmed",
+   "audience": "Customer",
+   "subject": "Booking confirmed — {date} {time}",
+   "body": "Hi {customer_first}, you are booked with {business} on {date} at {time} for {service} with {staff}. Details: {link}"
+  },
+  {
+   "id": 11,
+   "event": "booking_reminder",
+   "name": "Booking reminder",
+   "trigger": "24 h before",
+   "audience": "Customer",
+   "subject": "Reminder: tomorrow at {time}",
+   "body": "Reminder from {business}: {service} tomorrow, {date} at {time}. Reply if you need to reschedule."
+  },
+  {
+   "id": 12,
+   "event": "invoice_request",
+   "name": "Invoice & payment request",
+   "trigger": "Invoice shared",
+   "audience": "Customer",
+   "subject": "Invoice {invoice_no} — {amount} due {due_date}",
+   "body": "Hi {customer_first}, invoice {invoice_no} from {business} for {amount} is ready: {link}. Pay by UPI to {upi_id} or scan the QR on the page. Due {due_date}."
+  },
+  {
+   "id": 13,
+   "event": "payment_reminder_gentle",
+   "name": "Payment reminder +3",
+   "trigger": "up to 6 days overdue (D64); never for an unpaid reply (D75)",
+   "audience": "Customer",
+   "subject": "Reminder: invoice {invoice_no}",
+   "body": "Hi {customer_first}, a gentle reminder that invoice {invoice_no} ({amount}) from {business} is due. Pay here: {link}"
+  },
+  {
+   "id": 14,
+   "event": "payment_reminder_overdue",
+   "name": "Payment reminder +7 / +14",
+   "trigger": "from day 7 overdue (D64); never for an unpaid reply (D75)",
+   "audience": "Customer",
+   "subject": "Overdue: invoice {invoice_no}",
+   "body": "Hi {customer_first}, invoice {invoice_no} for {amount} is now {days} days overdue. Please pay at {link} or reply if there is an issue. — {business}"
+  },
+  {
+   "id": 15,
+   "event": "payment_received",
+   "name": "Payment received",
+   "trigger": "Owner approves proof",
+   "audience": "Customer",
+   "subject": "Receipt for {invoice_no}",
+   "body": "Thank you {customer_first}! {business} has received {amount} for invoice {invoice_no}. Receipt: {link}"
+  },
+  {
+   "id": 16,
+   "event": "proof_rejected",
+   "name": "Proof rejected (internal)",
+   "trigger": "Owner rejects",
+   "audience": "Uploader",
+   "subject": null,
+   "body": "Proof for {invoice_no} was not approved: {reject_note}. Please re-upload."
+  },
+  {
+   "id": 17,
+   "event": "job_completed",
+   "name": "Job completed",
+   "trigger": "Staff marks done",
+   "audience": "Customer",
+   "subject": "Work completed — {business}",
+   "body": "Hi {customer_first}, {service} is complete. Thank you for choosing {business}. Your invoice follows shortly."
+  },
+  {
+   "id": 18,
+   "event": "request_declined",
+   "name": "Request declined",
+   "trigger": "Business rejects a quoted lead",
+   "audience": "Customer",
+   "subject": "About your request to {business}",
+   "body": "Hi {customer_first}, thank you for asking {business}. We can't take on this request right now. — {sender}"
+  }
+ ],
+ "outbox": [],
+ "devices": [],
+ "activity": [
+  {
+   "at": "2026-10-19T13:50:00+05:30",
+   "by": "M1",
+   "action": "message.copied",
+   "recordId": "L1",
+   "text": "Ready message 2 \"Quote request received\" copied for WhatsApp by Priya"
+  },
+  {
+   "at": "2026-10-19T13:48:00+05:30",
+   "by": "M1",
+   "action": "payment.approved",
+   "recordId": "P3",
+   "text": "Asha Nair paid · INV-2627-0029"
+  },
+  {
+   "at": "2026-10-19T13:48:00+05:30",
+   "by": null,
+   "action": "lead.created",
+   "recordId": "L1",
+   "text": "New lead from Instagram · Kiran Rao"
+  },
+  {
+   "at": "2026-10-19T13:20:00+05:30",
+   "by": "M1",
+   "action": "lead.assigned",
+   "recordId": "L2",
+   "text": "Assigned to Rahul by Priya"
+  },
+  {
+   "at": "2026-10-19T13:00:00+05:30",
+   "by": null,
+   "action": "booking.created",
+   "recordId": "B7",
+   "text": "New booking from your page · Divya M. · slot held for 24 h"
+  },
+  {
+   "at": "2026-10-19T12:40:00+05:30",
+   "by": "M4",
+   "action": "payment.uploaded",
+   "recordId": "P1",
+   "text": "Payment proof uploaded · Meera Kulkarni"
+  },
+  {
+   "at": "2026-10-19T12:05:00+05:30",
+   "by": "M1",
+   "action": "invoice.shared",
+   "recordId": "I1",
+   "text": "Invoice PI-2627-0045 emailed to Meera Kulkarni"
+  },
+  {
+   "at": "2026-10-19",
+   "by": "M1",
+   "action": "payment.rejected",
+   "recordId": "P7",
+   "text": "Rohan Desai ₹4,720 rejected: \"Amount on screenshot is ₹4,270\" · Pooja told (message 16)"
+  },
+  {
+   "at": "2026-10-18T20:55:00+05:30",
+   "by": "M1",
+   "action": "invoice.shared",
+   "recordId": "I2",
+   "text": "Reply PI-2627-0046 shared by email by Priya"
+  },
+  {
+   "at": "2026-10-18",
+   "by": "M3",
+   "action": "payment.uploaded",
+   "recordId": "P2",
+   "text": "Payment proof uploaded · Kavya Joshi"
+  },
+  {
+   "at": "2026-10-17",
+   "by": "M1",
+   "action": "lead.edited",
+   "recordId": "L3",
+   "text": "Request edited: added Draping assistance"
+  },
+  {
+   "at": "2026-10-17",
+   "by": null,
+   "action": "invoice.reminded",
+   "recordId": "I11",
+   "text": "Gentle reminder (message 13) emailed to Rohan Desai"
+  },
+  {
+   "at": "2026-10-17",
+   "by": null,
+   "action": "lead.created",
+   "recordId": "L3",
+   "text": "Lead created from glow.biz4kit.com"
+  },
+  {
+   "at": "2026-10-16",
+   "by": null,
+   "action": "invoice.reminded",
+   "recordId": "I12",
+   "text": "Overdue reminder (message 14) emailed to Sneha Patil"
+  },
+  {
+   "at": "2026-10-16",
+   "by": null,
+   "action": "booking.created",
+   "recordId": "B1",
+   "text": "Booking: Bridal trial with Rahul, Mon 19 Oct 10:00"
+  },
+  {
+   "at": "2026-10-12",
+   "by": null,
+   "action": "invoice.reminded",
+   "recordId": "I12",
+   "text": "Overdue reminder (message 14) copied for WhatsApp for Sneha Patil"
+  }
+ ]
+}

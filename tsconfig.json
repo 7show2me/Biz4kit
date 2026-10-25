@@ -1,0 +1,3 @@
+{
+  "extends": "@Biz4kit/config/tsconfig.base.json"
+}

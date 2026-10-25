@@ -1,7 +1,7 @@
 """Build brand/design-system/index.html: the whole Biz4Kit design system as one docs-style page you open locally.
 
 Reads design-system/README.md, tokens.json and components/Cover/preview.html, and uses ../theme.css and
-assets/Logos/*.svg. Nothing is fetched from a server except the Google Fonts stylesheet.
+../logo/*.svg. Nothing is fetched from a server except the Google Fonts stylesheet.
 
   uv run --no-project --with markdown python -I brand/build_design_system.py
 """
@@ -16,7 +16,7 @@ DS = Path(__file__).resolve().parent / "design-system"
 tokens = json.loads((DS / "tokens.json").read_text(encoding="utf-8"))
 md = lambda s: markdown.markdown(s, extensions=["extra", "sane_lists"])
 book = md((DS / "README.md").read_text(encoding="utf-8"))
-logo_readme = md((DS / "assets/Logos/README.md").read_text(encoding="utf-8"))
+logo_readme = md((DS.parent / "logo/README.md").read_text(encoding="utf-8"))
 cover_src = (DS / "components/Cover/preview.html").read_text(encoding="utf-8")
 cover_css = re.sub(r"html, body \{[^}]*\}", "", re.search(r"<style>(.*?)</style>", cover_src, re.S).group(1))
 cover_html = re.sub(r"<!--.*?-->", "", re.search(r'(<div class="cover">.*?</div>\s*)<script>', cover_src, re.S).group(1), flags=re.S)
@@ -36,11 +36,11 @@ LOGOS = [
     ("biz4kit-app-icon.svg", "App icon", "light", "Favicon, PWA, Expo, avatar."),
 ]
 def size(name):
-    m = re.search(r'width="(\d+)" height="(\d+)"', (DS / "assets/Logos" / name).read_text(encoding="utf-8"))
+    m = re.search(r'width="(\d+)" height="(\d+)"', (DS.parent / "logo" / name).read_text(encoding="utf-8"))
     return int(m[1]), int(m[2])
 def logo_cards_for(rows):
     return "".join(
-        f'<figure class="card"><div class="stage {g}"><img src="assets/Logos/{f}" width="{size(f)[0]}" height="{size(f)[1]}" alt="Biz4Kit {t}"></div>'
+        f'<figure class="card"><div class="stage {g}"><img src="../logo/{f}" width="{size(f)[0]}" height="{size(f)[1]}" alt="Biz4Kit {t}"></div>'
         f'<figcaption><b>{f}</b><span>{size(f)[0]} × {size(f)[1]}. {n}</span></figcaption></figure>' for f, t, g, n in rows)
 # 3 lockups in one complete row, then the 4 marks and the icon in another
 logo_cards = (f'<h3>Lockups</h3><div class="grid c3">{logo_cards_for(LOGOS[:3])}</div>'
@@ -50,13 +50,14 @@ GROUPS = [
     ("Surfaces", ["background", "foreground", "card", "card-foreground", "popover", "popover-foreground"]),
     ("Brand", ["primary", "primary-foreground", "secondary", "secondary-foreground", "accent", "accent-foreground", "brand-ink", "brand-blue"]),
     ("Neutrals and focus", ["muted", "muted-foreground", "border", "input", "ring"]),
-    ("Status", ["destructive", "destructive-foreground"]),
+    ("Status", ["success", "success-foreground", "success-soft", "warning", "warning-foreground", "warning-soft", "destructive", "destructive-foreground", "status-paid", "status-due", "status-overdue"]),
     ("Charts", ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5"]),
     ("Sidebar", ["sidebar", "sidebar-foreground", "sidebar-primary", "sidebar-primary-foreground", "sidebar-accent", "sidebar-accent-foreground", "sidebar-border", "sidebar-ring"]),
+    ("Customer pages (fixed neutrals)", ["customer-page", "customer-surface", "customer-text", "customer-muted", "customer-border"]),
 ]
 PAIRS = [("background", "foreground"), ("card", "card-foreground"), ("primary", "primary-foreground"), ("secondary", "secondary-foreground"),
          ("accent", "accent-foreground"), ("muted", "muted-foreground"), ("destructive", "destructive-foreground"), ("sidebar", "sidebar-foreground"),
-         ("sidebar-accent", "sidebar-accent-foreground")]
+         ("sidebar-accent", "sidebar-accent-foreground"), ("success-soft", "success"), ("warning-soft", "warning"), ("customer-surface", "customer-text")]
 by_name = {t["name"]: t for t in tokens["color"]["tokens"]}
 assert all(n in by_name for _, names in GROUPS for n in names), "token missing from tokens.json"
 pairs = "".join(f'<div class="pair" style="background:var(--{b}); color:var(--{f})"><b>Aa</b><span>{f}<br>on {b}</span></div>' for b, f in PAIRS)
@@ -76,7 +77,8 @@ colour = "".join(
 
 FAM_NOTE = {"serif": ("Fraunces", "Headings and display, 24px and up. Warm, soft serif."),
             "sans": ("DM Sans", "The working UI: body, buttons, inputs, navigation."),
-            "mono": ("DM Mono", "Every amount and identifier. Digits share one width.")}
+            "mono": ("DM Mono", "Every amount and identifier. Digits share one width."),
+            "customer": ("Inter", "Customer-facing pages and PDFs only (D34). Not in our chrome.")}
 famcards = "".join(
     f'<div class="card fam"><div class="role">{k}</div><div class="aa" style="font-family:var(--font-{k})">Aa</div><b>{FAM_NOTE[k][0]}</b><p>{FAM_NOTE[k][1]}</p>'
     f'<div class="alpha" style="font-family:var(--font-{k})">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789 ₹ &amp; @ #</div><code>{html.escape(v)}</code></div>'
@@ -99,6 +101,11 @@ radius = (f'<div class="tablebox"><table class="ctable rtable"><colgroup><col cl
           f'<thead><tr><th>Preview</th><th>Token</th><th>Value</th><th>Usage</th></tr></thead><tbody>'
           + "".join(f'<tr><td class="sw"><i class="rprev" style="border-radius:{t["value"]}"></i></td><td><b class="rname">{t["name"]}</b></td><td><code>{t["value"]}</code></td><td class="use">{html.escape(t["usage"])}</td></tr>' for t in tokens["radius"]["tokens"])
           + '</tbody></table></div>')
+SIZE_CAP = 56
+size = (f'<div class="tablebox"><table class="ctable rtable"><colgroup><col class="c-pre"><col class="c-tok"><col class="c-rv"><col></colgroup>'
+        f'<thead><tr><th>Preview</th><th>Token</th><th>Value</th><th>Usage</th></tr></thead><tbody>'
+        + "".join(f'<tr><td class="sw"><i class="szprev" style="height:{min(int(t["value"][:-2]), SIZE_CAP)}px"></i></td><td><b class="rname">{t["name"]}</b></td><td><code>{t["value"]}</code></td><td class="use">{html.escape(t["usage"])}</td></tr>' for t in tokens["size"]["tokens"])
+        + '</tbody></table></div>')
 shadow = "".join(f'<div class="shd"><span style="box-shadow:{t["value"]}"></span><b>{t["name"]}</b><p>{html.escape(t["usage"])}</p></div>' for t in tokens["shadow"]["tokens"])
 
 TEMPLATE = r'''<!doctype html>
@@ -107,8 +114,8 @@ TEMPLATE = r'''<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Biz4Kit Design System</title>
-<link rel="icon" type="image/svg+xml" href="assets/Logos/biz4kit-app-icon.svg">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400..700&family=Fraunces:opsz,wght@9..144,500..800&display=swap">
+<link rel="icon" type="image/svg+xml" href="../logo/biz4kit-app-icon.svg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400..700&family=Fraunces:opsz,wght@9..144,500..800&family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="../theme.css">
 <style>
   :root { --card-r: 10px; }
@@ -172,6 +179,7 @@ TEMPLATE = r'''<!doctype html>
   .rtable { min-width: 560px; } .rtable col.c-pre { width: 96px; } .rtable col.c-tok { width: 190px; } .rtable col.c-rv { width: 110px; }
   .rtable td.sw { padding-right: 0; } .rtable i.rprev { display: block; width: 52px; height: 52px; background: var(--secondary); border: 1px solid var(--border); }
   .rname { font: 600 14px/20px var(--font-sans); }
+  .szprev { display: block; width: 52px; border-radius: 6px; background: var(--primary); }
   .ctable td.use { color: var(--muted-foreground); font-size: 13px; line-height: 18px; }
   .ctable td.vals code { display: flex; gap: 8px; white-space: nowrap; font-size: 11px; }
   .ctable td.vals code b { flex: none; width: 10px; color: var(--foreground); }
@@ -184,7 +192,7 @@ TEMPLATE = r'''<!doctype html>
   .tok em { display: block; margin-top: 4px; font-style: normal; color: var(--muted-foreground); font-size: 13px; line-height: 18px; } .tok .val { display: block; }
   .tok u { position: absolute; top: 12px; right: 12px; text-decoration: none; font: 500 11px/16px var(--font-mono); color: var(--muted-foreground); }
   .tok.done u { color: var(--foreground); }
-  .fams { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; grid-auto-rows: 1fr; margin-bottom: 8px; }
+  .fams { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; grid-auto-rows: 1fr; margin-bottom: 8px; }
   .fam { padding: 20px; } .fam .role { font: 500 11px/16px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); }
   .fam .aa { font-size: 88px; line-height: 96px; font-weight: 600; margin: 6px 0; } .fam b { font: 600 15px/22px var(--font-sans); display: block; }
   .fam p { margin: 2px 0 14px; color: var(--muted-foreground); font-size: 13px; line-height: 18px; }
@@ -204,7 +212,7 @@ TEMPLATE = r'''<!doctype html>
   /* components: built only from tokens */
   .demo { padding: 28px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; background: var(--background); border: 1px solid var(--border); border-radius: var(--card-r); }
   .demo + .note { margin: 10px 2px 0; color: var(--muted-foreground); font-size: 13px; line-height: 18px; }
-  .btn { font: 500 14px/20px var(--font-sans); padding: 10px 18px; border-radius: var(--radius-control, 8px); border: 1px solid transparent; cursor: pointer; }
+  .btn { display: inline-flex; align-items: center; height: var(--size-control-md); font: 500 var(--type-body-sm)/var(--type-body-sm-leading) var(--font-sans); padding: 0 14px; border-radius: var(--radius-control); border: 1px solid transparent; cursor: pointer; }
   .btn.primary { background: var(--primary); color: var(--primary-foreground); }
   .btn.secondary { background: var(--secondary); color: var(--secondary-foreground); }
   .btn.ghost { background: transparent; color: var(--foreground); } .btn.ghost:hover { background: var(--accent); color: var(--accent-foreground); }
@@ -212,11 +220,11 @@ TEMPLATE = r'''<!doctype html>
   .btn.disabled { background: var(--muted); color: var(--muted-foreground); cursor: not-allowed; }
   .btn.focus { outline: 2px solid var(--ring); outline-offset: 2px; }
   .field { display: grid; gap: 6px; min-width: 220px; flex: 1; } .field label { font: 500 13px/18px var(--font-sans); }
-  .field input { font: 400 15px/22px var(--font-sans); padding: 10px 14px; border-radius: var(--radius-sm, 16px); border: 1px solid var(--input); background: var(--card); color: var(--foreground); width: 100%; }
+  .field input { height: var(--size-control-md); font: 400 var(--type-body-sm)/var(--type-body-sm-leading) var(--font-sans); padding: 0 14px; border-radius: var(--radius-sm); border: 1px solid var(--input); background: var(--muted); color: var(--foreground); width: 100%; }
   .field input::placeholder { color: var(--muted-foreground); } .field small { color: var(--muted-foreground); font-size: 13px; line-height: 18px; }
-  .field input.mono { font: 500 14px/20px var(--font-mono); }
-  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 999px; font: 500 12px/16px var(--font-sans); letter-spacing: .04em; text-transform: uppercase; }
-  .pill.paid { background: var(--secondary); color: var(--secondary-foreground); } .pill.due { background: var(--muted); color: var(--muted-foreground); }
+  .field input.mono { font: 500 var(--type-code)/var(--type-code-leading) var(--font-mono); }
+  .pill { display: inline-flex; align-items: center; gap: 4px; height: var(--size-control-xs); padding: 0 8px; border-radius: var(--radius-xs); font: 500 var(--type-caption)/var(--type-caption-leading) var(--font-sans); }
+  .pill.paid { background: var(--success-soft); color: var(--success); } .pill.due { background: var(--warning-soft); color: var(--warning); }
   .pill.over { background: var(--destructive); color: var(--destructive-foreground); } .pill.draft { border: 1px solid var(--border); color: var(--foreground); }
   .inv { padding: 20px 24px; min-width: min(100%, 320px); flex: 1; }
   .inv .top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; } .inv h4 { font: 600 22px/28px var(--font-serif); margin: 0; }
@@ -242,15 +250,15 @@ TEMPLATE = r'''<!doctype html>
 <body>
 <div class="shell">
   <nav class="side" id="side">
-    <a class="brand" href="#overview" aria-label="Biz4Kit"><img src="assets/Logos/biz4kit-lockup.svg" alt="Biz4Kit" id="navlogo"></a>
+    <a class="brand" href="#overview" aria-label="Biz4Kit"><img src="../logo/biz4kit-lockup.svg" alt="Biz4Kit" id="navlogo"></a>
     <h4>Start</h4><a href="#overview">Overview</a><a href="#book">Brand book</a><a href="#logos">Logos</a>
-    <h4>Foundations</h4><a href="#colour">Colour</a><a href="#type">Typography</a><a href="#shape">Spacing and radius</a><a href="#depth">Shadows</a>
+    <h4>Foundations</h4><a href="#colour">Colour</a><a href="#type">Typography</a><a href="#shape">Spacing and radius</a><a href="#density">Density</a><a href="#depth">Shadows</a>
     <h4>Components</h4><a href="#buttons">Buttons</a><a href="#inputs">Inputs</a><a href="#pills">Status pills</a><a href="#cards">Cards and tables</a>
     <button id="theme" type="button" aria-pressed="false">Dark theme</button>
   </nav>
   <main>
     <div class="hero" id="overview">
-      <p class="eyebrow">Version 1 · Local files</p>
+      <p class="eyebrow">Version 2 · Local files</p>
       <h1>Design system</h1>
       <p class="lead">Biz4Kit's own brand, as owners and staff see it in the workspace chrome. A business's customers see the business's brand instead. Everything here is built from the files in this folder.</p>
       <div class="cover-box"><div class="cover-fit" id="coverfit">@@COVER_HTML@@</div></div>
@@ -271,6 +279,7 @@ TEMPLATE = r'''<!doctype html>
       @@STYLES@@</section>
 
     <section id="shape"><div class="head"><h2>Spacing and radius</h2></div><h3>Spacing</h3><div class="card" style="padding:8px 24px">@@SPACING@@</div><h3>Radius</h3>@@RADIUS@@</section>
+    <section id="density"><div class="head"><h2>Density</h2><p class="lead">The workspace is compact (D52). Heights and widths below; screens use them through <code>brand/tailwind.css</code>, never raw values.</p></div>@@SIZE@@</section>
     <section id="depth"><div class="head"><h2>Shadows</h2></div><div class="shds">@@SHADOW@@</div></section>
 
     <section id="buttons"><div class="head"><h2>Buttons</h2><p class="lead">One primary action per view. Everything else is secondary or ghost. Labels are DM Sans 500, 14px.</p></div>
@@ -283,7 +292,7 @@ TEMPLATE = r'''<!doctype html>
 
     <section id="pills" ><div class="head"><h2>Status pills</h2><p class="lead">Every status carries a word as well as a colour. They use theme tokens only.</p></div>
       <div class="demo"><span class="pill draft">Draft</span><span class="pill paid">✓ Paid</span><span class="pill due">● Due in 3 days</span><span class="pill over">! Overdue 7 days</span></div>
-      <p class="note">The supplied theme has no green or amber, so Paid, Due and Overdue use secondary, muted and destructive. A green/amber set is an open question (Linear).</p></section>
+      <p class="note">Paid uses <code>success</code> on <code>success-soft</code>, Due uses <code>warning</code> on <code>warning-soft</code> (both 4.8:1), Overdue is the solid <code>destructive</code> fill (D51).</p></section>
 
     <section id="cards"><div class="head"><h2>Cards and tables</h2><p class="lead">Headings in Fraunces, amounts in DM Mono, labels in DM Sans.</p></div>
       <div class="demo" style="align-items:stretch"><div class="card inv"><div class="top"><h4>Invoice INV-2026-014</h4><span class="pill due">● Due in 3 days</span></div><p>Priya Deshmukh · issued 19 Oct 2026</p><div class="big">₹41,700.00</div><button class="btn primary">Request payment</button></div>
@@ -298,7 +307,7 @@ TEMPLATE = r'''<!doctype html>
   function paint() {
     const dark = root.classList.contains("dark"), theme = dark ? "dark" : "light";
     btn.textContent = dark ? "Light theme" : "Dark theme"; btn.setAttribute("aria-pressed", dark);
-    logo.src = dark ? "assets/Logos/biz4kit-lockup-dark.svg" : "assets/Logos/biz4kit-lockup.svg";
+    logo.src = dark ? "../logo/biz4kit-lockup-dark.svg" : "../logo/biz4kit-lockup.svg";
   }
   let saved = null; try { saved = localStorage.getItem("b4k-theme"); } catch (e) {}
   if (saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches) root.classList.add("dark");
@@ -334,7 +343,7 @@ book_html = book_intro + "".join(f'<div class="sub">{p}</div>' for p in book_sec
 page = (TEMPLATE.replace("@@COVER_CSS@@", cover_css).replace("@@COVER_HTML@@", cover_html).replace("@@BOOK@@", book_html)
         .replace("@@LOGOS@@", logo_cards).replace("@@LOGO_README@@", logo_readme).replace("@@PAIRS@@", pairs).replace("@@COLOUR@@", colour)
         .replace("@@FAMS@@", famcards).replace("@@AMOUNTS@@", amounts).replace("@@STYLES@@", styles).replace("@@SPACING@@", spacing)
-        .replace("@@RADIUS@@", radius).replace("@@SHADOW@@", shadow)
+        .replace("@@RADIUS@@", radius).replace("@@SIZE@@", size).replace("@@SHADOW@@", shadow)
         .replace("@@TOKENS@@", json.dumps({"color": by_name}).replace("</", "<\\/")))
 out = DS / "index.html"
 out.write_text(page, encoding="utf-8")

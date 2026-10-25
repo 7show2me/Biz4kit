@@ -71,9 +71,9 @@ Then force a new deployment: `aws ecs update-service --cluster biz4kit-staging -
 
 The deploy roles trust only `repo:7show2me/Biz4kit:environment:<name>`. A workflow outside that environment cannot assume them.
 
-## 4. Neon (D4, D105)
+## 4. Neon (D4, D105, D111)
 
-The project is in `aws-ap-south-1`. Two long-lived branches only: `prod` (rename the default branch to it) and `dev`, created from it. The staging environment uses `dev`. Every pull request gets `preview/pr-<n>`, created from `dev` and deleted on close (`.github/workflows/preview-db.yml`). The free plan allows 10 branches per project, so about 8 PRs can be open at once.
+Project `biz4kit` (`fancy-leaf-05807484`), created 2026-10-25 in `aws-ap-southeast-1` (Singapore): Neon does not offer Mumbai to our account (D111). Two long-lived branches only: `prod` (the default branch, renamed from `main`) and `dev`, created from it. Both exist. The staging environment uses `dev`. Every pull request gets `preview/pr-<n>`, created from `dev` and deleted on close (`.github/workflows/preview-db.yml`). The free plan allows 10 branches per project, so about 8 PRs can be open at once.
 
 ```sh
 neonctl branches rename main prod --project-id <id>

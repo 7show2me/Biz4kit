@@ -67,13 +67,12 @@ Then force a new deployment: `aws ecs update-service --cluster biz4kit-staging -
 |---|---|---|---|
 | `staging` | `AWS_DEPLOY_ROLE_ARN` (bootstrap output), `API_URL`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `STAGING_WEB_DOMAIN` (optional), `SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT` | `VERCEL_TOKEN`, `SENTRY_AUTH_TOKEN` | branch `main` |
 | `production` | the same, with production values | `VERCEL_TOKEN`, `SENTRY_AUTH_TOKEN` | tags `v*`, required reviewer: the human |
-| `preview` | `NEON_PROJECT_ID` | `NEON_API_KEY` | none |
 
 The deploy roles trust only `repo:7show2me/Biz4kit:environment:<name>`. A workflow outside that environment cannot assume them.
 
-## 4. Neon (D4, D105, D111)
+## 4. Neon (D4, D105, D111, D114)
 
-Project `biz4kit` (`fancy-leaf-05807484`), created 2026-10-25 in `aws-ap-southeast-1` (Singapore): Neon does not offer Mumbai to our account (D111). Two long-lived branches only: `prod` (the default branch, renamed from `main`) and `dev`, created from it. Both exist. The staging environment uses `dev`. Every pull request gets `preview/pr-<n>`, created from `dev` and deleted on close (`.github/workflows/preview-db.yml`). The free plan allows 10 branches per project, so about 8 PRs can be open at once.
+Project `biz4kit` (`fancy-leaf-05807484`), created 2026-10-25 in `aws-ap-southeast-1` (Singapore): Neon does not offer Mumbai to our account (D111). Long-lived branches: `prod` (the default branch, renamed from `main`), `dev` created from it, and `test` created from `dev` (D113). The staging environment uses `dev`. There is no branch per pull request (D114): CI runs the database tests on `test` through the repository secrets `TEST_DATABASE_URL` (app role) and `TEST_DATABASE_MIGRATION_URL` (owner), and PR previews use `test` too (D115). CI does not reset `test`; reset it by hand with `pnpm db:test:reset` when it drifts, for example after an abandoned PR's migration (D116).
 
 ```sh
 neonctl branches rename main prod --project-id <id>

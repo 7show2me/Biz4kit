@@ -54,7 +54,7 @@ Query workspace data only through `withWorkspace(db, workspaceId, fn)` from `@Bi
 
 ### Tests and the `test` branch
 
-Tests that touch the database use the Neon `test` branch (`TEST_DATABASE_URL` as the app role, `TEST_DATABASE_MIGRATION_URL` as the owner), never `dev` (D113). The run applies migrations first. Without those keys the database tests are skipped, with a warning. Reset the branch from `dev` before a run:
+Tests that touch the database use the Neon `test` branch (`TEST_DATABASE_URL` as the app role, `TEST_DATABASE_MIGRATION_URL` as the owner), never `dev` (D113). The run applies migrations first. Without those keys the database tests are skipped locally, with a warning; in CI they fail instead. CI and PR previews share this branch (D114, D115) and CI never resets it, so reset it from `dev` by hand when it drifts (D116):
 
 ```bash
 pnpm db:test:reset

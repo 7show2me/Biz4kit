@@ -19,36 +19,44 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 - **Oxlint** - Oxlint + Oxfmt (linting & formatting)
 - **Turborepo** - Optimized monorepo build system
 
-## Getting Started
+## Run locally
 
-First, install the dependencies:
+Local development runs the code on your machine against the shared cloud dev services (D112): Neon `dev` (Postgres, Singapore, D111), Upstash Redis (Mumbai) and Sentry. There is no local database or Redis.
 
-```bash
-pnpm install
-```
-
-## Database Setup
-
-This project uses PostgreSQL with Drizzle ORM.
-
-1. Make sure you have a PostgreSQL database set up.
-2. Update your `apps/server/.env` file with your PostgreSQL connection details.
-
-3. Apply the schema to your database:
+You need: Node 24, pnpm, and the Vercel and Neon CLIs logged in (`vercel login`, `neonctl auth`). The repo is already linked to the Vercel project `biz4kit`.
 
 ```bash
-pnpm run db:push
+pnpm install          # also installs the lefthook pre-commit hook
+pnpm env:pull         # Vercel Development env -> apps/server, apps/web, packages/db .env.local
+pnpm db:migrate       # apply migrations to Neon dev
+pnpm dev:server       # API on http://localhost:3000 (GET /health)
+pnpm dev:worker       # BullMQ worker on the shared Upstash queue
+pnpm dev:web          # web app on http://localhost:3001
 ```
 
-Then, run the development server:
+`pnpm env:pull` gives each package only the keys its `.env.schema` declares and prints key counts, never values. Add or change a value in Vercel (Development environment), then pull again.
+
+Local and the deployed dev environment share the same database and queue (D112): a worker on your machine can take jobs queued by dev, and the other way round.
+
+### Tests and the `test` branch
+
+Tests that touch the database use the Neon `test` branch (`TEST_DATABASE_URL`), never `dev` (D113). Reset it from `dev` before a run:
 
 ```bash
-pnpm run dev
+pnpm db:test:reset
 ```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
-From `apps/native`, run the `ios` script for iOS or the `android` script for Android to build and launch the app. See [Expo development builds](https://docs.expo.dev/develop/development-builds/introduction/) for device setup.
-The API is running at [http://localhost:3000](http://localhost:3000).
+### Image test (Docker)
+
+Docker is only for checking the image Fargate runs (D112), not for daily work. It uses `apps/server/.env.local`:
+
+```bash
+pnpm docker:up        # API + worker from apps/server/Dockerfile
+curl http://localhost:3000/health
+pnpm docker:down
+```
+
+Stop `pnpm dev:server` first: both use port 3000.
 
 ## UI Customization
 
@@ -82,24 +90,15 @@ Each app owns its environment schema in `.env.schema`. Varlock generates `src/en
 
 Import the generated `ENV` accessor in application code. Shared database and auth packages receive configuration or initialized clients from the application. See [Varlock's monorepo guide](https://varlock.dev/guides/monorepos/).
 
-Bun's automatic env loading is disabled in `bunfig.toml`; the framework integration or server bootstrap loads Varlock. Node deployments must include Varlock and its dependencies alongside the app schema.
+The framework integration or server bootstrap loads Varlock. Node deployments must include Varlock and its dependencies alongside the app schema.
 
-Run standalone Node/Bun tools that use Varlock from the owning app directory so they load that app's schema and env files. `env:generate` only generates TypeScript files; it does not initialize environment values in a subsequent command.
+Run standalone Node tools that use Varlock from the owning app directory so they load that app's schema and env files. `env:generate` only generates TypeScript files; it does not initialize environment values in a subsequent command.
 
 ## Deployment
 
-### Docker Compose
+### API and workers
 
-- Target: server
-- Config: `docker-compose.yml` (app Dockerfiles live in `apps/*/Dockerfile`)
-- Build images: pnpm run docker:build
-- Start: pnpm run docker:up
-- Logs: pnpm run docker:logs
-- Stop: pnpm run docker:down
-
-Environment variables are read from each app's `.env` file (baked into web builds for public variables) and overridden in `docker-compose.yml` for container networking.
-
-For more details, see the guide on [Deploying with Docker Compose](https://www.better-t-stack.dev/docs/guides/docker).
+ECS Fargate in Mumbai behind API Gateway (D28, D38, D42). See `infra/README.md`.
 
 ### Vercel Services
 

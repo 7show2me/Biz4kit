@@ -53,3 +53,11 @@ describe("redisConnection", () => {
     );
   });
 });
+
+describe("BullMQ client", () => {
+  // BullMQ 6 makes ioredis optional; workers built from connection options
+  // fail at start without it (found running the worker locally, D112).
+  it("can load ioredis for connection options", async () => {
+    await expect(import("ioredis")).resolves.toBeDefined();
+  });
+});

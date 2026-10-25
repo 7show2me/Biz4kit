@@ -1,17 +1,9 @@
 name: Biz4kit
 
-# Local dev only (D28). Staging and production run on ECS Fargate.
+# Image test only (D112): runs the same API and worker image Fargate runs,
+# against the cloud dev services (Neon dev, Upstash). Daily development runs
+# with `pnpm dev`, not Docker. Values come from `vercel env pull` (README).
 services:
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-
   server:
     build:
       context: .
@@ -21,27 +13,18 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - path: apps/server/.env
-        required: false
-    environment:
-      REDIS_URL: redis://redis:6379
-    depends_on:
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
+      - path: apps/server/.env.local
+        required: true
+    restart: "no"
 
   worker:
     image: biz4kit-api:local
     command: ["node", "--enable-source-maps", "dist/worker.mjs"]
     init: true
     env_file:
-      - path: apps/server/.env
-        required: false
-    environment:
-      REDIS_URL: redis://redis:6379
+      - path: apps/server/.env.local
+        required: true
     depends_on:
-      redis:
-        condition: service_healthy
       server:
         condition: service_started
-    restart: unless-stopped
+    restart: "no"

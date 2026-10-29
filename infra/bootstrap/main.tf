@@ -42,15 +42,18 @@ variable "aws_region" {
 }
 
 variable "github_repository" {
-  description = "owner/name of the GitHub repo allowed to deploy."
+  # The repo uses GitHub's immutable OIDC subject: owner and repo carry their
+  # numeric ids, so a renamed or re-created repo with the same name cannot deploy.
+  # Read it with: gh api repos/<owner>/<repo>/actions/oidc/customization/sub
+  description = "Repo part of the GitHub OIDC subject allowed to deploy (owner@id/name@id)."
   type        = string
-  default     = "7show2me/Biz4kit"
+  default     = "7show2me@293344814/Biz4kit@1425347880"
 }
 
 data "aws_caller_identity" "current" {}
 
 locals {
-  environments = toset(["staging", "production"])
+  environments = toset(["dev", "production"])
   account_id   = data.aws_caller_identity.current.account_id
 }
 

@@ -5,7 +5,7 @@ description: Work one Biz4Kit WBS package from its Linear issue to a verified pu
 
 # biz-wbs-task
 
-One WBS package = one Linear issue = one branch = one PR. The agent builds; the human verifies (D24, D27). Nothing merges unverified. Full rules: `prep/Workflow & final verification.md`.
+One WBS package = one Linear issue = one branch = one PR. The agent builds; the human verifies (D24, D27). Full rules: `prep/Workflow & final verification.md`.
 
 ## 1. Start
 
@@ -34,7 +34,7 @@ One WBS package = one Linear issue = one branch = one PR. The agent builds; the 
 
 - Run lint, typecheck and the full suite locally. Report real results; if something fails, say so.
 - Open the PR with `linear issue pull-request BIZ-n` or `gh pr create`, using the PR template: Linear key, what changed, how to verify (the WBS "Human verifies" text), screenshots on a phone viewport, tests added, PII yes/no, migration yes/no, rollback note. Code and PRs only on GitHub; never GitHub issues.
-- Move the issue to Ready to verify only when CI is green. The human moves it to Done. The agent never approves or merges its own PR.
+- Move the issue to Ready to verify only when CI is green. The human does the "Human verifies" step. Under the single-founder exception (D124) the agent may merge its own PR into `dev` once CI is green, and moves the issue to Done or merges to `main` only when the founder says so.
 - Tell the user in a few lines: what was built, how to check it, and what you could not verify.
 
 ## Not yet in place

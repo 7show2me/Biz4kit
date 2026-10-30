@@ -8,6 +8,10 @@ BIZ-
 
 <!-- Copy the WBS "Human verifies" text for this package, then add click-through steps. -->
 
+## Acceptance checklist
+
+<!-- Copy the acceptance items from the Linear issue, one "- [ ]" line each. A bot comment lists the unticked ones. -->
+
 ## Screenshots or short recording
 
 <!-- Phone viewport. Generated demo data only, no real PII. -->

@@ -11,12 +11,12 @@ variable "aws_region" {
 }
 
 variable "environment" {
-  description = "staging or production (Workflow doc, Infra). PR previews: open question BIZ-87."
+  description = "dev (branch dev) or production (branch main), D118."
   type        = string
 
   validation {
-    condition     = contains(["staging", "production"], var.environment)
-    error_message = "environment must be staging or production."
+    condition     = contains(["dev", "production"], var.environment)
+    error_message = "environment must be dev or production."
   }
 }
 

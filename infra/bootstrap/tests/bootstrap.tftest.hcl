@@ -53,15 +53,15 @@ run "github_deploy_roles_trust_only_this_repo_and_environment" {
 
   assert {
     condition = alltrue([
-      for env in ["staging", "production"] :
-      jsondecode(aws_iam_role.deploy[env].assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:7show2me/Biz4kit:environment:${env}"
+      for env in ["dev", "production"] :
+      jsondecode(aws_iam_role.deploy[env].assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:7show2me@293344814/Biz4kit@1425347880:environment:${env}"
     ])
     error_message = "Each deploy role is assumable only from its GitHub environment in this repo."
   }
 
   assert {
     condition = alltrue([
-      for env in ["staging", "production"] :
+      for env in ["dev", "production"] :
       jsondecode(aws_iam_role.deploy[env].assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:aud"] == "sts.amazonaws.com"
     ])
     error_message = "OIDC audience is STS."

@@ -53,9 +53,9 @@ mock_provider "aws" {
 }
 
 variables {
-  environment = "staging"
+  environment = "dev"
   image_tag   = "test"
-  web_origin  = "https://staging.example.test"
+  web_origin  = "https://dev.example.test"
   sentry_dsn  = "https://key@o1.ingest.sentry.io/1"
 }
 
@@ -216,7 +216,7 @@ run "rejects_an_unknown_environment" {
   command = plan
 
   variables {
-    environment = "dev"
+    environment = "staging"
   }
 
   expect_failures = [var.environment]
@@ -239,7 +239,7 @@ run "api_and_worker_report_errors_to_sentry" {
     condition = alltrue([
       for td in [aws_ecs_task_definition.api, aws_ecs_task_definition.worker] :
       lookup({ for e in jsondecode(td.container_definitions)[0].environment : e.name => e.value }, "SENTRY_DSN", "") == "https://key@o1.ingest.sentry.io/1" &&
-      lookup({ for e in jsondecode(td.container_definitions)[0].environment : e.name => e.value }, "SENTRY_ENVIRONMENT", "") == "staging" &&
+      lookup({ for e in jsondecode(td.container_definitions)[0].environment : e.name => e.value }, "SENTRY_ENVIRONMENT", "") == "dev" &&
       lookup({ for e in jsondecode(td.container_definitions)[0].environment : e.name => e.value }, "SENTRY_RELEASE", "") == "test"
     ])
     error_message = "API and worker send errors to Sentry tagged with environment and image tag (D104)."

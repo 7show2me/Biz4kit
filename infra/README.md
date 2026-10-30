@@ -36,13 +36,13 @@ docker build -f apps/server/Dockerfile -t <ecr_repository_url>:$(git rev-parse H
 docker push <ecr_repository_url>:$(git rev-parse HEAD)
 ```
 
-## 2. An environment (staging, then production)
+## 2. An environment (dev, then production; D118)
 
 ```sh
 cd infra
-terraform init -backend-config=backend/staging.hcl -backend-config="bucket=biz4kit-tfstate-<account>"
-terraform apply -var environment=staging -var aws_profile=biz4kit \
-  -var image_tag=<sha> -var web_origin=https://<staging web origin> \
+terraform init -backend-config=backend/dev.hcl -backend-config="bucket=biz4kit-tfstate-<account>"
+terraform apply -var environment=dev -var aws_profile=biz4kit \
+  -var image_tag=<sha> -var web_origin=https://biz4kit-dev.vercel.app \
   -var sentry_dsn=<Sentry project DSN>
 ```
 
@@ -51,28 +51,28 @@ Fill in each secret once. Terraform creates the secrets empty and never holds th
 ```sh
 for name in DATABASE_URL REDIS_URL BETTER_AUTH_SECRET; do
   aws secretsmanager put-secret-value --profile biz4kit \
-    --secret-id "biz4kit/staging/$name" --secret-string "<value>"
+    --secret-id "biz4kit/dev/$name" --secret-string "<value>"
 done
 ```
 
-- `DATABASE_URL`: the Neon `dev` branch for staging (`prod` for production), pooled connection string (D105).
+- `DATABASE_URL`: the Neon `dev` branch for dev (`prod` for production), pooled connection string (D105).
 - `REDIS_URL`: the Upstash **TCP** endpoint, `rediss://…` (D29, D33), not the REST URL.
 - Polar is unwired in Phase 1 (D98): `POLAR_ACCESS_TOKEN` is optional and has no secret until WBS 5.5.
 
-Then force a new deployment: `aws ecs update-service --cluster biz4kit-staging --service api --force-new-deployment` (do the same for `worker`). Check it with `curl $(terraform output -raw api_url)/health`, which should return `{"status":"ok"}`.
+Then force a new deployment: `aws ecs update-service --cluster biz4kit-dev --service api --force-new-deployment` (do the same for `worker`). Check it with `curl $(terraform output -raw api_url)/health`, which should return `{"status":"ok"}`.
 
 ## 3. GitHub (Settings → Environments)
 
 | Environment | Variables | Secrets | Protection |
 |---|---|---|---|
-| `staging` | `AWS_DEPLOY_ROLE_ARN` (bootstrap output), `API_URL`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `STAGING_WEB_DOMAIN` (optional), `SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT` | `VERCEL_TOKEN`, `SENTRY_AUTH_TOKEN` | branch `main` |
-| `production` | the same, with production values | `VERCEL_TOKEN`, `SENTRY_AUTH_TOKEN` | tags `v*`, required reviewer: the human |
+| `dev` | `AWS_DEPLOY_ROLE_ARN` (bootstrap output), `API_URL`, `SENTRY_DSN` | none | branch `dev` |
+| `production` | the same, with production values | none | branch `main`, required reviewer: the human |
 
-The deploy roles trust only `repo:7show2me/Biz4kit:environment:<name>`. A workflow outside that environment cannot assume them.
+The deploy roles trust only `repo:7show2me@293344814/Biz4kit@1425347880:environment:<name>`: the repo uses GitHub's immutable OIDC subject (`gh api repos/7show2me/Biz4kit/actions/oidc/customization/sub`). A workflow outside that environment cannot assume them.
 
 ## 4. Neon (D4, D105, D111, D117)
 
-Project `biz4kit` (`fancy-leaf-05807484`), created 2026-10-25 in `aws-ap-southeast-1` (Singapore): Neon does not offer Mumbai to our account (D111). Long-lived branches: `prod` (the default branch, renamed from `main`), `dev` created from it, and `test` created from `dev` for local test runs (D113). The staging environment uses `dev`. Every pull request gets `preview/pr-<n>` (D105, D117), reset to a fresh copy of `dev` on each push, migrated, tested and deleted on close (`.github/workflows/database.yml`). GitHub gets `NEON_API_KEY` and `NEON_PROJECT_ID` from the Neon GitHub integration (Neon console → Integrations → GitHub). The free plan allows 10 branches per project, so about 7 PRs can be open at once.
+Project `biz4kit` (`fancy-leaf-05807484`), created 2026-10-25 in `aws-ap-southeast-1` (Singapore): Neon does not offer Mumbai to our account (D111). Long-lived branches: `prod` (the default branch, renamed from `main`), `dev` created from it, and `test` created from `dev` for local test runs (D113). The dev environment uses `dev`. Every pull request gets `preview/pr-<n>` (D105, D117), reset to a fresh copy of `dev` on each push, migrated, tested and deleted on close (`.github/workflows/database.yml`). GitHub gets `NEON_API_KEY` and `NEON_PROJECT_ID` from the Neon GitHub integration (Neon console → Integrations → GitHub). The free plan allows 10 branches per project, so about 7 PRs can be open at once.
 
 ```sh
 neonctl branches rename main prod --project-id <id>
@@ -100,7 +100,8 @@ For Vercel PR previews, add `VITE_SENTRY_DSN` and `VITE_SENTRY_ENVIRONMENT=previ
 
 ## 6. Deploys and rollback
 
-- Merging to `main` deploys staging: the API and workers to ECS, and the web app to Vercel.
-- A `v*` tag pushed by the human deploys that commit to production. The image already in ECR is reused.
-- To roll back, run **Deploy** by hand on the previous tag. ECR tags are immutable, so a tag always means the same build. ECS also rolls back on its own if a new revision fails its health check (circuit breaker).
-- Vercel's Git integration still builds PR previews. Auto-deploy from `main` is off in `vercel.json`, so production on Vercel follows tags too.
+- Branches (D118): feature PRs go into `dev`; a `dev → main` PR releases.
+- Merging to `dev` deploys dev: the API and workers to ECS (Deploy workflow), the web app to `biz4kit-dev.vercel.app` (Vercel Git build).
+- Merging to `main` deploys production: the web app at once (Vercel), the API and workers after the human approves the `production` environment in the Deploy run.
+- To roll back the API, run **Deploy** by hand on the previous commit; to roll back the web app, promote the previous deployment in Vercel. ECR tags are immutable, so a tag always means the same build. ECS also rolls back on its own if a new revision fails its health check (circuit breaker).
+- Vercel's Git integration builds every branch: `main` is the production branch, `dev` has the domain `biz4kit-dev.vercel.app`, other branches get preview links.

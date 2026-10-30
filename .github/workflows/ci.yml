@@ -35,6 +35,7 @@ jobs:
       - run: pnpm check-types
       # packages/db runs in database.yml, on the PR's own Neon branch (D117).
       - run: pnpm test --filter=!@Biz4kit/db
+      - run: pnpm test:scripts
 
   infra:
     name: Terraform

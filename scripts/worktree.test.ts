@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { planWorktree } from "./worktree.ts";
+import { planWorktree } from "./worktree.js";
 
 describe("planWorktree add", () => {
   it("puts the worktree in ../wt, named after the Linear branch", () => {

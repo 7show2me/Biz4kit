@@ -3,10 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -b ../../packages/api && vite build",
+    "build": "varlock codegen && tsc -b ../../packages/api && vite build",
     "serve": "vite preview",
     "dev": "vite dev",
-    "check-types": "tsc -b ../../packages/api && vite build && tsc --noEmit",
+    "check-types": "varlock codegen && tsc -b ../../packages/api && vite build && tsc --noEmit",
     "env:generate": "varlock codegen"
   },
   "dependencies": {

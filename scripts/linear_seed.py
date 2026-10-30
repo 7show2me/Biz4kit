@@ -292,8 +292,8 @@ def ensure_states(team_id, existing):
 
 # Workflow doc "Automation": PR opened -> In Review, checks green -> Ready to verify; only the
 # human moves to Done, so a merge into dev or main takes no action (a no-action rule needs a
-# target branch). The rules act once Linear's GitHub integration is installed.
-GIT_RULES = [("start", "In Progress"), ("draft", "In Progress"), ("review", "In Review"), ("mergeable", "Ready to verify")]
+# target branch). In Linear's API "start" is PR opened and "review" is review requested.
+GIT_RULES = [("draft", "In Progress"), ("start", "In Review"), ("review", "In Review"), ("mergeable", "Ready to verify")]
 GIT_TARGET = r"^(dev|main)$"
 
 
@@ -314,7 +314,7 @@ def ensure_git_automation(team_id, states):
             {"input": {"teamId": team_id, "branchPattern": GIT_TARGET, "isRegex": True}},
         )["gitAutomationTargetBranchCreate"]["targetBranch"]["id"]
     wanted = [(e, s, None) for e, s in GIT_RULES]
-    wanted += [(e, s, target) for e, s in GIT_RULES if e != "start"] + [("merge", None, target)]
+    wanted += [(e, s, target) for e, s in GIT_RULES] + [("merge", None, target)]
     created = 0
     for event, state, branch in wanted:
         if (event, GIT_TARGET if branch else None) in have:

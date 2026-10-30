@@ -21,9 +21,10 @@ ASK = ROOT / ".claude" / "skills" / "biz-linear-question" / "ask.py"
 
 TEAM = {"name": "Biz4Kit", "key": "BIZ", "description": "Biz4Kit build: Dev, Business and Sales & success (prep/WBS.md)"}
 
-# Added on top of Linear's defaults (Backlog, Todo, In Progress, In Review, Done, Canceled, Duplicate).
+# Added on top of Linear's defaults (Backlog, Todo, In Progress, Done, Canceled, Duplicate).
 # Statuses follow prep/Workflow & final verification.md, plus two for biz-linear-question.
 STATES = [
+    ("In Review", "started", "#0F783C"),
     ("Ready to verify", "started", "#4EA7FC"),
     ("Verifying", "started", "#BB87FC"),
     ("Blocked", "started", "#EB5757"),
@@ -275,8 +276,8 @@ def team_state(team_id):
 
 def ensure_states(team_id, existing):
     names = {s["name"]: s for s in existing}
-    review = names.get("In Review") or names.get("In Progress")
-    base = review["position"] if review else 100
+    started = names.get("In Progress")
+    base = started["position"] if started else 100
     created = 0
     for i, (name, typ, color) in enumerate(STATES, 1):
         if name in names:
@@ -284,6 +285,46 @@ def ensure_states(team_id, existing):
         gql(
             """mutation($input: WorkflowStateCreateInput!) { workflowStateCreate(input: $input) { success } }""",
             {"input": {"teamId": team_id, "name": name, "type": typ, "color": color, "position": base + i * 0.1}},
+        )
+        created += 1
+    return created
+
+
+# Workflow doc "Automation": PR opened -> In Review, checks green -> Ready to verify; only the
+# human moves to Done, so a merge into dev or main takes no action (a no-action rule needs a
+# target branch). The rules act once Linear's GitHub integration is installed.
+GIT_RULES = [("start", "In Progress"), ("draft", "In Progress"), ("review", "In Review"), ("mergeable", "Ready to verify")]
+GIT_TARGET = r"^(dev|main)$"
+
+
+def ensure_git_automation(team_id, states):
+    t = gql(
+        """query($id: String!) { team(id: $id) {
+          gitAutomationStates { nodes { event targetBranch { id branchPattern } } }
+        } }""",
+        {"id": team_id},
+    )["team"]
+    have = {(r["event"], (r["targetBranch"] or {}).get("branchPattern")) for r in t["gitAutomationStates"]["nodes"]}
+    target = next((r["targetBranch"]["id"] for r in t["gitAutomationStates"]["nodes"]
+                   if r["targetBranch"] and r["targetBranch"]["branchPattern"] == GIT_TARGET), None)
+    if target is None:
+        target = gql(
+            """mutation($input: GitAutomationTargetBranchCreateInput!) {
+              gitAutomationTargetBranchCreate(input: $input) { targetBranch { id } } }""",
+            {"input": {"teamId": team_id, "branchPattern": GIT_TARGET, "isRegex": True}},
+        )["gitAutomationTargetBranchCreate"]["targetBranch"]["id"]
+    wanted = [(e, s, None) for e, s in GIT_RULES]
+    wanted += [(e, s, target) for e, s in GIT_RULES if e != "start"] + [("merge", None, target)]
+    created = 0
+    for event, state, branch in wanted:
+        if (event, GIT_TARGET if branch else None) in have:
+            continue
+        rule = {"teamId": team_id, "event": event, "stateId": states[state] if state else None}
+        if branch:
+            rule["targetBranchId"] = branch
+        gql(
+            """mutation($input: GitAutomationStateCreateInput!) { gitAutomationStateCreate(input: $input) { success } }""",
+            {"input": rule},
         )
         created += 1
     return created
@@ -368,6 +409,7 @@ def main():
     print(f"States created: {ensure_states(team_id, t['states']['nodes'])}")
     t = team_state(team_id)
     states = {s["name"]: s["id"] for s in t["states"]["nodes"]}
+    print(f"Git automation rules created: {ensure_git_automation(team_id, states)}")
 
     wanted = (["phase:1", "phase:2", "phase:3", "team:dev", "team:business", "team:sales", "risk:high", "pii", "question"]
               + [f"area:{a}" for a in AREAS] + [f"q:{q}" for q in Q_AREAS] + [f"wbs:{r['id']}" for r in rows])

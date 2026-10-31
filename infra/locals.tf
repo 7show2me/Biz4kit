@@ -25,6 +25,8 @@ locals {
     { name = "SENTRY_DSN", value = var.sentry_dsn },
     { name = "SENTRY_ENVIRONMENT", value = var.environment },
     { name = "SENTRY_RELEASE", value = var.image_tag },
+    # Production shares dev's Redis (D121); dev keeps local's names (D112).
+    { name = "QUEUE_PREFIX", value = var.environment == "production" ? "biz4kit-production" : "bull" },
   ]
 
   secrets = [

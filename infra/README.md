@@ -12,7 +12,7 @@ Run the tests with `pnpm test:infra`. They need no AWS account.
 
 ## Not built yet
 
-- PR previews run the API as a Vercel function against the PR's Neon branch (D109). Not built yet.
+- PR previews have no API of their own for now (D126). They build against the dev API URL, which rejects them through CORS, so sign-in and data calls fail on a preview. Test API changes on `dev`.
 
 ## 1. Bootstrap (once per account)
 
@@ -56,7 +56,7 @@ done
 ```
 
 - `DATABASE_URL`: the Neon `dev` branch for dev (`prod` for production), pooled connection string (D105).
-- `REDIS_URL`: the Upstash **TCP** endpoint, `rediss://…` (D29, D33), not the REST URL.
+- `REDIS_URL`: the Upstash **TCP** endpoint, `rediss://…` (D29, D33), not the REST URL. Production uses dev's database (D121); Terraform sets its `QUEUE_PREFIX`.
 - Polar is unwired in Phase 1 (D98): `POLAR_ACCESS_TOKEN` is optional and has no secret until WBS 5.5.
 
 Then force a new deployment: `aws ecs update-service --cluster biz4kit-dev --service api --force-new-deployment` (do the same for `worker`). Check it with `curl $(terraform output -raw api_url)/health`, which should return `{"status":"ok"}`.
@@ -96,7 +96,7 @@ Free Developer plan: 5,000 errors a month, one user. Create one project for Biz4
 
 Every event passes through `@Biz4kit/monitoring` first. It drops request bodies, headers, cookies and query strings, keeps only the user id, and masks emails, phone numbers, UPI IDs, GSTINs and PANs.
 
-For Vercel PR previews, add `VITE_SENTRY_DSN` and `VITE_SENTRY_ENVIRONMENT=preview` to the Vercel project's Preview environment.
+For Vercel PR previews, add `VITE_SENTRY_DSN` and `VITE_SENTRY_ENVIRONMENT=preview` to the Vercel project's Preview environment. For web source maps, also add `SENTRY_ORG`, `SENTRY_PROJECT` and `SENTRY_AUTH_TOKEN` to Vercel.
 
 ## 6. Deploys and rollback
 

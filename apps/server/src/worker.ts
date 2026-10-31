@@ -11,6 +11,7 @@ import { DEFAULT_QUEUE, processJob } from "./queue/jobs";
 // keep an idle worker from polling Redis every few seconds.
 const worker = new Worker(DEFAULT_QUEUE, processJob, {
   connection: redisConnection(ENV.REDIS_URL),
+  prefix: ENV.QUEUE_PREFIX,
   drainDelay: 60,
   stalledInterval: 120_000,
 });
@@ -32,4 +33,4 @@ const shutdown = async () => {
 process.once("SIGTERM", shutdown);
 process.once("SIGINT", shutdown);
 
-console.log(`worker listening on queue "${DEFAULT_QUEUE}"`);
+console.log(`worker listening on queue "${ENV.QUEUE_PREFIX}:${DEFAULT_QUEUE}"`);

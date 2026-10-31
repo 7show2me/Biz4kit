@@ -255,3 +255,31 @@ run "rejects_a_sentry_dsn_that_is_not_https" {
 
   expect_failures = [var.sentry_dsn]
 }
+
+run "dev_keeps_the_queue_names_local_uses" {
+  command = plan
+
+  assert {
+    condition = alltrue([
+      for td in [aws_ecs_task_definition.api, aws_ecs_task_definition.worker] :
+      lookup({ for e in jsondecode(td.container_definitions)[0].environment : e.name => e.value }, "QUEUE_PREFIX", "") == "bull"
+    ])
+    error_message = "Dev shares queue names with local development (D112)."
+  }
+}
+
+run "production_has_its_own_queue_prefix" {
+  command = plan
+
+  variables {
+    environment = "production"
+  }
+
+  assert {
+    condition = alltrue([
+      for td in [aws_ecs_task_definition.api, aws_ecs_task_definition.worker] :
+      lookup({ for e in jsondecode(td.container_definitions)[0].environment : e.name => e.value }, "QUEUE_PREFIX", "") == "biz4kit-production"
+    ])
+    error_message = "Production shares dev's Redis, so it needs its own queue prefix (D121)."
+  }
+}

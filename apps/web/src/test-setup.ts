@@ -5,6 +5,10 @@ afterEach(() => {
   cleanup();
 });
 
+const noop = () => {
+  // jsdom does nothing here.
+};
+
 // jsdom has no matchMedia; the shadcn sidebar and next-themes read it.
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -12,10 +16,10 @@ Object.defineProperty(window, "matchMedia", {
     matches: false,
     media: query,
     onchange: null,
-    addEventListener: () => undefined,
-    removeEventListener: () => undefined,
-    addListener: () => undefined,
-    removeListener: () => undefined,
+    addEventListener: noop,
+    removeEventListener: noop,
+    addListener: noop,
+    removeListener: noop,
     dispatchEvent: () => false,
   }),
 });

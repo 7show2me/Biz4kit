@@ -1,4 +1,5 @@
 import { Toaster } from "@Biz4kit/ui/components/sonner";
+import { TooltipProvider } from "@Biz4kit/ui/components/tooltip";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
@@ -10,10 +11,9 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { createMiddleware } from "@tanstack/react-start";
 import { evlogErrorHandler } from "evlog/nitro/v3";
+import { ThemeProvider } from "next-themes";
 
 import type { orpc } from "@/utils/orpc";
-
-import Header from "../components/header";
 
 import appCss from "../index.css?url";
 
@@ -64,16 +64,22 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 function RootDocument() {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
       <body>
-        <div className="flex h-svh flex-col">
-          <Header />
-          <Outlet />
-        </div>
-        <Toaster richColors />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          disableTransitionOnChange
+          enableSystem
+        >
+          <TooltipProvider>
+            <Outlet />
+          </TooltipProvider>
+          <Toaster richColors />
+        </ThemeProvider>
         <TanStackRouterDevtools position="bottom-left" />
         <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
         <Scripts />

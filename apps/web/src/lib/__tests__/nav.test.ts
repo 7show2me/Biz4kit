@@ -89,7 +89,7 @@ describe("Lite mode (D63)", () => {
       role: "staff",
       modules: DEFAULT_MODULES,
     });
-    expect(names(sections)).not.toContain("Schedule");
+    expect(names(sections)).toEqual(["Home", "Sales", "Schedule"]);
   });
 });
 

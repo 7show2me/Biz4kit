@@ -44,3 +44,10 @@ declare module "@tanstack/react-router" {
     router: ReturnType<typeof getRouter>;
   }
 }
+
+declare module "@tanstack/react-router" {
+  // The screen (lib/screens.ts) a route shows; the workspace shell reads it to mark the current page.
+  interface StaticDataRouteOption {
+    screen?: string;
+  }
+}

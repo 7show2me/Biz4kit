@@ -84,7 +84,7 @@ describe("AppShell", () => {
     await renderShell();
     const nav = screen.getByRole("navigation", { name: "Workspace" });
     const labels = within(nav)
-      .getAllByRole("group")
+      .getAllByRole("region")
       .map((g) => g.getAttribute("aria-label"));
     expect(labels.slice(0, 5)).toEqual([
       "Home",
@@ -98,7 +98,7 @@ describe("AppShell", () => {
   it("shows Settings as its own item, outside every section (D83)", async () => {
     await renderShell();
     const nav = screen.getByRole("navigation", { name: "Workspace" });
-    for (const group of within(nav).getAllByRole("group")) {
+    for (const group of within(nav).getAllByRole("region")) {
       if (group.getAttribute("aria-label") !== "Settings") {
         expect(
           within(group).queryByRole("link", { name: "Settings" })

@@ -1,8 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { StubScreen } from "@/components/stub-screen";
+import { InvitePage } from "@/components/auth/invite-page";
 
 export const Route = createFileRoute("/invite/$token")({
-  component: () => <StubScreen id="invite" />,
+  component: InviteWithToken,
   staticData: { screen: "invite" },
 });
+
+function InviteWithToken() {
+  const { token } = Route.useParams();
+  return <InvitePage initialCode={token} />;
+}

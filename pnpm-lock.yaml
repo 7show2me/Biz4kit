@@ -495,6 +495,9 @@ importers:
       '@Biz4kit/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@Biz4kit/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@Biz4kit/monitoring':
         specifier: workspace:*
         version: link:../../packages/monitoring

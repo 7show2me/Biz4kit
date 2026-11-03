@@ -1,5 +1,5 @@
 import { BrandMark } from "@Biz4kit/ui/components/brand-mark";
-import { Button } from "@Biz4kit/ui/components/button";
+import { buttonVariants } from "@Biz4kit/ui/components/button";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -18,9 +18,9 @@ function MarketingPage() {
           <BrandMark className="h-5" />
         </span>
         <nav aria-label="Site" className="ml-auto flex items-center gap-2">
-          <Button render={<Link to="/login" />} variant="outline">
+          <Link className={buttonVariants({ variant: "outline" })} to="/login">
             Sign in
-          </Button>
+          </Link>
         </nav>
       </header>
       <main className="tab:px-page mx-auto w-full max-w-5xl flex-1 px-4 py-10">

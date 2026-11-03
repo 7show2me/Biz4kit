@@ -2,6 +2,8 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { renderInRouter } from "@/test-utils";
+
 import { DeviceList } from "../device-list";
 import type { DeviceRow } from "../device-list";
 import { InviteAcceptView } from "../invite-accept-view";
@@ -12,20 +14,20 @@ import { TransferOwnership } from "../transfer-ownership";
 describe("SignInView", () => {
   it("offers Continue with Google and calls the handler", async () => {
     const onGoogle = vi.fn();
-    render(<SignInView onGoogle={onGoogle} />);
+    await renderInRouter(<SignInView onGoogle={onGoogle} />);
     await userEvent.click(
       screen.getByRole("button", { name: "Continue with Google" })
     );
     expect(onGoogle).toHaveBeenCalledTimes(1);
   });
 
-  it("is Google only: no password field (locked screen, D94)", () => {
-    render(<SignInView onGoogle={vi.fn()} />);
+  it("is Google only: no password field (locked screen, D94)", async () => {
+    await renderInRouter(<SignInView onGoogle={vi.fn()} />);
     expect(screen.queryByLabelText(/password/iu)).toBeNull();
   });
 
-  it("has the invite code and new business links", () => {
-    render(<SignInView onGoogle={vi.fn()} />);
+  it("has the invite code and new business links", async () => {
+    await renderInRouter(<SignInView onGoogle={vi.fn()} />);
     expect(
       screen.getByRole("link", { name: "I have an invite code" })
     ).toBeTruthy();
@@ -34,15 +36,17 @@ describe("SignInView", () => {
     ).toBeTruthy();
   });
 
-  it("disables the button while signing in", () => {
-    render(<SignInView onGoogle={vi.fn()} pending />);
+  it("disables the button while signing in", async () => {
+    await renderInRouter(<SignInView onGoogle={vi.fn()} pending />);
     expect(
       screen.getByRole("button", { name: "Continue with Google" })
     ).toHaveProperty("disabled", true);
   });
 
-  it("says when Google sign-in is not set up", () => {
-    render(<SignInView googleEnabled={false} onGoogle={vi.fn()} />);
+  it("says when Google sign-in is not set up", async () => {
+    await renderInRouter(
+      <SignInView googleEnabled={false} onGoogle={vi.fn()} />
+    );
     expect(screen.getByText(/not set up/iu)).toBeTruthy();
     expect(
       screen.getByRole("button", { name: "Continue with Google" })
@@ -53,7 +57,7 @@ describe("SignInView", () => {
 describe("InviteAcceptView", () => {
   it("sends the trimmed code", async () => {
     const onSubmit = vi.fn();
-    render(<InviteAcceptView onSubmit={onSubmit} />);
+    await renderInRouter(<InviteAcceptView onSubmit={onSubmit} />);
     await userEvent.type(screen.getByLabelText("Invite code"), "  AB12  ");
     await userEvent.click(
       screen.getByRole("button", { name: "Join workspace" })
@@ -63,7 +67,7 @@ describe("InviteAcceptView", () => {
 
   it("does not send an empty code", async () => {
     const onSubmit = vi.fn();
-    render(<InviteAcceptView onSubmit={onSubmit} />);
+    await renderInRouter(<InviteAcceptView onSubmit={onSubmit} />);
     await userEvent.click(
       screen.getByRole("button", { name: "Join workspace" })
     );
@@ -71,13 +75,17 @@ describe("InviteAcceptView", () => {
     expect(screen.getByRole("alert").textContent).toMatch(/enter/iu);
   });
 
-  it("prefills the code from the link", () => {
-    render(<InviteAcceptView initialCode="XYZ" onSubmit={vi.fn()} />);
+  it("prefills the code from the link", async () => {
+    await renderInRouter(
+      <InviteAcceptView initialCode="XYZ" onSubmit={vi.fn()} />
+    );
     expect(screen.getByLabelText("Invite code")).toHaveProperty("value", "XYZ");
   });
 
-  it("shows an error from the server", () => {
-    render(<InviteAcceptView error="Code not found." onSubmit={vi.fn()} />);
+  it("shows an error from the server", async () => {
+    await renderInRouter(
+      <InviteAcceptView error="Code not found." onSubmit={vi.fn()} />
+    );
     expect(screen.getByRole("alert").textContent).toBe("Code not found.");
   });
 });

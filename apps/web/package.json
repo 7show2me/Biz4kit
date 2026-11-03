@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@Biz4kit/api": "workspace:*",
+    "@Biz4kit/auth": "workspace:*",
     "@Biz4kit/monitoring": "workspace:*",
     "@Biz4kit/ui": "workspace:*",
     "@orpc/client": "catalog:",

@@ -6,8 +6,11 @@ import { polar, checkout, portal } from "@polar-sh/better-auth";
 import { betterAuth } from "better-auth";
 
 import { createPolarClient } from "./lib/payments";
+import { REAUTH_MAX_AGE_SECONDS } from "./session-policy";
+import { socialProviders } from "./social";
+import type { GoogleKeys } from "./social";
 
-export interface AuthConfig {
+export interface AuthConfig extends GoogleKeys {
   BETTER_AUTH_URL: string;
   BETTER_AUTH_SECRET: string;
   CORS_ORIGIN: string;
@@ -55,6 +58,8 @@ export function createAuth(
       "http://localhost:8081",
     ],
     emailAndPassword: { enabled: true },
+    session: { freshAge: REAUTH_MAX_AGE_SECONDS },
+    socialProviders: socialProviders(env),
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
     advanced: {

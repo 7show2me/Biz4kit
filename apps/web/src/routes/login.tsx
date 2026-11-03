@@ -1,19 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 
-import SignInForm from "@/components/sign-in-form";
-import SignUpForm from "@/components/sign-up-form";
+import { SignInView } from "@/components/auth/sign-in-view";
+import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/login")({
-  component: RouteComponent,
+  component: LoginPage,
+  staticData: { screen: "login" },
 });
 
-function RouteComponent() {
-  const [showSignIn, setShowSignIn] = useState(false);
+function LoginPage() {
+  const [pending, setPending] = useState(false);
 
-  return showSignIn ? (
-    <SignInForm onSwitchToSignUp={() => setShowSignIn(false)} />
-  ) : (
-    <SignUpForm onSwitchToSignIn={() => setShowSignIn(true)} />
-  );
+  const signInWithGoogle = async () => {
+    setPending(true);
+    // Where a signed-in user lands is decided once workspaces exist (WBS 1.4).
+    const { error } = await authClient.signIn.social({
+      callbackURL: `${window.location.origin}/`,
+      provider: "google",
+    });
+    if (error) {
+      setPending(false);
+      toast.error(error.message ?? "Google sign-in failed.");
+    }
+  };
+
+  return <SignInView onGoogle={signInWithGoogle} pending={pending} />;
 }

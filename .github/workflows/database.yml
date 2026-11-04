@@ -1,4 +1,4 @@
-# A Neon branch per pull request (D105, D117), reset to a fresh copy of dev on
+# A Neon branch per pull request (D105, D117), recreated as a fresh copy of dev on
 # every push and deleted when the PR closes. Migrations run on it, then the RLS
 # cross-tenant suite and the data rules (packages/db). NEON_API_KEY and
 # NEON_PROJECT_ID come from the Neon GitHub integration. Dev holds generated
@@ -37,11 +37,12 @@ jobs:
       - name: Fresh PR branch from dev
         run: |
           neon() { npx -y neonctl@8.8.0 --project-id "$NEON_PROJECT_ID" "$@"; }
+          # Recreate from dev, not `reset --parent`: a branch's parent can change
+          # (a restore of dev makes its backup the parent of dev's children).
           if neon branches get "$BRANCH" > /dev/null 2>&1; then
-            neon branches reset "$BRANCH" --parent
-          else
-            neon branches create --name "$BRANCH" --parent dev
+            neon branches delete "$BRANCH"
           fi
+          neon branches create --name "$BRANCH" --parent dev
           url=$(neon connection-string "$BRANCH" --pooled --role-name neondb_owner --database-name neondb)
           echo "::add-mask::$url"
           echo "DATABASE_MIGRATION_URL=$url" >> "$GITHUB_ENV"

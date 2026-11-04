@@ -20,6 +20,8 @@ import { ENV } from "./env.server";
 import "./instrument";
 import { health } from "./health";
 import { auth } from "./services";
+import { createSmoke } from "./smoke";
+import { createSmokeProbes } from "./smoke-probes";
 
 initLogger({
   env: { service: "Biz4kit-server" },
@@ -34,6 +36,18 @@ const app = new Hono<EvlogVariables>();
 
 // Before logging and auth: the health check runs every few seconds.
 app.route("/", health);
+
+// Test-only routes for the post-deploy smoke test: off without SMOKE_SECRET.
+if (ENV.SMOKE_SECRET) {
+  app.route(
+    "/",
+    createSmoke({
+      secret: ENV.SMOKE_SECRET,
+      environment: ENV.SENTRY_ENVIRONMENT,
+      probes: createSmokeProbes(),
+    })
+  );
+}
 
 app.use(
   evlog({

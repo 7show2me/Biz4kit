@@ -16,7 +16,16 @@ locals {
   image    = "${data.aws_ecr_repository.api.repository_url}:${var.image_tag}"
 
   # Values are set by a person with the AWS CLI, never in Terraform (README).
-  secret_names = ["DATABASE_URL", "REDIS_URL", "BETTER_AUTH_SECRET"]
+  base_secret_names = ["DATABASE_URL", "REDIS_URL", "BETTER_AUTH_SECRET"]
+
+  # Dev only: Google sign-in, Resend, and the post-deploy smoke test. Production
+  # gets none, so the /__smoke routes stay off there.
+  extra_secret_names = var.environment == "dev" ? ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "RESEND_API_KEY", "SMOKE_SECRET"] : []
+
+  secret_names = concat(local.base_secret_names, local.extra_secret_names)
+
+  # Only secrets that already hold a value may be in a task, or it fails to start.
+  task_secret_names = concat(local.base_secret_names, var.wire_extra_secrets ? local.extra_secret_names : [])
 
   environment = [
     { name = "NODE_ENV", value = "production" },
@@ -30,7 +39,7 @@ locals {
   ]
 
   secrets = [
-    for name in local.secret_names :
+    for name in local.task_secret_names :
     { name = name, valueFrom = aws_secretsmanager_secret.server[name].arn }
   ]
 

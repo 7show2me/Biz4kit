@@ -35,6 +35,7 @@
     "check": "ultracite check",
     "fix": "ultracite fix",
     "test": "turbo run test",
+    "drill:neon-restore": "tsx scripts/neon-restore-drill.ts",
     "test:scripts": "tsx --test scripts/*.test.ts",
     "worktree": "tsx scripts/worktree.ts",
     "test:infra": "terraform -chdir=infra init -backend=false -input=false && terraform -chdir=infra test && terraform -chdir=infra/bootstrap init -backend=false -input=false && terraform -chdir=infra/bootstrap test",

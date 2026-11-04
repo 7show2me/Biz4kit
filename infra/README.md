@@ -65,7 +65,8 @@ done
    ```sh
    terraform apply -var environment=dev -var aws_profile=biz4kit -var image_tag=<sha>      -var web_origin=https://biz4kit-dev.vercel.app -var sentry_dsn=<DSN>      -target='aws_secretsmanager_secret.server' -target=aws_iam_role_policy.task_execution_secrets
    ```
-2. Fill each one with `aws secretsmanager put-secret-value` (the Google pair is in the `wave-a-shell-auth` worktree's `apps/server/.env.local`; `SMOKE_SECRET` matches the GitHub `dev` secret of the same name). Then apply again with `-var wire_extra_secrets=true` and force a new deployment.
+2. Fill each one with `aws secretsmanager put-secret-value` (the Google pair is in the `wave-a-shell-auth` worktree's `apps/server/.env.local`; `SMOKE_SECRET` matches the GitHub `dev` secret of the same name).
+3. Wire them into the tasks. **Do not use `wire_extra_secrets=true` with Terraform yet:** even a targeted plan pulls in the Cloud Map replacement (Known drift below). Instead register new task revisions with the four extra `secrets` entries added (`aws ecs describe-task-definition`, edit, `register-task-definition`, `update-service`). The Deploy workflow renders from the latest revision, so later deploys keep them. Once the drift is fixed, `wire_extra_secrets=true` brings Terraform back in line.
 
 Google redirect URI to register in the Google console: `<API_URL>/api/auth/callback/google`. The API reads no Google or Resend value yet; the auth provider and email adapter land with their WBS packages.
 

@@ -59,20 +59,33 @@ done
 - `REDIS_URL`: the Upstash **TCP** endpoint, `rediss://…` (D29, D33), not the REST URL. Production uses dev's database (D121); Terraform sets its `QUEUE_PREFIX`.
 - Polar is unwired in Phase 1 (D98): `POLAR_ACCESS_TOKEN` is optional and has no secret until WBS 5.5.
 
+**Dev-only secrets (Google sign-in, Resend, smoke test).** `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY` and `SMOKE_SECRET` exist only in `dev`; production gets none, so the `/__smoke` routes can never run there. Two steps, so a task never points at a secret with no value (it would fail to start):
+
+1. Create them empty. A targeted plan touches only the four secrets and one IAM policy; a full plan also shows an old Cloud Map replacement (see Known drift):
+   ```sh
+   terraform apply -var environment=dev -var aws_profile=biz4kit -var image_tag=<sha>      -var web_origin=https://biz4kit-dev.vercel.app -var sentry_dsn=<DSN>      -target='aws_secretsmanager_secret.server' -target=aws_iam_role_policy.task_execution_secrets
+   ```
+2. Fill each one with `aws secretsmanager put-secret-value` (the Google pair is in the `wave-a-shell-auth` worktree's `apps/server/.env.local`; `SMOKE_SECRET` matches the GitHub `dev` secret of the same name).
+3. Wire them into the tasks. **Do not use `wire_extra_secrets=true` with Terraform yet:** even a targeted plan pulls in the Cloud Map replacement (Known drift below). Instead register new task revisions with the four extra `secrets` entries added (`aws ecs describe-task-definition`, edit, `register-task-definition`, `update-service`). The Deploy workflow renders from the latest revision, so later deploys keep them. Once the drift is fixed, `wire_extra_secrets=true` brings Terraform back in line.
+
+Google redirect URI to register in the Google console: `<API_URL>/api/auth/callback/google`. The API reads no Google or Resend value yet; the auth provider and email adapter land with their WBS packages.
+
+**Known drift (not from this change).** A full `terraform plan` on dev replaces `aws_service_discovery_service.api` (the provider now wants `health_check_custom_config {}` removed or added), which also updates the API Gateway integration and the ECS service registry. Fix the drift on its own before a full apply.
+
 Then force a new deployment: `aws ecs update-service --cluster biz4kit-dev --service api --force-new-deployment` (do the same for `worker`). Check it with `curl $(terraform output -raw api_url)/health`, which should return `{"status":"ok"}`.
 
 ## 3. GitHub (Settings → Environments)
 
 | Environment | Variables | Secrets | Protection |
 |---|---|---|---|
-| `dev` | `AWS_DEPLOY_ROLE_ARN` (bootstrap output), `API_URL`, `SENTRY_DSN` | none | branch `dev` |
+| `dev` | `AWS_DEPLOY_ROLE_ARN` (bootstrap output), `API_URL`, `SENTRY_DSN` | `SMOKE_SECRET`, `VERCEL_AUTOMATION_BYPASS_SECRET` (the smoke test) | branch `dev` |
 | `production` | the same, with production values | none | branch `main`, required reviewer: the human |
 
 The deploy roles trust only `repo:7show2me@293344814/Biz4kit@1425347880:environment:<name>`: the repo uses GitHub's immutable OIDC subject (`gh api repos/7show2me/Biz4kit/actions/oidc/customization/sub`). A workflow outside that environment cannot assume them.
 
 ## 4. Neon (D4, D105, D111, D117)
 
-Project `biz4kit` (`fancy-leaf-05807484`), created 2026-10-25 in `aws-ap-southeast-1` (Singapore): Neon does not offer Mumbai to our account (D111). Long-lived branches: `prod` (the default branch, renamed from `main`), `dev` created from it, and `test` created from `dev` for local test runs (D113). The dev environment uses `dev`. Every pull request gets `preview/pr-<n>` (D105, D117), reset to a fresh copy of `dev` on each push, migrated, tested and deleted on close (`.github/workflows/database.yml`). GitHub gets `NEON_API_KEY` and `NEON_PROJECT_ID` from the Neon GitHub integration (Neon console → Integrations → GitHub). The free plan allows 10 branches per project, so about 7 PRs can be open at once.
+Project `biz4kit` (`fancy-leaf-05807484`), created 2026-10-25 in `aws-ap-southeast-1` (Singapore): Neon does not offer Mumbai to our account (D111). Long-lived branches: `prod` (the default branch, renamed from `main`), `dev` created from it, and `test` created from `dev` for local test runs (D113). The dev environment uses `dev`. Every pull request gets `preview/pr-<n>` (D105, D117), recreated as a fresh copy of `dev` on each push, migrated, tested and deleted on close (`.github/workflows/database.yml`). GitHub gets `NEON_API_KEY` and `NEON_PROJECT_ID` from the Neon GitHub integration (Neon console → Integrations → GitHub). The free plan allows 10 branches per project, so about 7 PRs can be open at once.
 
 ```sh
 neonctl branches rename main prod --project-id <id>
@@ -82,15 +95,37 @@ neonctl branches create --project-id <id> --name dev --parent prod
 **Restore drill (the WBS 1.1 check; day 8 and monthly after, logged in Linear):**
 
 ```sh
-# Restore dev to how it was 1 hour ago; the pre-restore state is kept as a backup branch.
-# The free plan keeps 6 hours of history, so the restore point must be inside that.
-neonctl branches restore dev ^self@$(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%SZ) \
-  --project-id <id> --preserve-under-name dev-before-restore
+pnpm drill:neon-restore            # dry run, changes nothing
+pnpm drill:neon-restore -- --yes   # about 2 minutes
 ```
 
-Confirm a row written after that time is gone, then delete `dev-before-restore`.
+It branches `dev` into `drill/restore-<time>`, writes a row, waits, writes a second row, restores the branch to the moment between them, checks the second row is gone, and deletes the drill branches. It refuses any branch that is not `drill/*`, so it can never touch `prod`. Needs `neonctl` signed in.
+
+Why not restore `dev` itself: Neon needs a backup branch for a restore to the branch's own past, and that backup becomes the **parent** of the restored branch and of its children (`test`, the PR branches). It cannot be deleted while they exist. This happened once on 2026-11-04 (`dev-before-restore` is now the parent of `dev`, `test` and `preview/pr-12`; it holds the same data and can stay). If you ever must restore `dev` for real, use a point inside the 6-hour history window:
+
+```sh
+neonctl branches restore dev "^self@<UTC time, for example 2026-11-04T08:00:00Z>"   --project-id fancy-leaf-05807484 --preserve-under-name dev-before-restore
+```
+
+Time notes: Neon checks the time against its control plane and rejects a future time; the database clock runs about 15 seconds ahead of it, so leave a margin when you pick the point. PR branches are recreated from `dev` on every push (`database.yml`) for the same reason: `reset --parent` follows the parent, which can change.
+
+## Smoke test (dev)
+
+`pnpm --filter @Biz4kit/smoke smoke` runs five checks against the deployed dev stack. The Deploy workflow runs it after every dev deploy (job `smoke`) and fails the run if one fails. Inputs: `API_URL`, `SMOKE_SECRET`, `VERCEL_AUTOMATION_BYPASS_SECRET` (dev previews sit behind Vercel sign-in; the bypass sets a cookie for the browser run), optional `WEB_URL`.
+
+| # | Check |
+|---|---|
+| 1 | The web page loads (200) with no console error |
+| 2 | API `/health` answers ok |
+| 3 | The browser calls the API from the web origin with no CORS error |
+| 4 | `POST /__smoke/db`: the API reads Neon as `biz4kit_app`, no bypass, RLS shows 0 workspaces |
+| 5 | `POST /__smoke/queue`: a `ping` job is queued and the worker finishes it |
+
+The `/__smoke/*` routes are off unless `SMOKE_SECRET` is set (dev only, Terraform), off when `SENTRY_ENVIRONMENT` is `production`, and need the `x-smoke-secret` header. They return counts and role names only.
 
 ## 5. Sentry (D104)
+
+**Paused until after launch (owner, 2026-11-04):** no Sentry auth token, source maps or Sentry check in the smoke test. Two facts for when it resumes: the dev web build sends no errors because Vercel builds through Turborepo and `turbo.json` `globalEnv` lists neither `VITE_SENTRY_*` nor `SENTRY_*` (Turborepo drops unlisted variables, so the bundle has `dsn: undefined`); and `SENTRY_AUTH_TOKEN` belongs in `globalPassThroughEnv`. The Sentry slug is `biz4kit-sen` (org `biz4kit`, region de).
 
 Free Developer plan: 5,000 errors a month, one user. Create one project for Biz4Kit and copy its DSN. No Sentry CLI is needed: the API and workers read `SENTRY_DSN` from the task definition, and the web build uploads source maps through the Vite plugin when `SENTRY_AUTH_TOKEN` is set. An empty DSN turns reporting off, which is how local dev and CI run.
 
@@ -105,3 +140,14 @@ For Vercel PR previews, add `VITE_SENTRY_DSN` and `VITE_SENTRY_ENVIRONMENT=previ
 - Merging to `main` deploys production: the web app at once (Vercel), the API and workers after the human approves the `production` environment in the Deploy run.
 - To roll back the API, run **Deploy** by hand on the previous commit; to roll back the web app, promote the previous deployment in Vercel. ECR tags are immutable, so a tag always means the same build. ECS also rolls back on its own if a new revision fails its health check (circuit breaker).
 - Vercel's Git integration builds every branch: `main` is the production branch, `dev` has the domain `biz4kit-dev.vercel.app`, other branches get preview links.
+
+## 7. Vercel variables (project `biz4kit`)
+
+| Variable | Targets | Why |
+|---|---|---|
+| `VITE_SERVER_URL` | Development, Preview (all branches), Preview (branch `dev`) | The web build needs the API URL (required). **Production has none yet**: set it to the production API URL before the first `main` deploy, or that build fails. |
+| `VITE_SENTRY_DSN`, `VITE_SENTRY_ENVIRONMENT` | Development, Preview, Production; Preview on branch `dev` = `dev` | Browser reporting (paused, see Sentry) |
+| `DATABASE_URL`, `DATABASE_MIGRATION_URL`, `TEST_DATABASE_URL`, `TEST_DATABASE_MIGRATION_URL`, `REDIS_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `CORS_ORIGIN`, `SENTRY_DSN`, `SENTRY_ENVIRONMENT` | **Development only, on purpose** | Local development pulls them with `pnpm env:pull` (D112). The deployed web app is a static client plus SSR that talks to the API; the API and workers get their values from AWS Secrets Manager and the ECS task. Preview and Production builds must not hold database or queue URLs. |
+
+Dev previews are protected by Vercel sign-in; the project has one Protection Bypass for Automation secret, copied into GitHub env `dev` as `VERCEL_AUTOMATION_BYPASS_SECRET`.
+

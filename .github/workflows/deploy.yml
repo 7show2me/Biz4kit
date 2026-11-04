@@ -111,3 +111,28 @@ jobs:
         run: |
           curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors \
             "${{ vars.API_URL }}/health"
+
+  # After every dev deploy: the live stack must still work end to end (web,
+  # API, CORS, Neon through the app role, queue and worker, Sentry). A failure
+  # fails the run. Production has no smoke routes (SMOKE_SECRET is dev only).
+  smoke:
+    name: Smoke test (dev)
+    needs: [target, api]
+    if: needs.target.outputs.environment == 'dev'
+    runs-on: ubuntu-latest
+    environment: dev
+    timeout-minutes: 15
+    env:
+      API_URL: ${{ vars.API_URL }}
+      SMOKE_SECRET: ${{ secrets.SMOKE_SECRET }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @Biz4kit/smoke exec playwright install --with-deps chromium
+      - run: pnpm --filter @Biz4kit/smoke smoke

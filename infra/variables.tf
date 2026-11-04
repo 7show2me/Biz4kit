@@ -86,3 +86,11 @@ variable "worker_memory" {
   type        = number
   default     = 512
 }
+
+variable "wire_extra_secrets" {
+  # Dev only. Step 1: leave false, apply (secrets are created empty), fill them
+  # with `aws secretsmanager put-secret-value`. Step 2: set true and apply again.
+  description = "Inject the dev-only secrets into the API and worker tasks. Set true only after each has a value."
+  type        = bool
+  default     = false
+}

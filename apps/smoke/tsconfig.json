@@ -1,0 +1,5 @@
+{
+  "extends": "@Biz4kit/config/tsconfig.base.json",
+  "compilerOptions": { "noEmit": true },
+  "include": ["src", "*.ts"]
+}

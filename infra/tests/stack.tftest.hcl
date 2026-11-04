@@ -283,3 +283,59 @@ run "production_has_its_own_queue_prefix" {
     error_message = "Production shares dev's Redis, so it needs its own queue prefix (D121)."
   }
 }
+
+# Dev-only secrets (Google sign-in, Resend, the smoke test). Two steps, so a task
+# never points at a secret that has no value yet: apply creates them empty, a
+# person fills them, then wire_extra_secrets = true puts them in the task.
+run "dev_creates_the_extra_secrets_but_does_not_wire_them_yet" {
+  command = plan
+
+  assert {
+    condition = alltrue([
+      for name in ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "RESEND_API_KEY", "SMOKE_SECRET"] :
+      contains(keys(aws_secretsmanager_secret.server), name)
+    ])
+    error_message = "Dev has a secret for each extra name."
+  }
+
+  assert {
+    condition = alltrue([
+      for td in [aws_ecs_task_definition.api, aws_ecs_task_definition.worker] :
+      !contains([for s in jsondecode(td.container_definitions)[0].secrets : s.name], "SMOKE_SECRET")
+    ])
+    error_message = "A secret with no value is not in the task until wire_extra_secrets is true."
+  }
+}
+
+run "dev_wires_the_extra_secrets_once_filled" {
+  command = plan
+
+  variables {
+    wire_extra_secrets = true
+  }
+
+  assert {
+    condition = alltrue([
+      for name in ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "RESEND_API_KEY", "SMOKE_SECRET"] :
+      contains([for s in jsondecode(aws_ecs_task_definition.api.container_definitions)[0].secrets : s.name], name)
+    ])
+    error_message = "The API gets the extra secrets."
+  }
+}
+
+run "production_has_no_extra_secrets_and_no_smoke_routes" {
+  command = plan
+
+  variables {
+    environment        = "production"
+    wire_extra_secrets = true
+  }
+
+  assert {
+    condition = length([
+      for k in keys(aws_secretsmanager_secret.server) : k
+      if contains(["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "RESEND_API_KEY", "SMOKE_SECRET"], k)
+    ]) == 0
+    error_message = "Production gets none of the dev-only secrets (the smoke routes must stay off there)."
+  }
+}
